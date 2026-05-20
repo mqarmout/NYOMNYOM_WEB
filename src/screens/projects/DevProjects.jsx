@@ -330,6 +330,7 @@ export default function DevProjects() {
           tasks={kanbanTasks}
           projects={projects}
           onAdd={addKanbanTask}
+          onUpdate={updateKanbanTask}
           onMove={handleKanbanMove}
           onDelete={deleteKanbanTask}
           onClose={() => setBoardProject(null)}

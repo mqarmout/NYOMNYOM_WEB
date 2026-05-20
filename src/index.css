@@ -1799,6 +1799,13 @@ html::after {
 .kb-card:hover { border-color: rgba(0,255,65,0.3); box-shadow: 0 0 8px rgba(0,255,65,0.08); }
 .kb-card:active { cursor: grabbing; opacity: 0.7; }
 
+.kb-delete-btn {
+  background: none; border: none; cursor: pointer; padding: 3px 4px;
+  color: rgba(255,255,255,0.35); font-size: 12px; flex-shrink: 0;
+  border-radius: 0; transition: color 0.1s;
+}
+.kb-delete-btn:hover { color: var(--danger); }
+
 .kb-card-top {
   display: flex;
   align-items: flex-start;

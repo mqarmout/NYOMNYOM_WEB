@@ -8,7 +8,7 @@ export default function KanbanScreen() {
 
   const filtered = projectFilter === 'all'
     ? kanbanTasks
-    : kanbanTasks.filter(t => String(t.project_id) === projectFilter);
+    : kanbanTasks.filter(t => (t.project_ids || []).includes(Number(projectFilter)));
 
   const handleMove = async (taskId, newStatus) => {
     const task = kanbanTasks.find(t => t.id === taskId);
@@ -20,8 +20,7 @@ export default function KanbanScreen() {
   };
 
   const handleAdd = async (fields) => {
-    const projectId = projectFilter !== 'all' ? Number(projectFilter) : (fields.project_id ?? null);
-    await addKanbanTask({ ...fields, project_id: projectId });
+    await addKanbanTask(fields);
   };
 
   const inProgress = kanbanTasks.filter(t => t.status === 'in_progress').length;
@@ -63,9 +62,10 @@ export default function KanbanScreen() {
         projects={projects}
         showProject={projectFilter === 'all'}
         onAdd={handleAdd}
+        onUpdate={updateKanbanTask}
         onMove={handleMove}
         onDelete={deleteKanbanTask}
-        defaultProjectId={projectFilter !== 'all' ? Number(projectFilter) : null}
+        defaultProjectIds={projectFilter !== 'all' ? [Number(projectFilter)] : []}
       />
     </div>
   );
