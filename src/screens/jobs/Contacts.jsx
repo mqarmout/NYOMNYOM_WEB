@@ -80,11 +80,14 @@ export default function Contacts() {
 
   useEffect(() => { loadAll(); }, [loadAll]);
 
+  const jobsRef = useRef(jobs);
+  useEffect(() => { jobsRef.current = jobs; }, [jobs]);
+
   useEffect(() => {
-    const handler = () => { if (jobs.length > 0) setModal({ mode: 'add' }); };
+    const handler = () => { if (jobsRef.current.length > 0) setModal({ mode: 'add' }); };
     window.addEventListener('shortcut:new', handler);
     return () => window.removeEventListener('shortcut:new', handler);
-  }, [jobs.length]);
+  }, []);
 
   const filtered = search.trim()
     ? contacts.filter(c =>

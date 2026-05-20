@@ -184,6 +184,7 @@ const COMMANDS = [
   { cmd: 'projects/new',            screen: 'projects-tracker',     fire: true,  label: 'Projects → New Project' },
   { cmd: 'projects/board',          screen: 'projects-board',       fire: false, label: 'Projects → Board' },
   { cmd: 'projects/board/new',      screen: 'projects-board',       fire: true,  label: 'Projects → Add Task' },
+  { cmd: 'profile',                 screen: 'profile',              fire: false, label: 'Profile' },
 ];
 
 function TerminalLauncher({ onNavigate, onClose }) {
@@ -331,226 +332,215 @@ function Toasts() {
 }
 
 function MapSidebar() {
-  const { expenses, categories, profile }       = useApp();
-  const { jobs }                                = useJob();
-  const { metrics, history, workouts }          = useFitness();
-  const { projects, skills, experience }        = usePortfolio();
-  const { climbs }                              = useClimbing();
-  const { projects: devProjects, kanbanTasks }  = useDevProjects();
+  const { expenses, categories, profile }      = useApp();
+  const { jobs }                               = useJob();
+  const { metrics, history, workouts }         = useFitness();
+  const { climbs }                             = useClimbing();
+  const { projects: devProjects, kanbanTasks } = useDevProjects();
 
   const currency = profile.currency || '$';
+  const mo       = new Date().toISOString().slice(0, 7);
+  const fmtAmt   = n => n >= 1000 ? `${(n / 1000).toFixed(1)}k` : n.toFixed(0);
 
   // ── Spending ─────────────────────────────────────────────────
-  const totalSpent  = expenses.reduce((s, e) => s + e.amount, 0);
-  const totalBudget = categories.reduce((s, c) => s + (c.budget || 0), 0);
-  const catSpend = {};
-  expenses.forEach(e => { if (e.category_id) catSpend[e.category_id] = (catSpend[e.category_id] || 0) + e.amount; });
+  const thisMonthExp  = expenses.filter(e => e.date?.startsWith(mo));
+  const totalSpent    = thisMonthExp.reduce((s, e) => s + e.amount, 0);
+  const totalBudget   = categories.reduce((s, c) => s + (c.budget || 0), 0);
+  const budgetPct     = totalBudget > 0 ? Math.min(100, totalSpent / totalBudget * 100) : 0;
+  const catSpend      = {};
+  thisMonthExp.forEach(e => { if (e.category_id) catSpend[e.category_id] = (catSpend[e.category_id] || 0) + e.amount; });
   const topCats = Object.entries(catSpend)
     .map(([id, amt]) => ({ cat: categories.find(c => c.id === +id), amt }))
-    .filter(x => x.cat).sort((a, b) => b.amt - a.amt).slice(0, 3);
+    .filter(x => x.cat).sort((a, b) => b.amt - a.amt).slice(0, 4);
   const maxCatAmt = topCats[0]?.amt || 1;
 
   // ── Jobs ─────────────────────────────────────────────────────
-  const activeJobs = jobs.filter(j => !['rejected', 'withdrawn'].includes(j.status));
+  const activeJobs  = jobs.filter(j => !['rejected', 'withdrawn'].includes(j.status));
+  const rejectedCnt = jobs.filter(j => j.status === 'rejected').length;
   const PIPE_STAGES = ['applied', 'screening', 'interviewing', 'offer'];
   const pipelineCounts = PIPE_STAGES.map(s => ({
     label: s.charAt(0).toUpperCase() + s.slice(1),
-    count: activeJobs.filter(j => j.status === s).length,
+    count: jobs.filter(j => j.status === s).length,
   }));
   const maxPipe = Math.max(...pipelineCounts.map(p => p.count), 1);
 
   // ── Fitness ──────────────────────────────────────────────────
-  const latestWeight = metrics[0]?.weight;
-  const mo = new Date().toISOString().slice(0, 7);
+  const latestWeight      = metrics[0]?.weight;
   const workoutsThisMonth = workouts.filter(w => w.date?.startsWith(mo)).length;
-  const sparkPts = [...history].reverse().slice(-12);
-  const SW = 264, SH = 44;
+  const sparkPts          = [...history].reverse().slice(-16);
+  const SW = 400, SH = 58;
   let sparkPath = '';
   if (sparkPts.length >= 2) {
     const vals = sparkPts.map(h => h.weight);
     const lo = Math.min(...vals), hi = Math.max(...vals), range = hi - lo || 1;
     sparkPath = sparkPts.map((h, i) => {
       const x = (i / (sparkPts.length - 1)) * SW;
-      const y = SH - 4 - ((h.weight - lo) / range) * (SH - 10);
+      const y = SH - 6 - ((h.weight - lo) / range) * (SH - 14);
       return `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`;
     }).join(' ');
   }
 
-  // ── Portfolio ─────────────────────────────────────────────────
-  const currentRole = experience.find(e => !e.end_date);
-  const skillCats   = [...new Set(skills.map(s => s.category))];
-  const fmtAmt = n => n >= 1000 ? `${(n / 1000).toFixed(1)}k` : n.toFixed(0);
+  // ── Climbing ─────────────────────────────────────────────────
+  const sentCount   = climbs.filter(c => c.sent).length;
+  const flashCount  = climbs.filter(c => c.flash).length;
+  const thisMonthC  = climbs.filter(c => c.date?.startsWith(mo)).length;
+  const sendRate    = climbs.length > 0 ? Math.round(sentCount / climbs.length * 100) : 0;
+
+  // ── Dev Projects ─────────────────────────────────────────────
+  const activeProjects = devProjects.filter(p => p.status === 'active');
+  const inProgress     = kanbanTasks.filter(t => t.status === 'in_progress').length;
+  const doneTasks      = kanbanTasks.filter(t => t.status === 'done').length;
+
+  const showSpending  = thisMonthExp.length > 0;
+  const showJobs      = jobs.length > 0;
+  const showFitness   = workouts.length > 0 || metrics.length > 0;
+  const showClimbing  = climbs.length > 0;
+  const showProjects  = devProjects.length > 0;
+
+  if (!showSpending && !showJobs && !showFitness && !showClimbing && !showProjects) return null;
 
   return (
     <div className="map-sidebar">
 
-      {/* Spending */}
-      <div className="msb-card" style={{ '--ca': '#e07b3a', '--cg': 'rgba(224,123,58,0.45)' }}>
-        <div className="msb-head">
-          <Px name="coins" size={13} className="msb-icon" />
-          <span className="msb-name">SPENDING</span>
-          <span className="msb-badge">{expenses.length} txns</span>
-        </div>
-        {expenses.length === 0
-          ? <div className="msb-empty">No expenses this month</div>
-          : <>
+      {/* Spending — full width */}
+      {showSpending && (
+        <div className="msb-card msb-wide" style={{ '--ca': '#e07b3a', '--cg': 'rgba(224,123,58,0.45)' }}>
+          <div className="msb-head">
+            <Px name="coins" size={14} className="msb-icon" />
+            <span className="msb-name">SPENDING</span>
+            <span className="msb-badge">{thisMonthExp.length} transactions this month</span>
+          </div>
+          <div style={{ display: 'flex', gap: 24, alignItems: 'flex-end' }}>
+            <div>
               <div className="msb-big">{currency}{totalSpent.toFixed(0)}<span className="msb-big-unit"> this month</span></div>
-              {totalBudget > 0 && <>
-                <div className="msb-prog"><div className="msb-prog-fill" style={{ width: `${Math.min(100, totalSpent / totalBudget * 100).toFixed(1)}%` }} /></div>
-                <div className="msb-tiny">{currency}{(totalBudget - totalSpent).toFixed(0)} remaining of {currency}{totalBudget.toFixed(0)}</div>
-              </>}
-              {topCats.length > 0 && (
-                <div className="msb-bars">
-                  {topCats.map(({ cat, amt }) => (
-                    <div key={cat.id} className="msb-bar-row">
-                      <span className="msb-bar-lbl"><Px name={cat.icon} size={11} /> {cat.name}</span>
-                      <div className="msb-bar-bg"><div className="msb-bar-fill" style={{ width: `${(amt / maxCatAmt * 100).toFixed(0)}%` }} /></div>
-                      <span className="msb-bar-val">{currency}{fmtAmt(amt)}</span>
-                    </div>
-                  ))}
+              {totalBudget > 0 && (
+                <div className="msb-tiny" style={{ marginTop: 4 }}>
+                  {budgetPct.toFixed(0)}% of {currency}{totalBudget.toFixed(0)} budget
+                  {totalSpent > totalBudget ? ' — over budget' : ` · ${currency}${(totalBudget - totalSpent).toFixed(0)} left`}
                 </div>
               )}
-            </>
-        }
-      </div>
-
-      {/* Jobs */}
-      <div className="msb-card" style={{ '--ca': '#4ab87a', '--cg': 'rgba(74,184,122,0.45)' }}>
-        <div className="msb-head">
-          <Px name="briefcase" size={13} className="msb-icon" />
-          <span className="msb-name">JOBS</span>
-          <span className="msb-badge">{activeJobs.length} active · {jobs.length} total</span>
-        </div>
-        {jobs.length === 0
-          ? <div className="msb-empty">No applications yet</div>
-          : <div className="msb-bars">
-              {pipelineCounts.map(({ label, count }) => (
-                <div key={label} className="msb-bar-row">
-                  <span className="msb-bar-lbl">{label}</span>
-                  <div className="msb-bar-bg"><div className="msb-bar-fill" style={{ width: count ? `${(count / maxPipe * 100).toFixed(0)}%` : '0%' }} /></div>
-                  <span className="msb-bar-val">{count}</span>
+            </div>
+          </div>
+          {totalBudget > 0 && (
+            <div className="msb-prog">
+              <div className="msb-prog-fill" style={{ width: `${budgetPct.toFixed(1)}%`, background: budgetPct >= 100 ? '#e05a5a' : 'var(--ca)' }} />
+            </div>
+          )}
+          {topCats.length > 0 && (
+            <div className="msb-bars">
+              {topCats.map(({ cat, amt }) => (
+                <div key={cat.id} className="msb-bar-row">
+                  <span className="msb-bar-lbl"><Px name={cat.icon} size={11} /> {cat.name}</span>
+                  <div className="msb-bar-bg"><div className="msb-bar-fill" style={{ width: `${(amt / maxCatAmt * 100).toFixed(0)}%` }} /></div>
+                  <span className="msb-bar-val">{currency}{fmtAmt(amt)}</span>
                 </div>
               ))}
             </div>
-        }
-      </div>
+          )}
+        </div>
+      )}
+
+      {/* Jobs */}
+      {showJobs && (
+        <div className="msb-card" style={{ '--ca': '#4ab87a', '--cg': 'rgba(74,184,122,0.45)' }}>
+          <div className="msb-head">
+            <Px name="briefcase" size={14} className="msb-icon" />
+            <span className="msb-name">JOBS</span>
+            <span className="msb-badge">{activeJobs.length} active</span>
+          </div>
+          <div className="msb-bars">
+            {pipelineCounts.map(({ label, count }) => (
+              <div key={label} className="msb-bar-row">
+                <span className="msb-bar-lbl">{label}</span>
+                <div className="msb-bar-bg"><div className="msb-bar-fill" style={{ width: count ? `${(count / maxPipe * 100).toFixed(0)}%` : '0%' }} /></div>
+                <span className="msb-bar-val">{count}</span>
+              </div>
+            ))}
+          </div>
+          {rejectedCnt > 0 && (
+            <div className="msb-tiny" style={{ color: 'rgba(224,90,90,0.55)' }}>{rejectedCnt} rejected</div>
+          )}
+        </div>
+      )}
 
       {/* Fitness */}
-      <div className="msb-card" style={{ '--ca': '#5a9ed4', '--cg': 'rgba(90,158,212,0.45)' }}>
-        <div className="msb-head">
-          <Px name="human-arms-up" size={13} className="msb-icon" />
-          <span className="msb-name">FITNESS</span>
-          <span className="msb-badge">{workoutsThisMonth} this month</span>
-        </div>
-        {latestWeight && <div className="msb-big">{latestWeight}<span className="msb-big-unit"> lbs</span></div>}
-        <div className="msb-tiny">{metrics.length} measurements · {workouts.length} workouts total</div>
-        {sparkPath
-          ? <svg className="msb-spark" viewBox={`0 0 ${SW} ${SH}`} preserveAspectRatio="none">
-              <path d={sparkPath} stroke="var(--ca)" strokeWidth="1.8" fill="none"
+      {showFitness && (
+        <div className="msb-card" style={{ '--ca': '#5a9ed4', '--cg': 'rgba(90,158,212,0.45)' }}>
+          <div className="msb-head">
+            <Px name="human-arms-up" size={14} className="msb-icon" />
+            <span className="msb-name">FITNESS</span>
+            <span className="msb-badge">{workoutsThisMonth} workouts this month</span>
+          </div>
+          {latestWeight && (
+            <div className="msb-big">{latestWeight}<span className="msb-big-unit"> lbs</span></div>
+          )}
+          {sparkPath ? (
+            <svg className="msb-spark" viewBox={`0 0 ${SW} ${SH}`} preserveAspectRatio="none">
+              <path d={sparkPath} stroke="var(--ca)" strokeWidth="2" fill="none"
                     strokeLinecap="round" strokeLinejoin="round"
-                    style={{ filter: 'drop-shadow(0 0 3px var(--cg))' }} />
+                    style={{ filter: 'drop-shadow(0 0 4px var(--cg))' }} />
             </svg>
-          : workouts.length === 0 && <div className="msb-empty">No workouts logged yet</div>
-        }
-      </div>
-
-      {/* Portfolio */}
-      <div className="msb-card" style={{ '--ca': '#b87ad4', '--cg': 'rgba(184,122,212,0.45)' }}>
-        <div className="msb-head">
-          <Px name="globe" size={13} className="msb-icon" />
-          <span className="msb-name">PORTFOLIO</span>
+          ) : (
+            <div className="msb-tiny">{workouts.length} workouts logged · no weight data</div>
+          )}
+          {sparkPath && (
+            <div className="msb-tiny">{metrics.length} measurements · {workouts.length} workouts total</div>
+          )}
         </div>
-        <div className="msb-trio">
-          {[{ v: projects.length, l: 'PROJECTS' }, { v: skills.length, l: 'SKILLS' }, { v: experience.length, l: 'ROLES' }].map(({ v, l }) => (
-            <div key={l} className="msb-trio-item">
-              <div className="msb-trio-val">{v}</div>
-              <div className="msb-trio-lbl">{l}</div>
-            </div>
-          ))}
-        </div>
-        {currentRole && (
-          <div className="msb-current-role">
-            <span className="msb-role-dot" />
-            {currentRole.role} @ {currentRole.company}
-          </div>
-        )}
-        {skillCats.length > 0 && (
-          <div className="msb-tag-row">
-            {skillCats.map(c => <span key={c} className="msb-tag">{c}</span>)}
-          </div>
-        )}
-      </div>
+      )}
 
       {/* Climbing */}
-      {(() => {
-        const sentCount  = climbs.filter(c => c.sent).length;
-        const flashCount = climbs.filter(c => c.flash).length;
-        const moClimbs   = new Date().toISOString().slice(0, 7);
-        const thisMonthC = climbs.filter(c => c.date?.startsWith(moClimbs)).length;
-        const rate = climbs.length > 0 ? Math.round(sentCount / climbs.length * 100) : 0;
-        return (
-          <div className="msb-card" style={{ '--ca': '#d4a040', '--cg': 'rgba(212,160,64,0.45)' }}>
-            <div className="msb-head">
-              <Px name="arrow-up-box" size={13} className="msb-icon" />
-              <span className="msb-name">CLIMBING</span>
-              <span className="msb-badge">{climbs.length} routes</span>
-            </div>
-            {climbs.length === 0
-              ? <div className="msb-empty">No climbs logged yet</div>
-              : <>
-                  <div className="msb-trio">
-                    {[{ v: sentCount, l: 'SENT' }, { v: flashCount, l: 'FLASH' }, { v: `${rate}%`, l: 'RATE' }].map(({ v, l }) => (
-                      <div key={l} className="msb-trio-item">
-                        <div className="msb-trio-val">{v}</div>
-                        <div className="msb-trio-lbl">{l}</div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="msb-tiny">{thisMonthC} climbs this month</div>
-                </>
-            }
+      {showClimbing && (
+        <div className="msb-card" style={{ '--ca': '#d4a040', '--cg': 'rgba(212,160,64,0.45)' }}>
+          <div className="msb-head">
+            <Px name="arrow-up-box" size={14} className="msb-icon" />
+            <span className="msb-name">CLIMBING</span>
+            <span className="msb-badge">{climbs.length} routes</span>
           </div>
-        );
-      })()}
+          <div className="msb-trio">
+            {[{ v: sentCount, l: 'SENT' }, { v: flashCount, l: 'FLASH' }, { v: `${sendRate}%`, l: 'RATE' }].map(({ v, l }) => (
+              <div key={l} className="msb-trio-item">
+                <div className="msb-trio-val">{v}</div>
+                <div className="msb-trio-lbl">{l}</div>
+              </div>
+            ))}
+          </div>
+          {thisMonthC > 0 && <div className="msb-tiny">{thisMonthC} sessions this month</div>}
+        </div>
+      )}
 
       {/* Dev Projects */}
-      {(() => {
-        const activeProjects = devProjects.filter(p => p.status === 'active');
-        const inProgress = kanbanTasks.filter(t => t.status === 'in_progress').length;
-        const done       = kanbanTasks.filter(t => t.status === 'done').length;
-        return (
-          <div className="msb-card" style={{ '--ca': '#40c4c4', '--cg': 'rgba(64,196,196,0.45)' }}>
-            <div className="msb-head">
-              <Px name="terminal" size={13} className="msb-icon" />
-              <span className="msb-name">PROJECTS</span>
-              <span className="msb-badge">{devProjects.length} total</span>
-            </div>
-            {devProjects.length === 0
-              ? <div className="msb-empty">No projects tracked yet</div>
-              : <>
-                  <div className="msb-trio">
-                    {[
-                      { v: activeProjects.length,  l: 'ACTIVE' },
-                      { v: inProgress,             l: 'IN PROG' },
-                      { v: done,                   l: 'DONE' },
-                    ].map(({ v, l }) => (
-                      <div key={l} className="msb-trio-item">
-                        <div className="msb-trio-val">{v}</div>
-                        <div className="msb-trio-lbl">{l}</div>
-                      </div>
-                    ))}
-                  </div>
-                  {activeProjects.length > 0 && (
-                    <div className="msb-tiny">
-                      {activeProjects.slice(0, 2).map(p => p.name).join(' · ')}
-                      {activeProjects.length > 2 ? ` +${activeProjects.length - 2}` : ''}
-                    </div>
-                  )}
-                </>
-            }
+      {showProjects && (
+        <div className="msb-card" style={{ '--ca': '#40c4c4', '--cg': 'rgba(64,196,196,0.45)' }}>
+          <div className="msb-head">
+            <Px name="terminal" size={14} className="msb-icon" />
+            <span className="msb-name">PROJECTS</span>
+            <span className="msb-badge">{devProjects.length} total</span>
           </div>
-        );
-      })()}
+          <div className="msb-trio">
+            {[
+              { v: activeProjects.length, l: 'ACTIVE' },
+              { v: inProgress,            l: 'IN PROG' },
+              { v: doneTasks,             l: 'DONE' },
+            ].map(({ v, l }) => (
+              <div key={l} className="msb-trio-item">
+                <div className="msb-trio-val">{v}</div>
+                <div className="msb-trio-lbl">{l}</div>
+              </div>
+            ))}
+          </div>
+          {activeProjects.length > 0 && (
+            <div className="msb-list">
+              {activeProjects.slice(0, 3).map(p => (
+                <div key={p.id} className="msb-list-item">{p.name}</div>
+              ))}
+              {activeProjects.length > 3 && (
+                <div className="msb-tiny">+{activeProjects.length - 3} more</div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
     </div>
   );

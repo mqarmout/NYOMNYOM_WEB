@@ -320,14 +320,16 @@ html::after {
   position: absolute;
   top: 60px;
   right: 16px;
-  width: 286px;
+  width: clamp(360px, 38vw, 600px);
   max-height: calc(100vh - 76px);
   overflow-y: auto;
   overflow-x: hidden;
   z-index: 10;
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 10px;
   padding-bottom: 16px;
   scrollbar-width: thin;
   scrollbar-color: rgba(0,255,65,0.1) transparent;
@@ -341,75 +343,79 @@ html::after {
 .map-sidebar::-webkit-scrollbar-thumb { background: rgba(0,255,65,0.1); }
 
 .msb-card {
-  background: rgba(0, 3, 0, 0.84);
-  border: 1px solid rgba(0,255,65,0.09);
+  flex: 1 1 42%;
+  background: rgba(0, 3, 0, 0.88);
+  border: 1px solid rgba(0,255,65,0.10);
   border-left: 2px solid var(--ca, #00ff41);
-  padding: 11px 13px;
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 10px;
   backdrop-filter: blur(8px);
+  min-width: 0;
 }
+.msb-wide { flex: 1 1 100%; }
 
 .msb-head {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
 }
 .msb-icon { line-height: 1; flex-shrink: 0; }
 .msb-name {
   font-family: 'Press Start 2P', monospace;
-  font-size: 6px;
+  font-size: 7px;
   color: var(--ca);
   letter-spacing: 0.07em;
   flex: 1;
   text-shadow: 0 0 8px var(--cg);
 }
-.msb-badge { font-size: 9px; color: rgba(0,255,65,0.32); white-space: nowrap; }
+.msb-badge { font-size: 10px; color: rgba(0,255,65,0.35); white-space: nowrap; }
 
-.msb-big { font-size: 26px; color: var(--ca); text-shadow: 0 0 14px var(--cg); line-height: 1; }
-.msb-big-unit { font-size: 11px; color: rgba(255,255,255,0.28); }
-.msb-tiny  { font-size: 9px; color: rgba(0,255,65,0.28); }
-.msb-empty { font-size: 10px; color: rgba(0,255,65,0.22); padding: 2px 0; }
+.msb-big { font-size: 36px; color: var(--ca); text-shadow: 0 0 18px var(--cg); line-height: 1; }
+.msb-big-unit { font-size: 13px; color: rgba(255,255,255,0.28); }
+.msb-tiny  { font-size: 10px; color: rgba(0,255,65,0.32); }
 
-.msb-prog      { height: 3px; background: rgba(0,255,65,0.07); }
-.msb-prog-fill { height: 100%; background: var(--ca); box-shadow: 0 0 5px var(--cg); transition: width 0.5s; }
+.msb-prog-wrap { display: flex; flex-direction: column; gap: 5px; }
+.msb-prog-labels { display: flex; justify-content: space-between; font-size: 10px; color: rgba(0,255,65,0.32); }
+.msb-prog      { height: 4px; background: rgba(0,255,65,0.07); }
+.msb-prog-fill { height: 100%; background: var(--ca); box-shadow: 0 0 6px var(--cg); transition: width 0.5s; }
 
-.msb-bars    { display: flex; flex-direction: column; gap: 5px; }
-.msb-bar-row { display: flex; align-items: center; gap: 7px; }
-.msb-bar-lbl { font-size: 9px; color: rgba(0,255,65,0.45); width: 74px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
+.msb-bars    { display: flex; flex-direction: column; gap: 7px; }
+.msb-bar-row { display: flex; align-items: center; gap: 9px; }
+.msb-bar-lbl { font-size: 10px; color: rgba(0,255,65,0.52); min-width: 0; flex: 0 0 110px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 5px; }
 .msb-bar-bg  { flex: 1; height: 3px; background: rgba(0,255,65,0.06); }
-.msb-bar-fill { height: 100%; background: var(--ca); opacity: 0.8; min-width: 2px; }
-.msb-bar-val { font-size: 9px; color: var(--ca); width: 32px; text-align: right; flex-shrink: 0; }
+.msb-bar-fill { height: 100%; background: var(--ca); opacity: 0.85; min-width: 2px; }
+.msb-bar-val { font-size: 10px; color: var(--ca); width: 44px; text-align: right; flex-shrink: 0; }
 
-.msb-spark { width: 100%; height: 44px; display: block; overflow: visible; }
+.msb-spark { width: 100%; height: 58px; display: block; overflow: visible; }
 
-.msb-trio { display: flex; gap: 18px; }
-.msb-trio-item { display: flex; flex-direction: column; gap: 2px; }
+.msb-trio { display: flex; gap: 0; }
+.msb-trio-item { display: flex; flex-direction: column; gap: 4px; flex: 1; }
 .msb-trio-val {
-  font-size: 24px;
+  font-size: 30px;
   color: var(--ca);
-  text-shadow: 0 0 10px var(--cg);
+  text-shadow: 0 0 12px var(--cg);
   line-height: 1;
 }
 .msb-trio-lbl {
   font-family: 'Press Start 2P', monospace;
-  font-size: 5px;
-  color: rgba(0,255,65,0.28);
+  font-size: 6px;
+  color: rgba(0,255,65,0.30);
   letter-spacing: 0.06em;
 }
 
-.msb-current-role {
-  display: flex;
-  align-items: center;
-  gap: 7px;
+.msb-list { display: flex; flex-direction: column; gap: 4px; }
+.msb-list-item {
   font-size: 10px;
-  color: rgba(0,255,65,0.48);
-  padding: 5px 8px;
-  background: rgba(0,255,65,0.03);
-  border-left: 2px solid var(--ca);
+  color: rgba(0,255,65,0.45);
+  padding: 4px 8px;
+  background: rgba(0,255,65,0.02);
+  border-left: 1px solid var(--ca);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.msb-role-dot { width: 4px; height: 4px; background: var(--ca); flex-shrink: 0; box-shadow: 0 0 4px var(--cg); }
 
 .msb-tag-row { display: flex; flex-wrap: wrap; gap: 4px; }
 .msb-tag {
@@ -986,7 +992,7 @@ html::after {
 /* ── Job board ── */
 .job-board {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 10px;
   margin-bottom: 8px;
 }

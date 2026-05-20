@@ -175,6 +175,12 @@ export function KanbanBoard({ tasks, projects, showProject, onAdd, onMove, onDel
   const [showAdd,     setShowAdd]     = useState(false);
   const [draggingId,  setDraggingId]  = useState(null);
 
+  useEffect(() => {
+    const handler = () => setShowAdd(true);
+    window.addEventListener('shortcut:new', handler);
+    return () => window.removeEventListener('shortcut:new', handler);
+  }, []);
+
   const dragHandlers = {
     start: id => setDraggingId(id),
     end:   ()  => setDraggingId(null),
