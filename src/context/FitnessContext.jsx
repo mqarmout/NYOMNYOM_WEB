@@ -34,6 +34,12 @@ export function FitnessProvider({ children }) {
     return res.id;
   }, [showToast]);
 
+  const updateWorkout = useCallback(async (id, data) => {
+    await apiFetch('/api/fitness/workouts/' + id, { method: 'PUT', body: JSON.stringify(data) });
+    setWorkouts(await apiFetch('/api/fitness/workouts'));
+    showToast('Workout updated ✓');
+  }, [showToast]);
+
   const deleteWorkout = useCallback(async (id) => {
     await apiFetch('/api/fitness/workouts/' + id, { method: 'DELETE' });
     setWorkouts(prev => prev.filter(w => w.id !== id));
@@ -42,6 +48,11 @@ export function FitnessProvider({ children }) {
 
   const addSet = useCallback(async (workoutId, data) => {
     await apiFetch('/api/fitness/workouts/' + workoutId + '/sets', { method: 'POST', body: JSON.stringify(data) });
+    setWorkouts(await apiFetch('/api/fitness/workouts'));
+  }, []);
+
+  const updateSet = useCallback(async (setId, data) => {
+    await apiFetch('/api/fitness/sets/' + setId, { method: 'PUT', body: JSON.stringify(data) });
     setWorkouts(await apiFetch('/api/fitness/workouts'));
   }, []);
 
@@ -75,7 +86,7 @@ export function FitnessProvider({ children }) {
   return (
     <FitnessContext.Provider value={{
       workouts, metrics, history, toast,
-      loadAll, addWorkout, deleteWorkout, addSet, deleteSet,
+      loadAll, addWorkout, updateWorkout, deleteWorkout, addSet, updateSet, deleteSet,
       addMetric, deleteMetric, showToast,
     }}>
       {children}

@@ -185,6 +185,7 @@ const COMMANDS = [
   { cmd: 'projects/board',          screen: 'projects-board',       fire: false, label: 'Projects → Board' },
   { cmd: 'projects/board/new',      screen: 'projects-board',       fire: true,  label: 'Projects → Add Task' },
   { cmd: 'profile',                 screen: 'profile',              fire: false, label: 'Profile' },
+  { cmd: 'logout',                  screen: '__logout__',           fire: false, label: 'Logout' },
 ];
 
 function TerminalLauncher({ onNavigate, onClose }) {
@@ -622,6 +623,7 @@ function AppInner({ authUser, onLogout }) {
   }, [screen, showHelp, showTerminal]);
 
   const handleTerminalNavigate = (targetScreen, fireNew) => {
+    if (targetScreen === '__logout__') { setShowTerminal(false); onLogout(); return; }
     setScreen(targetScreen);
     if (fireNew) setTimeout(() => window.dispatchEvent(new Event('shortcut:new')), 120);
   };

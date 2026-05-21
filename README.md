@@ -37,7 +37,7 @@ nyomnyom_web/
 │   ├── App.jsx         # auth shell, mountain map, terminal launcher, AppInner
 │   ├── icons.jsx       # all pixelarticons — Px component, CATEGORY_ICONS, named shortcuts
 │   ├── index.css       # all styles (CRT theme, component classes)
-│   ├── utils.js        # apiFetch, fmt, fmtDate, getInitials
+│   ├── utils.js        # apiFetch, fmt, fmtDate, getInitials, COLORS
 │   ├── Charts.jsx      # AreaChart SVG component
 │   ├── context/        # one context per tracker section
 │   │   ├── AppContext.jsx        # spending: categories, expenses, profile
@@ -45,7 +45,7 @@ nyomnyom_web/
 │   │   ├── FitnessContext.jsx    # workouts, sets, body metrics, weight history
 │   │   ├── PortfolioContext.jsx  # projects, skills, experience, about
 │   │   ├── ClimbingContext.jsx   # climb log, photo upload
-│   │   └── ProjectsContext.jsx  # dev projects, kanban tasks, commit cache
+│   │   └── ProjectsContext.jsx   # dev projects, kanban tasks, commit cache
 │   └── screens/
 │       ├── spending/   Dashboard, Graphs, Categories, AddExpense
 │       ├── jobs/       Applications, Contacts
@@ -96,3 +96,12 @@ Supports `section`, `section/tab`, `section/tab/new`. Tab-completes; arrow keys 
 The homepage is an SVG mountain (`viewBox="0 0 1000 600"`, `preserveAspectRatio="none"`). Six clickable station markers zoom the world toward the selected section. SVG coordinate `(x, y)` maps to CSS `left: x/10 %, top: y/6 %`.
 
 Station positions: fitness `(120,340)`, jobs `(260,255)`, portfolio `(200,180)`, climbing `(380,230)`, spending `(290,100)`, projects `(430,340)`.
+
+## Tracker features
+
+- **Spending** — expenses with categories and budgets, monthly analytics, multi-month history graphs
+- **Jobs** — kanban pipeline (applied → screening → interviewing → offer → rejected/withdrawn), contacts per job, URL extraction
+- **Fitness** — workout sessions with completion time; exercises as sets/reps/weight or time-based (seconds); edit sessions and individual sets inline; body weight log with history graph
+- **Portfolio** — projects, skills, experience, about; public read-only view at `/` when unauthenticated
+- **Climbing** — boulder and sport climb log with grades, wall type, attempts, sent/flash flags, optional photo upload
+- **Dev Projects** — status/priority tracker, per-project todos, kanban board, GitHub last-commit fetch
