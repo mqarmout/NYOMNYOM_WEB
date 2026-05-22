@@ -1,12 +1,44 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import Fuse from 'fuse.js';
 import { useApp } from '../../context/AppContext';
 import { fmt } from '../../utils';
 import { Px, IClose, IEdit, CATEGORY_ICONS } from '../../icons';
 
+const _fuse = new Fuse(CATEGORY_ICONS, { threshold: 0.4, distance: 80 });
+
+function scoreIcon(ic, query) {
+  const tokens = ic.split('-');
+  let score = 0;
+  for (const token of tokens) {
+    if (token === query)            score += 10;
+    else if (token.startsWith(query)) score += 5;
+    else if (token.includes(query)) score += 2;
+  }
+  if (ic === query)            score += 20;
+  else if (ic.startsWith(query)) score += 8;
+  else if (ic.includes(query)) score += 3;
+  return score;
+}
+
+function searchIcons(query) {
+  if (!query.trim()) return CATEGORY_ICONS;
+  const q = query.trim().toLowerCase();
+  const scored = CATEGORY_ICONS
+    .map(ic => ({ ic, score: scoreIcon(ic, q) }))
+    .filter(x => x.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .map(x => x.ic);
+  if (scored.length > 0) return scored;
+  return _fuse.search(q).map(r => r.item);
+}
+
 function CategoryModal({ initial, onSave, onClose }) {
-  const [icon,   setIcon]   = useState(initial?.icon   || CATEGORY_ICONS[0]);
-  const [name,   setName]   = useState(initial?.name   || '');
-  const [budget, setBudget] = useState(initial?.budget != null ? initial.budget : '');
+  const [icon,       setIcon]       = useState(initial?.icon   || CATEGORY_ICONS[0]);
+  const [name,       setName]       = useState(initial?.name   || '');
+  const [budget,     setBudget]     = useState(initial?.budget != null ? initial.budget : '');
+  const [iconSearch, setIconSearch] = useState('');
+
+  const filteredIcons = useMemo(() => searchIcons(iconSearch), [iconSearch]);
 
   const handleSave = () => {
     if (!name.trim()) return;
@@ -42,12 +74,22 @@ function CategoryModal({ initial, onSave, onClose }) {
 
         <div className="field">
           <label>Icon</label>
+          <input
+            type="text"
+            placeholder="Search icons…"
+            value={iconSearch}
+            onChange={e => setIconSearch(e.target.value)}
+            style={{ marginBottom: 8 }}
+          />
           <div className="icon-picker">
-            {CATEGORY_ICONS.map(ic => (
+            {filteredIcons.length === 0 ? (
+              <div style={{ fontSize: 11, color: 'var(--muted)', padding: '6px 2px' }}>No icons match</div>
+            ) : filteredIcons.map(ic => (
               <button
                 key={ic}
                 className={'icon-opt ' + (icon === ic ? 'selected' : '')}
                 onClick={() => setIcon(ic)}
+                title={ic}
               ><Px name={ic} size={18} /></button>
             ))}
           </div>

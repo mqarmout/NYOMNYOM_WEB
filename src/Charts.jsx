@@ -98,21 +98,37 @@ export function HistoryBars({ months, color = '#5b8dee' }) {
     </svg>
   );
 
-  const max  = Math.max(...months.map(m => m.total), 1);
+  const hasIncome = months.some(m => (m.income || 0) > 0);
+  const max  = Math.max(...months.map(m => Math.max(m.total, m.income || 0)), 1);
   const slot = iW / months.length;
-  const bW   = slot * 0.55;
+  const bW   = hasIncome ? slot * 0.38 : slot * 0.55;
+  const gap  = hasIncome ? slot * 0.06 : 0;
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="svg-chart">
+      {hasIncome && (
+        <g>
+          <rect x={12} y={pT} width={8} height={4} rx="1" fill="#4caf82" />
+          <text x={23} y={pT + 4} fill="#555" fontSize="8">Income</text>
+          <rect x={65} y={pT} width={8} height={4} rx="1" fill={color} />
+          <text x={76} y={pT + 4} fill="#555" fontSize="8">Spent</text>
+        </g>
+      )}
       {months.map((m, i) => {
-        const bH  = Math.max((m.total / max) * iH, 2);
-        const x   = +(pL + i * slot + (slot - bW) / 2).toFixed(2);
-        const y   = +(pT + iH - bH).toFixed(2);
-        const lbl = m.month.slice(5, 7) + '/' + m.month.slice(2, 4);
+        const expH = Math.max((m.total / max) * iH, 2);
+        const incH = Math.max(((m.income || 0) / max) * iH, m.income ? 2 : 0);
+        const slotX = pL + i * slot + (slot - (hasIncome ? bW * 2 + gap : bW)) / 2;
+        const lbl   = m.month.slice(5, 7) + '/' + m.month.slice(2, 4);
         return (
           <g key={i}>
-            <rect x={x} y={y} width={+bW.toFixed(2)} height={+bH.toFixed(2)} rx="4" fill={color} />
-            <text x={+(x + bW / 2).toFixed(2)} y={H - 6} textAnchor="middle" fill="#555" fontSize="9">{lbl}</text>
+            {hasIncome && incH > 0 && (
+              <rect x={+slotX.toFixed(2)} y={+(pT + iH - incH).toFixed(2)}
+                    width={+bW.toFixed(2)} height={+incH.toFixed(2)} rx="3" fill="#4caf82" />
+            )}
+            <rect x={+(slotX + (hasIncome ? bW + gap : 0)).toFixed(2)} y={+(pT + iH - expH).toFixed(2)}
+                  width={+bW.toFixed(2)} height={+expH.toFixed(2)} rx="3" fill={color} />
+            <text x={+(slotX + (hasIncome ? bW + gap / 2 : bW / 2)).toFixed(2)}
+                  y={H - 6} textAnchor="middle" fill="#555" fontSize="9">{lbl}</text>
           </g>
         );
       })}

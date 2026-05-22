@@ -677,6 +677,67 @@ html::after {
 .mini-stat .ms-val { font-size: 26px; font-weight: 400; margin-top: 8px; text-shadow: 0 0 10px var(--accent-glow); }
 .mini-stat .ms-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
 
+/* ── Finance cards (new dashboard) ── */
+.finance-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.finance-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--border);
+  padding: 16px 18px;
+}
+.finance-card .fc-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
+}
+.finance-card .fc-amount { font-size: 22px; font-weight: 400; line-height: 1; margin-bottom: 6px; }
+.finance-card .fc-sub    { font-size: 10px; color: var(--muted); }
+.income-card { border-top-color: #4caf82; }
+.income-card .fc-amount { color: #4caf82; text-shadow: 0 0 10px rgba(76,175,130,.35); }
+.spent-card  { border-top-color: var(--accent); }
+.spent-card  .fc-amount { color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); }
+.net-positive { border-top-color: #4caf82; }
+.net-positive .fc-amount { color: #4caf82; text-shadow: 0 0 10px rgba(76,175,130,.35); }
+.net-negative { border-top-color: var(--danger); }
+.net-negative .fc-amount { color: var(--danger); }
+
+.budget-bar-wrap { margin-bottom: 16px; }
+.budget-bar-labels { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.budget-bar-labels span { font-size: 11px; color: var(--muted); }
+
+/* ── Tx filter tabs ── */
+.tx-filter-tabs { display: flex; gap: 0; margin-bottom: 12px; border-bottom: 1px solid var(--border); }
+.tx-filter-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 11px;
+  letter-spacing: .03em;
+  margin-bottom: -1px;
+  padding: 6px 14px;
+  transition: color .15s, border-color .15s;
+}
+.tx-filter-tab:hover  { color: var(--text); }
+.tx-filter-tab.active { border-bottom-color: var(--accent); color: var(--text); }
+
+/* ── Income tx row ── */
+.tx-amount-income { color: #4caf82 !important; text-shadow: 0 0 6px rgba(76,175,130,.35) !important; }
+.income-add-btn   { background: rgba(76,175,130,.12) !important; border-color: rgba(76,175,130,.4) !important; color: #4caf82 !important; }
+.income-add-btn:hover { background: rgba(76,175,130,.22) !important; }
+.income-sym   { color: #4caf82 !important; }
+.income-amount { color: #4caf82 !important; }
+.income-save-btn { background: rgba(76,175,130,.15) !important; border-color: rgba(76,175,130,.5) !important; color: #4caf82 !important; }
+.income-save-btn:hover { background: rgba(76,175,130,.25) !important; }
+
 /* ── Section title ── */
 .section-title {
   font-family: 'Press Start 2P', monospace;
@@ -723,7 +784,8 @@ html::after {
   font-size: 16px; flex-shrink: 0;
 }
 .tx-info { flex: 1; min-width: 0; }
-.tx-name { font-size: 13px; font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tx-name { font-size: 13px; font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 6px; }
+.tx-recurring-badge { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; padding: 1px 5px; flex-shrink: 0; opacity: .8; }
 .tx-cat  { font-size: 11px; color: var(--muted); margin-top: 2px; }
 .tx-right { text-align: right; flex-shrink: 0; }
 .tx-amount { font-size: 14px; font-weight: 400; color: var(--accent); text-shadow: 0 0 6px var(--accent-glow); }

@@ -1,14 +1,23 @@
 import { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Px, IClose } from '../../icons';
+import { IClose } from '../../icons';
 
-export default function AddExpense({ onClose }) {
-  const { categories, addExpense, showToast, profile } = useApp();
+const SOURCES = [
+  { value: 'salary',     label: 'Salary' },
+  { value: 'freelance',  label: 'Freelance' },
+  { value: 'e-transfer', label: 'E-Transfer' },
+  { value: 'gift',       label: 'Gift' },
+  { value: 'refund',     label: 'Refund' },
+  { value: 'other',      label: 'Other' },
+];
+
+export default function AddIncome({ onClose }) {
+  const { addIncome, showToast, profile } = useApp();
   const today = new Date().toISOString().split('T')[0];
   const [amount,          setAmount]          = useState('');
   const [desc,            setDesc]            = useState('');
+  const [source,          setSource]          = useState('salary');
   const [date,            setDate]            = useState(today);
-  const [catId,           setCatId]           = useState(null);
   const [saving,          setSaving]          = useState(false);
   const [recurring,       setRecurring]       = useState(false);
   const [recurringPeriod, setRecurringPeriod] = useState('monthly');
@@ -16,13 +25,11 @@ export default function AddExpense({ onClose }) {
 
   const handleSave = async () => {
     if (!amount || parseFloat(amount) <= 0) return showToast('Enter a valid amount');
-    if (!desc.trim())   return showToast('Enter a description');
-    if (!catId)         return showToast('Select a category');
-    if (!date)          return showToast('Select a date');
-
+    if (!desc.trim()) return showToast('Enter a description');
+    if (!date)        return showToast('Select a date');
     setSaving(true);
-    await addExpense({
-      amount: parseFloat(amount), description: desc.trim(), category_id: catId, date,
+    await addIncome({
+      amount: parseFloat(amount), description: desc.trim(), source, date,
       ...(recurring && { recurring: true, recurring_period: recurringPeriod, recurring_start: recurringStart }),
     });
     setSaving(false);
@@ -47,15 +54,15 @@ export default function AddExpense({ onClose }) {
   return (
     <>
       <div className="modal-header">
-        <div className="modal-title">Add Expense</div>
+        <div className="modal-title">Add Income</div>
         <button className="close-btn" onClick={onClose}><IClose /></button>
       </div>
 
       <div className="amount-wrap">
         <div className="amount-row">
-          <span className="currency-sym">{profile.currency || '$'}</span>
+          <span className="currency-sym income-sym">{profile.currency || '$'}</span>
           <input
-            className="amount-big"
+            className="amount-big income-amount"
             type="number"
             min="0"
             step="0.01"
@@ -65,22 +72,30 @@ export default function AddExpense({ onClose }) {
             autoFocus
           />
         </div>
-        <div className="amount-hint">Enter amount</div>
+        <div className="amount-hint">Enter amount received</div>
       </div>
 
       <div className="field">
         <label>Description</label>
         <input
           type="text"
-          placeholder="e.g. Lunch at Subway"
+          placeholder="e.g. June salary"
           value={desc}
           onChange={e => setDesc(e.target.value)}
         />
       </div>
 
-      <div className="field">
-        <label>Date</label>
-        <input type="date" value={date} onChange={e => setDate(e.target.value)} />
+      <div style={{ display: 'flex', gap: 12 }}>
+        <div className="field" style={{ flex: 1 }}>
+          <label>Source</label>
+          <select value={source} onChange={e => setSource(e.target.value)}>
+            {SOURCES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+          </select>
+        </div>
+        <div className="field" style={{ flex: 1 }}>
+          <label>Date</label>
+          <input type="date" value={date} onChange={e => setDate(e.target.value)} />
+        </div>
       </div>
 
       <div className="field">
@@ -108,22 +123,8 @@ export default function AddExpense({ onClose }) {
         </div>
       )}
 
-      <div className="section-title" style={{ marginBottom: 12, marginTop: recurring ? 16 : 0 }}>Category</div>
-      <div className="cat-grid">
-        {categories.map(c => (
-          <div
-            key={c.id}
-            className={'cat-tile ' + (catId === c.id ? 'selected' : '')}
-            onClick={() => setCatId(c.id)}
-          >
-            <div className="cat-tile-icon"><Px name={c.icon} size={24} /></div>
-            <div className="cat-tile-label">{c.name}</div>
-          </div>
-        ))}
-      </div>
-
-      <button className="modal-save-btn" onClick={handleSave} disabled={saving}>
-        {saving ? 'Saving…' : 'Save Expense'}
+      <button className="modal-save-btn income-save-btn" onClick={handleSave} disabled={saving}>
+        {saving ? 'Saving…' : 'Save Income'}
       </button>
     </>
   );

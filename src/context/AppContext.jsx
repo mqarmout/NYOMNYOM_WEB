@@ -6,6 +6,7 @@ const AppContext = createContext(null);
 export function AppProvider({ children }) {
   const [categories, setCategories] = useState([]);
   const [expenses,   setExpenses]   = useState([]);
+  const [income,     setIncome]     = useState([]);
   const [profile,    setProfile]    = useState({
     name: '', currency: '$', tx_count: 0, total_all_time: 0, since: null,
   });
@@ -20,13 +21,15 @@ export function AppProvider({ children }) {
 
   const loadAll = useCallback(async () => {
     const month = new Date().toISOString().slice(0, 7);
-    const [cats, exps, prof] = await Promise.all([
+    const [cats, exps, inc, prof] = await Promise.all([
       apiFetch('/api/categories'),
       apiFetch('/api/expenses?month=' + month),
+      apiFetch('/api/income?month=' + month),
       apiFetch('/api/profile'),
     ]);
     setCategories(cats);
     setExpenses(exps);
+    setIncome(inc);
     setProfile(prof);
   }, []);
 
@@ -40,6 +43,19 @@ export function AppProvider({ children }) {
   const deleteExpense = useCallback(async (id) => {
     await apiFetch('/api/expenses/' + id, { method: 'DELETE' });
     setExpenses(prev => prev.filter(e => e.id !== id));
+    showToast('Deleted');
+  }, [showToast]);
+
+  const addIncome = useCallback(async (data) => {
+    await apiFetch('/api/income', { method: 'POST', body: JSON.stringify(data) });
+    const month = new Date().toISOString().slice(0, 7);
+    setIncome(await apiFetch('/api/income?month=' + month));
+    showToast('Income saved ✓');
+  }, [showToast]);
+
+  const deleteIncome = useCallback(async (id) => {
+    await apiFetch('/api/income/' + id, { method: 'DELETE' });
+    setIncome(prev => prev.filter(i => i.id !== id));
     showToast('Deleted');
   }, [showToast]);
 
@@ -70,8 +86,9 @@ export function AppProvider({ children }) {
 
   return (
     <AppContext.Provider value={{
-      categories, expenses, profile, toast,
-      loadAll, addExpense, deleteExpense, addCategory, updateCategory, deleteCategory, saveProfile, showToast,
+      categories, expenses, income, profile, toast,
+      loadAll, addExpense, deleteExpense, addIncome, deleteIncome,
+      addCategory, updateCategory, deleteCategory, saveProfile, showToast,
     }}>
       {children}
     </AppContext.Provider>

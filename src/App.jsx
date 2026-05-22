@@ -163,6 +163,7 @@ const SECTION_ORDER = ['spending', 'jobs', 'fitness', 'portfolio', 'climbing', '
 const COMMANDS = [
   { cmd: 'spending',                screen: 'dashboard',            fire: false, label: 'Spending → Dashboard' },
   { cmd: 'spending/new',            screen: 'dashboard',            fire: true,  label: 'Spending → Add Expense' },
+  { cmd: 'spending/new-income',     screen: 'dashboard',            fire: true,  event: 'shortcut:new-income', label: 'Spending → Add Income' },
   { cmd: 'spending/graphs',         screen: 'graphs',               fire: false, label: 'Spending → Graphs' },
   { cmd: 'spending/categories',     screen: 'categories',           fire: false, label: 'Spending → Categories' },
   { cmd: 'spending/categories/new', screen: 'categories',           fire: true,  label: 'Spending → New Category' },
@@ -244,7 +245,7 @@ function TerminalLauncher({ onNavigate, onClose }) {
                 key={c.cmd}
                 className={'term-result' + (i === selIdx ? ' selected' : '')}
                 onMouseEnter={() => setSelIdx(i)}
-                onClick={() => { onNavigate(c.screen, c.fire); onClose(); }}
+                onClick={() => { onNavigate(c.screen, c.fire, c.event); onClose(); }}
               >
                 <span className="term-result-cmd">/{c.cmd}</span>
                 <span className="term-result-label">{c.label}</span>
@@ -622,10 +623,10 @@ function AppInner({ authUser, onLogout }) {
     return () => document.removeEventListener('keydown', handler);
   }, [screen, showHelp, showTerminal]);
 
-  const handleTerminalNavigate = (targetScreen, fireNew) => {
+  const handleTerminalNavigate = (targetScreen, fireNew, fireEvent) => {
     if (targetScreen === '__logout__') { setShowTerminal(false); onLogout(); return; }
     setScreen(targetScreen);
-    if (fireNew) setTimeout(() => window.dispatchEvent(new Event('shortcut:new')), 120);
+    if (fireNew) setTimeout(() => window.dispatchEvent(new Event(fireEvent || 'shortcut:new')), 120);
   };
 
   const activeSection = screen ? SCREEN_TO_SECTION[screen] : null;

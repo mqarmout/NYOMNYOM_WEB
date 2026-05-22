@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useFitness } from '../../context/FitnessContext';
 import { AreaChart } from '../../Charts';
 import { fmtDate } from '../../utils';
@@ -9,8 +9,20 @@ export default function BodyMetrics() {
   const [weight, setWeight] = useState('');
   const [date,   setDate]   = useState(new Date().toISOString().split('T')[0]);
   const [saving, setSaving] = useState(false);
+  const weightRef = useRef(null);
 
   useEffect(() => { loadAll(); }, [loadAll]);
+
+  useEffect(() => {
+    const onKey = e => {
+      if (e.key === 'n' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        weightRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   const handleAdd = async () => {
     if (!weight || parseFloat(weight) <= 0) return;
@@ -18,6 +30,7 @@ export default function BodyMetrics() {
     await addMetric({ weight: parseFloat(weight), date });
     setWeight('');
     setSaving(false);
+    weightRef.current?.blur();
   };
 
   const latest  = metrics[0];
@@ -46,7 +59,7 @@ export default function BodyMetrics() {
       <div className="metric-add-row">
         <div className="field" style={{ flex: 1, marginBottom: 0 }}>
           <label>Weight (lbs)</label>
-          <input type="number" min="0" step="0.1" placeholder="e.g. 185" value={weight} onChange={e => setWeight(e.target.value)}
+          <input ref={weightRef} type="number" min="0" step="0.1" placeholder="e.g. 185" value={weight} onChange={e => setWeight(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleAdd()} />
         </div>
         <div className="field" style={{ flex: 1, marginBottom: 0 }}>
