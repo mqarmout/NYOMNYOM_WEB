@@ -40,6 +40,13 @@ export function AppProvider({ children }) {
     showToast('Expense saved ✓');
   }, [showToast]);
 
+  const updateExpense = useCallback(async (id, data) => {
+    await apiFetch('/api/expenses/' + id, { method: 'PUT', body: JSON.stringify(data) });
+    const month = new Date().toISOString().slice(0, 7);
+    setExpenses(await apiFetch('/api/expenses?month=' + month));
+    showToast('Expense updated ✓');
+  }, [showToast]);
+
   const deleteExpense = useCallback(async (id) => {
     await apiFetch('/api/expenses/' + id, { method: 'DELETE' });
     setExpenses(prev => prev.filter(e => e.id !== id));
@@ -51,6 +58,13 @@ export function AppProvider({ children }) {
     const month = new Date().toISOString().slice(0, 7);
     setIncome(await apiFetch('/api/income?month=' + month));
     showToast('Income saved ✓');
+  }, [showToast]);
+
+  const updateIncome = useCallback(async (id, data) => {
+    await apiFetch('/api/income/' + id, { method: 'PUT', body: JSON.stringify(data) });
+    const month = new Date().toISOString().slice(0, 7);
+    setIncome(await apiFetch('/api/income?month=' + month));
+    showToast('Income updated ✓');
   }, [showToast]);
 
   const deleteIncome = useCallback(async (id) => {
@@ -87,7 +101,7 @@ export function AppProvider({ children }) {
   return (
     <AppContext.Provider value={{
       categories, expenses, income, profile, toast,
-      loadAll, addExpense, deleteExpense, addIncome, deleteIncome,
+      loadAll, addExpense, updateExpense, deleteExpense, addIncome, updateIncome, deleteIncome,
       addCategory, updateCategory, deleteCategory, saveProfile, showToast,
     }}>
       {children}

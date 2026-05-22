@@ -21,16 +21,16 @@ const SOURCE_LABELS = {
 
 export default function Dashboard() {
   const { categories, expenses, income, profile, deleteExpense, deleteIncome } = useApp();
-  const [modal,     setModal]     = useState(null); // 'expense' | 'income' | null
+  const [modal,     setModal]     = useState(null); // { type: 'expense'|'income', item: obj|null }
   const [txFilter,  setTxFilter]  = useState('all'); // 'all' | 'income' | 'expenses'
 
   useEffect(() => {
-    const onExpense = () => setModal('expense');
-    const onIncome  = () => setModal('income');
+    const onExpense = () => setModal({ type: 'expense', item: null });
+    const onIncome  = () => setModal({ type: 'income',  item: null });
     const onKey = e => {
       if (e.key === 'i' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
         e.preventDefault();
-        setModal('income');
+        setModal({ type: 'income', item: null });
       }
     };
     window.addEventListener('shortcut:new', onExpense);
@@ -72,8 +72,8 @@ export default function Dashboard() {
           <p>{month}</p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          <button className="sidebar-add-btn income-add-btn" onClick={() => setModal('income')}>+ Income</button>
-          <button className="sidebar-add-btn" onClick={() => setModal('expense')}>+ Expense</button>
+          <button className="sidebar-add-btn income-add-btn" onClick={() => setModal({ type: 'income', item: null })}>+ Income</button>
+          <button className="sidebar-add-btn" onClick={() => setModal({ type: 'expense', item: null })}>+ Expense</button>
         </div>
       </div>
 
@@ -117,7 +117,7 @@ export default function Dashboard() {
         {filtered.length === 0 ? (
           <div className="empty-state">No transactions yet.</div>
         ) : filtered.map(tx => tx._type === 'income' ? (
-          <div className="tx-item tx-item-income" key={'i' + tx.id}>
+          <div className="tx-item tx-item-income" key={'i' + tx.id} onClick={() => setModal({ type: 'income', item: tx })} style={{ cursor: 'pointer' }}>
             <div className="tx-icon"><Px name={SOURCE_ICONS[tx.source] || 'plus'} size={16} /></div>
             <div className="tx-info">
               <div className="tx-name">
@@ -130,10 +130,10 @@ export default function Dashboard() {
               <div className="tx-amount tx-amount-income">+{fmt(tx.amount, currency)}</div>
               <div className="tx-date">{fmtDate(tx.date)}</div>
             </div>
-            <button className="tx-delete" onClick={() => deleteIncome(tx.id)}><IClose /></button>
+            <button className="tx-delete" onClick={e => { e.stopPropagation(); deleteIncome(tx.id); }}><IClose /></button>
           </div>
         ) : (
-          <div className="tx-item" key={'e' + tx.id}>
+          <div className="tx-item" key={'e' + tx.id} onClick={() => setModal({ type: 'expense', item: tx })} style={{ cursor: 'pointer' }}>
             <div className="tx-icon"><Px name={tx.category_icon} size={16} /></div>
             <div className="tx-info">
               <div className="tx-name">
@@ -146,22 +146,22 @@ export default function Dashboard() {
               <div className="tx-amount">-{fmt(tx.amount, currency)}</div>
               <div className="tx-date">{fmtDate(tx.date)}</div>
             </div>
-            <button className="tx-delete" onClick={() => deleteExpense(tx.id)}><IClose /></button>
+            <button className="tx-delete" onClick={e => { e.stopPropagation(); deleteExpense(tx.id); }}><IClose /></button>
           </div>
         ))}
       </div>
 
-      {modal === 'expense' && (
+      {modal?.type === 'expense' && (
         <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) setModal(null); }}>
           <div className="modal-box">
-            <AddExpense onClose={() => setModal(null)} />
+            <AddExpense onClose={() => setModal(null)} initial={modal.item} />
           </div>
         </div>
       )}
-      {modal === 'income' && (
+      {modal?.type === 'income' && (
         <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) setModal(null); }}>
           <div className="modal-box">
-            <AddIncome onClose={() => setModal(null)} />
+            <AddIncome onClose={() => setModal(null)} initial={modal.item} />
           </div>
         </div>
       )}

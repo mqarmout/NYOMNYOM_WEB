@@ -11,27 +11,36 @@ const SOURCES = [
   { value: 'other',      label: 'Other' },
 ];
 
-export default function AddIncome({ onClose }) {
-  const { addIncome, showToast, profile } = useApp();
+export default function AddIncome({ onClose, initial }) {
+  const { addIncome, updateIncome, showToast, profile } = useApp();
   const today = new Date().toISOString().split('T')[0];
-  const [amount,          setAmount]          = useState('');
-  const [desc,            setDesc]            = useState('');
-  const [source,          setSource]          = useState('salary');
-  const [date,            setDate]            = useState(today);
+  const [amount,          setAmount]          = useState(initial ? String(initial.amount) : '');
+  const [desc,            setDesc]            = useState(initial?.description ?? '');
+  const [source,          setSource]          = useState(initial?.source ?? 'salary');
+  const [date,            setDate]            = useState(initial?.date ?? today);
   const [saving,          setSaving]          = useState(false);
-  const [recurring,       setRecurring]       = useState(false);
-  const [recurringPeriod, setRecurringPeriod] = useState('monthly');
-  const [recurringStart,  setRecurringStart]  = useState(today);
+  const [recurring,       setRecurring]       = useState(initial?.recurring ? true : false);
+  const [recurringPeriod, setRecurringPeriod] = useState(initial?.recurring_period ?? 'monthly');
+  const [recurringStart,  setRecurringStart]  = useState(initial?.recurring_start ?? today);
+
+  const isEdit = !!initial;
 
   const handleSave = async () => {
     if (!amount || parseFloat(amount) <= 0) return showToast('Enter a valid amount');
     if (!desc.trim()) return showToast('Enter a description');
     if (!date)        return showToast('Select a date');
     setSaving(true);
-    await addIncome({
+    const data = {
       amount: parseFloat(amount), description: desc.trim(), source, date,
-      ...(recurring && { recurring: true, recurring_period: recurringPeriod, recurring_start: recurringStart }),
-    });
+      ...(recurring
+        ? { recurring: true, recurring_period: recurringPeriod, recurring_start: recurringStart }
+        : { recurring: false, recurring_period: null, recurring_start: null }),
+    };
+    if (isEdit) {
+      await updateIncome(initial.id, data);
+    } else {
+      await addIncome(data);
+    }
     setSaving(false);
     onClose();
   };
@@ -54,7 +63,7 @@ export default function AddIncome({ onClose }) {
   return (
     <>
       <div className="modal-header">
-        <div className="modal-title">Add Income</div>
+        <div className="modal-title">{isEdit ? 'Edit Income' : 'Add Income'}</div>
         <button className="close-btn" onClick={onClose}><IClose /></button>
       </div>
 
@@ -124,7 +133,7 @@ export default function AddIncome({ onClose }) {
       )}
 
       <button className="modal-save-btn income-save-btn" onClick={handleSave} disabled={saving}>
-        {saving ? 'Saving…' : 'Save Income'}
+        {saving ? 'Saving…' : isEdit ? 'Save Changes' : 'Save Income'}
       </button>
     </>
   );

@@ -2,17 +2,19 @@ import { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Px, IClose } from '../../icons';
 
-export default function AddExpense({ onClose }) {
-  const { categories, addExpense, showToast, profile } = useApp();
+export default function AddExpense({ onClose, initial }) {
+  const { categories, addExpense, updateExpense, showToast, profile } = useApp();
   const today = new Date().toISOString().split('T')[0];
-  const [amount,          setAmount]          = useState('');
-  const [desc,            setDesc]            = useState('');
-  const [date,            setDate]            = useState(today);
-  const [catId,           setCatId]           = useState(null);
+  const [amount,          setAmount]          = useState(initial ? String(initial.amount) : '');
+  const [desc,            setDesc]            = useState(initial?.description ?? '');
+  const [date,            setDate]            = useState(initial?.date ?? today);
+  const [catId,           setCatId]           = useState(initial?.category_id ?? null);
   const [saving,          setSaving]          = useState(false);
-  const [recurring,       setRecurring]       = useState(false);
-  const [recurringPeriod, setRecurringPeriod] = useState('monthly');
-  const [recurringStart,  setRecurringStart]  = useState(today);
+  const [recurring,       setRecurring]       = useState(initial?.recurring ? true : false);
+  const [recurringPeriod, setRecurringPeriod] = useState(initial?.recurring_period ?? 'monthly');
+  const [recurringStart,  setRecurringStart]  = useState(initial?.recurring_start ?? today);
+
+  const isEdit = !!initial;
 
   const handleSave = async () => {
     if (!amount || parseFloat(amount) <= 0) return showToast('Enter a valid amount');
@@ -21,10 +23,17 @@ export default function AddExpense({ onClose }) {
     if (!date)          return showToast('Select a date');
 
     setSaving(true);
-    await addExpense({
+    const data = {
       amount: parseFloat(amount), description: desc.trim(), category_id: catId, date,
-      ...(recurring && { recurring: true, recurring_period: recurringPeriod, recurring_start: recurringStart }),
-    });
+      ...(recurring
+        ? { recurring: true, recurring_period: recurringPeriod, recurring_start: recurringStart }
+        : { recurring: false, recurring_period: null, recurring_start: null }),
+    };
+    if (isEdit) {
+      await updateExpense(initial.id, data);
+    } else {
+      await addExpense(data);
+    }
     setSaving(false);
     onClose();
   };
@@ -47,7 +56,7 @@ export default function AddExpense({ onClose }) {
   return (
     <>
       <div className="modal-header">
-        <div className="modal-title">Add Expense</div>
+        <div className="modal-title">{isEdit ? 'Edit Expense' : 'Add Expense'}</div>
         <button className="close-btn" onClick={onClose}><IClose /></button>
       </div>
 
@@ -123,7 +132,7 @@ export default function AddExpense({ onClose }) {
       </div>
 
       <button className="modal-save-btn" onClick={handleSave} disabled={saving}>
-        {saving ? 'Saving…' : 'Save Expense'}
+        {saving ? 'Saving…' : isEdit ? 'Save Changes' : 'Save Expense'}
       </button>
     </>
   );
