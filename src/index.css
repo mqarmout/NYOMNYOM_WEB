@@ -2005,3 +2005,198 @@ html::after {
   border-top: 1px solid rgba(0,255,65,0.08);
   letter-spacing: 0.05em;
 }
+
+/* ── Mobile home grid (hidden on desktop) ── */
+.mobile-home {
+  display: none;
+  position: absolute;
+  top: 50px;
+  left: 0; right: 0; bottom: 0;
+  z-index: 5;
+  padding: 14px 12px;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  align-content: start;
+  overflow-y: auto;
+  background: var(--bg);
+  -webkit-overflow-scrolling: touch;
+}
+.mobile-home-tile {
+  background: rgba(0, 3, 0, 0.9);
+  border: 1px solid rgba(0,255,65,0.1);
+  border-top: 2px solid var(--ca, #00ff41);
+  padding: 22px 12px 18px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  color: var(--ca, #00ff41);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 0.06em;
+  text-shadow: 0 0 10px var(--cg);
+  transition: background 0.15s, box-shadow 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.mobile-home-tile:hover { background: rgba(0,5,0,0.98); box-shadow: 0 0 18px var(--cg); }
+
+/* ── Tablet — constrain some grids ── */
+@media (max-width: 900px) {
+  .map-sidebar { width: clamp(300px, 45vw, 420px); }
+  .job-board { grid-template-columns: repeat(5, minmax(150px, 1fr)); overflow-x: auto; }
+}
+
+/* ── Mobile (≤ 640px) ── */
+@media (max-width: 640px) {
+  /* Topbar: compact */
+  .topbar { padding: 0 10px; gap: 6px; height: 50px; }
+  .tb-brand { font-size: 9px; }
+  .tb-nav { display: none; }
+  .tb-name { display: none; }
+  .tb-help-btn { display: none; }
+  .tb-logout { font-size: 5px; padding: 4px 8px; }
+  .tb-avatar { width: 24px; height: 24px; font-size: 6px; }
+  .tb-map-btn { font-size: 5px; padding: 4px 8px; }
+
+  /* Hide mountain world, show mobile home grid */
+  .world-layer { display: none; }
+  .mobile-home { display: grid; }
+  .map-sidebar { display: none !important; }
+
+  /* Section popup: full screen */
+  .section-popup {
+    top: 50px !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    transform: none !important;
+    height: calc(100vh - 50px);
+    animation: popupIn-mobile 0.2s ease;
+  }
+  @keyframes popupIn-mobile {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Popup header: title+close on row 1, tabs on row 2 */
+  .popup-header { flex-wrap: wrap; padding: 8px 10px; gap: 6px; }
+  .popup-title  { order: 1; font-size: 6px; }
+  .popup-close  { order: 2; margin-left: auto; padding: 5px 8px; font-size: 5px; }
+  .popup-tabs {
+    order: 3; width: 100%;
+    overflow-x: auto; flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; padding-bottom: 2px;
+  }
+  .popup-tabs::-webkit-scrollbar { display: none; }
+  .popup-tab { white-space: nowrap; flex-shrink: 0; padding: 5px 10px; font-size: 5px; }
+  .popup-body { padding: 12px; }
+
+  /* Page header */
+  .page-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+
+  /* Finance cards: 2 cols */
+  .finance-cards { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .finance-card { padding: 12px 12px; }
+  .finance-card .fc-amount { font-size: 18px; }
+
+  /* Graphs: single column */
+  .graphs-grid { grid-template-columns: 1fr; }
+  .graphs-grid .span-2 { grid-column: span 1; }
+  .donut-row { flex-direction: column; align-items: center; }
+  .donut-svg-wrap { width: 110px; }
+
+  /* Profile / About: single column */
+  .profile-layout { grid-template-columns: 1fr; }
+  .about-layout   { grid-template-columns: 1fr; }
+
+  /* Portfolio project grid */
+  .project-grid { grid-template-columns: 1fr; }
+
+  /* Category cards */
+  .cat-card-grid { grid-template-columns: 1fr 1fr; }
+
+  /* Category grid in add-expense modal */
+  .cat-grid { grid-template-columns: repeat(4, 1fr); }
+
+  /* Icon picker */
+  .icon-picker { grid-template-columns: repeat(7, 1fr); }
+
+  /* Stats row */
+  .stats-row { grid-template-columns: 1fr; }
+
+  /* Climbing grid */
+  .climb-grid { grid-template-columns: 1fr; }
+
+  /* Job board: horizontal swipe */
+  .job-board {
+    grid-template-columns: repeat(5, 75vw);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 6px;
+    gap: 8px;
+  }
+  .job-column { scroll-snap-align: start; }
+
+  /* Kanban: horizontal swipe */
+  .kb-columns {
+    grid-template-columns: repeat(3, 82vw);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+    gap: 10px;
+  }
+  .kb-col { scroll-snap-align: start; }
+
+  /* Modal: bottom sheet */
+  .modal-overlay { align-items: flex-end; padding: 0; }
+  .modal-box {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    max-height: 92vh;
+    border-left: none; border-right: none; border-bottom: none;
+    border-radius: 0;
+    padding: 20px 16px 32px;
+  }
+
+  /* Terminal: full width */
+  .term-overlay { padding: 8vh 12px 0; align-items: flex-start; }
+  .term-box { width: 100%; max-width: 100%; }
+
+  /* Add-set form */
+  .add-set-form { flex-direction: column; }
+  .set-input-sm { width: 100%; }
+
+  /* Settings row */
+  .settings-row { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .settings-row-input { max-width: 100%; width: 100%; text-align: left; }
+
+  /* Timeline */
+  .timeline-header { flex-direction: column; gap: 4px; }
+
+  /* Metric / skill add rows */
+  .metric-add-row { flex-direction: column; }
+  .skill-add-row  { flex-direction: column; }
+
+  /* Toast */
+  .toast { bottom: 16px; right: 12px; left: 12px; font-size: 11px; }
+
+  /* Auth card */
+  .auth-card { padding: 28px 18px; }
+
+  /* Public portfolio */
+  .public-header    { padding: 0 16px; }
+  .public-container { padding: 28px 16px 48px; }
+  .public-name      { font-size: 22px; }
+}
+
+/* ── Very small phones (≤ 380px) ── */
+@media (max-width: 380px) {
+  .finance-cards { grid-template-columns: 1fr; }
+  .cat-card-grid { grid-template-columns: 1fr; }
+  .cat-grid      { grid-template-columns: repeat(3, 1fr); }
+  .icon-picker   { grid-template-columns: repeat(6, 1fr); }
+}

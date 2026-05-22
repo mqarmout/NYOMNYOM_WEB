@@ -739,6 +739,23 @@ function AppInner({ authUser, onLogout }) {
         <button className="tb-logout" onClick={onLogout}>SIGN OUT</button>
       </div>
 
+      {/* Mobile home grid — shown only on small screens when no section is open */}
+      {!isOpen && (
+        <div className="mobile-home">
+          {Object.entries(SECTIONS).map(([id, s]) => (
+            <button
+              key={id}
+              className="mobile-home-tile"
+              style={{ '--ca': s.accent, '--cg': s.glow }}
+              onClick={() => setScreen(SECTION_DEFAULT[id])}
+            >
+              <Px name={s.icon} size={32} />
+              <span>{id.toUpperCase()}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Map sidebar — overview stats, hidden when popup is open */}
       {!isOpen && <MapSidebar />}
 
