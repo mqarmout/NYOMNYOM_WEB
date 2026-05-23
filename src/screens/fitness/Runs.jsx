@@ -146,8 +146,35 @@ export default function Runs() {
   const { runs, runHistory, loadAll, addRun, updateRun, deleteRun } = useFitness();
   const [showModal, setShowModal] = useState(false);
   const [editing,   setEditing]   = useState(null);
+  const [toast,     setToast]     = useState(null);
 
   useEffect(() => { loadAll(); }, [loadAll]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const strava = params.get('strava');
+    if (strava) {
+      if (strava === 'ok') {
+        const count = params.get('count') || '0';
+        setToast({ type: 'ok', msg: `Imported ${count} run${count === '1' ? '' : 's'} from Strava.` });
+        loadAll();
+      } else if (strava === 'denied') {
+        setToast({ type: 'err', msg: 'Strava authorization was denied.' });
+      } else {
+        setToast({ type: 'err', msg: 'Strava import failed. Please try again.' });
+      }
+      const clean = new URL(window.location.href);
+      clean.searchParams.delete('strava');
+      clean.searchParams.delete('count');
+      window.history.replaceState({}, '', clean.toString());
+    }
+  }, [loadAll]);
+
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 4000);
+    return () => clearTimeout(t);
+  }, [toast]);
 
   useEffect(() => {
     const handler = () => setShowModal(true);
@@ -168,13 +195,34 @@ export default function Runs() {
 
   return (
     <div className="screen">
+      {toast && (
+        <div style={{
+          position: 'fixed', top: 20, left: '50%', transform: 'translateX(-50%)',
+          background: toast.type === 'ok' ? 'var(--accent)' : '#c0392b',
+          color: '#fff', padding: '10px 20px', borderRadius: 8,
+          zIndex: 9999, fontWeight: 600, fontSize: 14, pointerEvents: 'none',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
+        }}>
+          {toast.msg}
+        </div>
+      )}
       <div className="page-header">
         <div>
           <h1>Running</h1>
           <p>{month}</p>
         </div>
-        <button className="sidebar-add-btn" style={{ width: 'auto', padding: '10px 20px', marginTop: 4 }}
-          onClick={() => setShowModal(true)}>+ Log Run</button>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 4 }}>
+          <a href="/api/strava/auth"
+            style={{
+              padding: '10px 18px', borderRadius: 8, fontSize: 13, fontWeight: 600,
+              background: '#fc4c02', color: '#fff', textDecoration: 'none',
+              border: 'none', cursor: 'pointer', display: 'inline-block',
+            }}>
+            Strava Import
+          </a>
+          <button className="sidebar-add-btn" style={{ width: 'auto', padding: '10px 20px' }}
+            onClick={() => setShowModal(true)}>+ Log Run</button>
+        </div>
       </div>
 
       <div className="finance-cards">
