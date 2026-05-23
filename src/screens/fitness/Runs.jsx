@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useFitness } from '../../context/FitnessContext';
 import { AreaChart } from '../../Charts';
-import { fmtDate } from '../../utils';
+import { fmtDate, apiFetch } from '../../utils';
 import { IClose, IEdit } from '../../icons';
 
 const RUN_TYPES = ['easy', 'tempo', 'long', 'intervals', 'race'];
@@ -144,30 +144,36 @@ function RunModal({ initial, onSave, onClose }) {
 
 export default function Runs() {
   const { runs, runHistory, loadAll, addRun, updateRun, deleteRun } = useFitness();
-  const [showModal, setShowModal] = useState(false);
-  const [editing,   setEditing]   = useState(null);
-  const [toast,     setToast]     = useState(null);
+  const [showModal,       setShowModal]       = useState(false);
+  const [editing,         setEditing]         = useState(null);
+  const [toast,           setToast]           = useState(null);
+  const [stravaConnected, setStravaConnected] = useState(null);
+  const [importing,       setImporting]       = useState(false);
 
   useEffect(() => { loadAll(); }, [loadAll]);
 
   useEffect(() => {
+    apiFetch('/api/strava/status').then(d => setStravaConnected(d.connected ?? false));
+  }, []);
+
+  useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const strava = params.get('strava');
-    if (strava) {
-      if (strava === 'ok') {
-        const count = params.get('count') || '0';
-        setToast({ type: 'ok', msg: `Imported ${count} run${count === '1' ? '' : 's'} from Strava.` });
-        loadAll();
-      } else if (strava === 'denied') {
-        setToast({ type: 'err', msg: 'Strava authorization was denied.' });
-      } else {
-        setToast({ type: 'err', msg: 'Strava import failed. Please try again.' });
-      }
-      const clean = new URL(window.location.href);
-      clean.searchParams.delete('strava');
-      clean.searchParams.delete('count');
-      window.history.replaceState({}, '', clean.toString());
+    if (!strava) return;
+    if (strava === 'connected') {
+      const count = params.get('count') || '0';
+      setStravaConnected(true);
+      setToast({ type: 'ok', msg: `Strava connected! Imported ${count} run${count === '1' ? '' : 's'}.` });
+      loadAll();
+    } else if (strava === 'denied') {
+      setToast({ type: 'err', msg: 'Strava authorization was denied.' });
+    } else {
+      setToast({ type: 'err', msg: 'Strava connection failed. Please try again.' });
     }
+    const clean = new URL(window.location.href);
+    clean.searchParams.delete('strava');
+    clean.searchParams.delete('count');
+    window.history.replaceState({}, '', clean.toString());
   }, [loadAll]);
 
   useEffect(() => {
@@ -175,6 +181,19 @@ export default function Runs() {
     const t = setTimeout(() => setToast(null), 4000);
     return () => clearTimeout(t);
   }, [toast]);
+
+  const handleStravaImport = useCallback(async () => {
+    setImporting(true);
+    const res = await apiFetch('/api/strava/import', { method: 'POST' });
+    setImporting(false);
+    if (res.error) {
+      setToast({ type: 'err', msg: 'Import failed. Please try again.' });
+    } else {
+      const n = res.imported ?? 0;
+      setToast({ type: 'ok', msg: n > 0 ? `Imported ${n} new run${n === 1 ? '' : 's'} from Strava.` : 'Already up to date.' });
+      if (n > 0) loadAll();
+    }
+  }, [loadAll]);
 
   useEffect(() => {
     const handler = () => setShowModal(true);
@@ -212,14 +231,23 @@ export default function Runs() {
           <p>{month}</p>
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 4 }}>
-          <a href="/api/strava/auth"
-            style={{
+          {stravaConnected === false && (
+            <a href="/api/strava/auth" style={{
               padding: '10px 18px', borderRadius: 8, fontSize: 13, fontWeight: 600,
-              background: '#fc4c02', color: '#fff', textDecoration: 'none',
-              border: 'none', cursor: 'pointer', display: 'inline-block',
+              background: '#fc4c02', color: '#fff', textDecoration: 'none', display: 'inline-block',
             }}>
-            Strava Import
-          </a>
+              Connect Strava
+            </a>
+          )}
+          {stravaConnected === true && (
+            <button onClick={handleStravaImport} disabled={importing} style={{
+              padding: '10px 18px', borderRadius: 8, fontSize: 13, fontWeight: 600,
+              background: importing ? '#a33000' : '#fc4c02', color: '#fff',
+              border: 'none', cursor: importing ? 'default' : 'pointer',
+            }}>
+              {importing ? 'Importing…' : 'Import Strava'}
+            </button>
+          )}
           <button className="sidebar-add-btn" style={{ width: 'auto', padding: '10px 20px' }}
             onClick={() => setShowModal(true)}>+ Log Run</button>
         </div>
