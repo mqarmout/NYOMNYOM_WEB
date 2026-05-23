@@ -4,10 +4,12 @@ import { apiFetch } from '../utils';
 const FitnessContext = createContext(null);
 
 export function FitnessProvider({ children }) {
-  const [workouts, setWorkouts] = useState([]);
-  const [metrics,  setMetrics]  = useState([]);
-  const [history,  setHistory]  = useState([]);
-  const [toast,    setToast]    = useState('');
+  const [workouts,    setWorkouts]    = useState([]);
+  const [metrics,     setMetrics]     = useState([]);
+  const [history,     setHistory]     = useState([]);
+  const [runs,        setRuns]        = useState([]);
+  const [runHistory,  setRunHistory]  = useState([]);
+  const [toast,       setToast]       = useState('');
   const toastTimer = useRef(null);
 
   const showToast = useCallback((msg) => {
@@ -17,14 +19,18 @@ export function FitnessProvider({ children }) {
   }, []);
 
   const loadAll = useCallback(async () => {
-    const [w, m, h] = await Promise.all([
+    const [w, m, h, r, rh] = await Promise.all([
       apiFetch('/api/fitness/workouts'),
       apiFetch('/api/fitness/metrics'),
       apiFetch('/api/fitness/metrics/history'),
+      apiFetch('/api/runs'),
+      apiFetch('/api/runs/history'),
     ]);
     setWorkouts(w);
     setMetrics(m);
     setHistory(h);
+    setRuns(r);
+    setRunHistory(rh);
   }, []);
 
   const addWorkout = useCallback(async (data) => {
@@ -83,11 +89,35 @@ export function FitnessProvider({ children }) {
     showToast('Deleted');
   }, [showToast]);
 
+  const refreshRuns = useCallback(async () => {
+    const [r, rh] = await Promise.all([apiFetch('/api/runs'), apiFetch('/api/runs/history')]);
+    setRuns(r);
+    setRunHistory(rh);
+  }, []);
+
+  const addRun = useCallback(async (data) => {
+    await apiFetch('/api/runs', { method: 'POST', body: JSON.stringify(data) });
+    await refreshRuns();
+    showToast('Run logged ✓');
+  }, [refreshRuns, showToast]);
+
+  const updateRun = useCallback(async (id, data) => {
+    await apiFetch('/api/runs/' + id, { method: 'PUT', body: JSON.stringify(data) });
+    await refreshRuns();
+    showToast('Run updated ✓');
+  }, [refreshRuns, showToast]);
+
+  const deleteRun = useCallback(async (id) => {
+    await apiFetch('/api/runs/' + id, { method: 'DELETE' });
+    setRuns(prev => prev.filter(r => r.id !== id));
+    showToast('Deleted');
+  }, [showToast]);
+
   return (
     <FitnessContext.Provider value={{
-      workouts, metrics, history, toast,
+      workouts, metrics, history, runs, runHistory, toast,
       loadAll, addWorkout, updateWorkout, deleteWorkout, addSet, updateSet, deleteSet,
-      addMetric, deleteMetric, showToast,
+      addMetric, deleteMetric, addRun, updateRun, deleteRun, showToast,
     }}>
       {children}
     </FitnessContext.Provider>

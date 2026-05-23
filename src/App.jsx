@@ -13,6 +13,7 @@ import Applications from './screens/jobs/Applications';
 import Contacts     from './screens/jobs/Contacts';
 import Workouts     from './screens/fitness/Workouts';
 import BodyMetrics  from './screens/fitness/BodyMetrics';
+import Runs         from './screens/fitness/Runs';
 import Projects     from './screens/portfolio/Projects';
 import Skills       from './screens/portfolio/Skills';
 import Experience   from './screens/portfolio/Experience';
@@ -84,6 +85,7 @@ const SECTIONS = {
     routeActive: 'rgba(90,158,212,0.9)',
     items: [
       { id: 'fitness-workouts', label: 'WORKOUTS' },
+      { id: 'fitness-runs',     label: 'RUNNING' },
       { id: 'fitness-metrics',  label: 'BODY METRICS' },
     ],
   },
@@ -139,6 +141,7 @@ const SCREEN_TO_SECTION = {
   'jobs-applications':    'jobs',
   'jobs-contacts':        'jobs',
   'fitness-workouts':     'fitness',
+  'fitness-runs':         'fitness',
   'fitness-metrics':      'fitness',
   'portfolio-projects':   'portfolio',
   'portfolio-skills':     'portfolio',
@@ -173,6 +176,8 @@ const COMMANDS = [
   { cmd: 'jobs/contacts/new',       screen: 'jobs-contacts',        fire: true,  label: 'Jobs → Add Contact' },
   { cmd: 'fitness',                 screen: 'fitness-workouts',     fire: false, label: 'Fitness → Workouts' },
   { cmd: 'fitness/new',             screen: 'fitness-workouts',     fire: true,  label: 'Fitness → Log Workout' },
+  { cmd: 'fitness/runs',            screen: 'fitness-runs',         fire: false, label: 'Fitness → Running' },
+  { cmd: 'fitness/runs/new',        screen: 'fitness-runs',         fire: true,  label: 'Fitness → Log Run' },
   { cmd: 'fitness/metrics',         screen: 'fitness-metrics',      fire: false, label: 'Fitness → Body Metrics' },
   { cmd: 'portfolio',               screen: 'portfolio-projects',   fire: false, label: 'Portfolio → Projects' },
   { cmd: 'portfolio/projects',      screen: 'portfolio-projects',   fire: false, label: 'Portfolio → Projects' },
@@ -336,7 +341,7 @@ function Toasts() {
 function MapSidebar() {
   const { expenses, categories, profile }      = useApp();
   const { jobs }                               = useJob();
-  const { metrics, history, workouts }         = useFitness();
+  const { metrics, history, workouts, runs }   = useFitness();
   const { climbs }                             = useClimbing();
   const { projects: devProjects, kanbanTasks } = useDevProjects();
 
@@ -369,6 +374,8 @@ function MapSidebar() {
   // ── Fitness ──────────────────────────────────────────────────
   const latestWeight      = metrics[0]?.weight;
   const workoutsThisMonth = workouts.filter(w => w.date?.startsWith(mo)).length;
+  const runsThisMonth     = runs.filter(r => r.date?.startsWith(mo));
+  const runKmThisMonth    = runsThisMonth.reduce((s, r) => s + r.distance_km, 0);
   const sparkPts          = [...history].reverse().slice(-16);
   const SW = 400, SH = 58;
   let sparkPath = '';
@@ -395,7 +402,7 @@ function MapSidebar() {
 
   const showSpending  = thisMonthExp.length > 0;
   const showJobs      = jobs.length > 0;
-  const showFitness   = workouts.length > 0 || metrics.length > 0;
+  const showFitness   = workouts.length > 0 || metrics.length > 0 || runs.length > 0;
   const showClimbing  = climbs.length > 0;
   const showProjects  = devProjects.length > 0;
 
@@ -487,6 +494,9 @@ function MapSidebar() {
           )}
           {sparkPath && (
             <div className="msb-tiny">{metrics.length} measurements · {workouts.length} workouts total</div>
+          )}
+          {runKmThisMonth > 0 && (
+            <div className="msb-tiny" style={{ marginTop: 2 }}>{runKmThisMonth.toFixed(1)} km run this month · {runsThisMonth.length} run{runsThisMonth.length !== 1 ? 's' : ''}</div>
           )}
         </div>
       )}
@@ -642,6 +652,7 @@ function AppInner({ authUser, onLogout }) {
       case 'jobs-applications':    return <Applications />;
       case 'jobs-contacts':        return <Contacts />;
       case 'fitness-workouts':     return <Workouts />;
+      case 'fitness-runs':         return <Runs />;
       case 'fitness-metrics':      return <BodyMetrics />;
       case 'portfolio-projects':   return <Projects />;
       case 'portfolio-skills':     return <Skills />;
