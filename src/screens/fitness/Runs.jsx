@@ -147,13 +147,13 @@ export default function Runs() {
   const [showModal,       setShowModal]       = useState(false);
   const [editing,         setEditing]         = useState(null);
   const [toast,           setToast]           = useState(null);
-  const [stravaConnected, setStravaConnected] = useState(null);
+  const [stravaStatus,    setStravaStatus]    = useState(null); // {configured, connected}
   const [importing,       setImporting]       = useState(false);
 
   useEffect(() => { loadAll(); }, [loadAll]);
 
   useEffect(() => {
-    apiFetch('/api/strava/status').then(d => setStravaConnected(d.connected ?? false));
+    apiFetch('/api/strava/status').then(d => setStravaStatus(d));
   }, []);
 
   useEffect(() => {
@@ -162,7 +162,7 @@ export default function Runs() {
     if (!strava) return;
     if (strava === 'connected') {
       const count = params.get('count') || '0';
-      setStravaConnected(true);
+      setStravaStatus(s => ({ ...s, connected: true }));
       setToast({ type: 'ok', msg: `Strava connected! Imported ${count} run${count === '1' ? '' : 's'}.` });
       loadAll();
     } else if (strava === 'denied') {
@@ -231,15 +231,25 @@ export default function Runs() {
           <p>{month}</p>
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 4 }}>
-          {stravaConnected === false && (
-            <a href="/api/strava/auth" style={{
-              padding: '10px 18px', borderRadius: 8, fontSize: 13, fontWeight: 600,
-              background: '#fc4c02', color: '#fff', textDecoration: 'none', display: 'inline-block',
-            }}>
-              Connect Strava
-            </a>
+          {stravaStatus && !stravaStatus.connected && (
+            stravaStatus.configured ? (
+              <a href="/api/strava/auth" style={{
+                padding: '10px 18px', borderRadius: 8, fontSize: 13, fontWeight: 600,
+                background: '#fc4c02', color: '#fff', textDecoration: 'none', display: 'inline-block',
+              }}>
+                Connect Strava
+              </a>
+            ) : (
+              <span title="Set STRAVA_CLIENT_ID and STRAVA_CLIENT_SECRET on the server" style={{
+                padding: '10px 18px', borderRadius: 8, fontSize: 13, fontWeight: 600,
+                background: 'var(--bg-card)', color: 'var(--fg-dim)',
+                border: '1px solid var(--border)', cursor: 'not-allowed', display: 'inline-block',
+              }}>
+                Strava (not configured)
+              </span>
+            )
           )}
-          {stravaConnected === true && (
+          {stravaStatus?.connected && (
             <button onClick={handleStravaImport} disabled={importing} style={{
               padding: '10px 18px', borderRadius: 8, fontSize: 13, fontWeight: 600,
               background: importing ? '#a33000' : '#fc4c02', color: '#fff',
