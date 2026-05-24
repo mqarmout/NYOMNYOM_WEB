@@ -3,8 +3,9 @@ import { AppProvider, useApp }             from './context/AppContext';
 import { JobProvider, useJob }             from './context/JobContext';
 import { FitnessProvider, useFitness }     from './context/FitnessContext';
 import { PortfolioProvider, usePortfolio } from './context/PortfolioContext';
-import { ClimbingProvider, useClimbing }     from './context/ClimbingContext';
+import { ClimbingProvider, useClimbing }   from './context/ClimbingContext';
 import { ProjectsProvider, useDevProjects } from './context/ProjectsContext';
+import { HydroProvider, useHydro }         from './context/HydroContext';
 
 import Dashboard    from './screens/spending/Dashboard';
 import Graphs       from './screens/spending/Graphs';
@@ -21,6 +22,10 @@ import About        from './screens/portfolio/About';
 import Climbs       from './screens/climbing/Climbs';
 import DevProjects  from './screens/projects/DevProjects';
 import KanbanScreen from './screens/projects/KanbanScreen';
+import HydroDashboard from './screens/hydro/Dashboard';
+import HydroHistory   from './screens/hydro/History';
+import HydroPlants    from './screens/hydro/Plants';
+import HydroDosing    from './screens/hydro/Dosing';
 import Profile      from './screens/Profile';
 import SignIn       from './screens/SignIn';
 import PublicPortfolio from './screens/PublicPortfolio';
@@ -38,11 +43,13 @@ import { Px, IClose, IArrowLeft, IChevDown } from './icons';
  *            Q 290 200 380 230   ← climbing
  *            Q 320 165 290 100   ← spending
  */
-/* Projects station spur: M 380 450 Q 410 395 430 340 (branches right from base)
- * Right face at x=430: y=275; point y=340 > 275 → inside mountain ✓
- * Control (410,395): right face at x=410: y=245; point y=395 > 245 ✓
+/* Projects spur: M 380 450 Q 410 395 430 340 (right from base)
+ * Right face at x=430: y=275; point y=340 > 275 ✓
+ * Hydro spur: M 380 450 Q 450 435 490 410 (further right/lower)
+ * Right face at x=490: y=365; point y=410 > 365 ✓
+ * Control (450,435): right face at x=450: y=305; 435 > 305 ✓
  */
-const FULL_PATH = 'M 380 450 Q 410 395 430 340 M 380 450 Q 250 420 120 340 Q 200 305 260 255 Q 230 215 200 180 Q 290 200 380 230 Q 320 165 290 100';
+const FULL_PATH = 'M 380 450 Q 410 395 430 340 M 380 450 Q 450 435 490 410 M 380 450 Q 250 420 120 340 Q 200 305 260 255 Q 230 215 200 180 Q 290 200 380 230 Q 320 165 290 100';
 
 const SECTIONS = {
   spending: {
@@ -132,6 +139,22 @@ const SECTIONS = {
       { id: 'projects-board',   label: 'BOARD' },
     ],
   },
+  hydro: {
+    accent:      '#2eb8a0',
+    glow:        'rgba(46,184,160,0.5)',
+    dim:         'rgba(46,184,160,0.15)',
+    label:       '▶ HYDROPONICS BASE CAMP',
+    icon:        'droplet',
+    pos:         { left: '49%', top: '68.3%' },
+    pathTo:      'M 380 450 Q 450 435 490 410',
+    routeActive: 'rgba(46,184,160,0.9)',
+    items: [
+      { id: 'hydro-dashboard', label: 'DASHBOARD' },
+      { id: 'hydro-history',   label: 'HISTORY' },
+      { id: 'hydro-plants',    label: 'PLANTS' },
+      { id: 'hydro-dosing',    label: 'DOSING' },
+    ],
+  },
 };
 
 const SCREEN_TO_SECTION = {
@@ -150,6 +173,10 @@ const SCREEN_TO_SECTION = {
   'climbing-routes':      'climbing',
   'projects-tracker':     'projects',
   'projects-board':       'projects',
+  'hydro-dashboard':      'hydro',
+  'hydro-history':        'hydro',
+  'hydro-plants':         'hydro',
+  'hydro-dosing':         'hydro',
 };
 
 const SECTION_DEFAULT = {
@@ -159,9 +186,10 @@ const SECTION_DEFAULT = {
   portfolio: 'portfolio-projects',
   climbing:  'climbing-routes',
   projects:  'projects-tracker',
+  hydro:     'hydro-dashboard',
 };
 
-const SECTION_ORDER = ['spending', 'jobs', 'fitness', 'portfolio', 'climbing', 'projects'];
+const SECTION_ORDER = ['spending', 'jobs', 'fitness', 'portfolio', 'climbing', 'projects', 'hydro'];
 
 const COMMANDS = [
   { cmd: 'spending',                screen: 'dashboard',            fire: false, label: 'Spending → Dashboard' },
@@ -190,6 +218,13 @@ const COMMANDS = [
   { cmd: 'projects/new',            screen: 'projects-tracker',     fire: true,  label: 'Projects → New Project' },
   { cmd: 'projects/board',          screen: 'projects-board',       fire: false, label: 'Projects → Board' },
   { cmd: 'projects/board/new',      screen: 'projects-board',       fire: true,  label: 'Projects → Add Task' },
+  { cmd: 'hydro',                   screen: 'hydro-dashboard',      fire: false, label: 'Hydro → Dashboard' },
+  { cmd: 'hydro/new',               screen: 'hydro-dashboard',      fire: true,  label: 'Hydro → Log Reading' },
+  { cmd: 'hydro/history',           screen: 'hydro-history',        fire: false, label: 'Hydro → History' },
+  { cmd: 'hydro/plants',            screen: 'hydro-plants',         fire: false, label: 'Hydro → Plants' },
+  { cmd: 'hydro/plants/new',        screen: 'hydro-plants',         fire: true,  label: 'Hydro → Add Plant' },
+  { cmd: 'hydro/dosing',            screen: 'hydro-dosing',         fire: false, label: 'Hydro → Dosing Log' },
+  { cmd: 'hydro/dosing/new',        screen: 'hydro-dosing',         fire: true,  label: 'Hydro → Log Dosing' },
   { cmd: 'profile',                 screen: 'profile',              fire: false, label: 'Profile' },
   { cmd: 'logout',                  screen: '__logout__',           fire: false, label: 'Logout' },
 ];
@@ -334,7 +369,8 @@ function Toasts() {
   const { toast: t4 } = usePortfolio();
   const { toast: t5 } = useClimbing();
   const { toast: t6 } = useDevProjects();
-  const msg = t1 || t2 || t3 || t4 || t5 || t6;
+  const { toast: t7 } = useHydro();
+  const msg = t1 || t2 || t3 || t4 || t5 || t6 || t7;
   return <div className={'toast ' + (msg ? 'show' : '')}>{msg}</div>;
 }
 
@@ -344,6 +380,7 @@ function MapSidebar() {
   const { metrics, history, workouts, runs }   = useFitness();
   const { climbs }                             = useClimbing();
   const { projects: devProjects, kanbanTasks } = useDevProjects();
+  const { latest: hydroLatest, plants: hydroPlants } = useHydro();
 
   const currency = profile.currency || '$';
   const mo       = new Date().toISOString().slice(0, 7);
@@ -400,13 +437,15 @@ function MapSidebar() {
   const inProgress     = kanbanTasks.filter(t => t.status === 'in_progress').length;
   const doneTasks      = kanbanTasks.filter(t => t.status === 'done').length;
 
+  const activePlants  = hydroPlants.filter(p => p.active);
   const showSpending  = thisMonthExp.length > 0;
   const showJobs      = jobs.length > 0;
   const showFitness   = workouts.length > 0 || metrics.length > 0 || runs.length > 0;
   const showClimbing  = climbs.length > 0;
   const showProjects  = devProjects.length > 0;
+  const showHydro     = hydroLatest !== null && hydroLatest !== undefined;
 
-  if (!showSpending && !showJobs && !showFitness && !showClimbing && !showProjects) return null;
+  if (!showSpending && !showJobs && !showFitness && !showClimbing && !showProjects && !showHydro) return null;
 
   return (
     <div className="map-sidebar">
@@ -554,6 +593,32 @@ function MapSidebar() {
         </div>
       )}
 
+      {/* Hydroponics */}
+      {showHydro && (
+        <div className="msb-card" style={{ '--ca': '#2eb8a0', '--cg': 'rgba(46,184,160,0.45)' }}>
+          <div className="msb-head">
+            <Px name="droplet" size={14} className="msb-icon" />
+            <span className="msb-name">HYDRO</span>
+            <span className="msb-badge">{activePlants.length} plant{activePlants.length !== 1 ? 's' : ''} active</span>
+          </div>
+          <div className="msb-trio">
+            {[
+              { v: hydroLatest?.ph?.toFixed(1) ?? '—',      l: 'PH' },
+              { v: hydroLatest?.ec_ppm?.toFixed(0) ?? '—',  l: 'PPM' },
+              { v: hydroLatest?.water_level?.toFixed(0) != null ? hydroLatest.water_level.toFixed(0) + '%' : '—', l: 'LEVEL' },
+            ].map(({ v, l }) => (
+              <div key={l} className="msb-trio-item">
+                <div className="msb-trio-val">{v}</div>
+                <div className="msb-trio-lbl">{l}</div>
+              </div>
+            ))}
+          </div>
+          {hydroLatest?.water_temp != null && (
+            <div className="msb-tiny">{hydroLatest.water_temp.toFixed(1)}°C water · {hydroLatest.air_temp?.toFixed(1) ?? '—'}°C air</div>
+          )}
+        </div>
+      )}
+
     </div>
   );
 }
@@ -579,10 +644,11 @@ function AppInner({ authUser, onLogout }) {
   const { loadAll: loadPortfolio } = usePortfolio();
   const { loadAll: loadClimbing }  = useClimbing();
   const { loadAll: loadProjects }  = useDevProjects();
+  const { loadAll: loadHydro }     = useHydro();
 
   useEffect(() => {
-    loadApp(); loadJob(); loadFitness(); loadPortfolio(); loadClimbing(); loadProjects();
-  }, [loadApp, loadJob, loadFitness, loadPortfolio, loadClimbing, loadProjects]);
+    loadApp(); loadJob(); loadFitness(); loadPortfolio(); loadClimbing(); loadProjects(); loadHydro();
+  }, [loadApp, loadJob, loadFitness, loadPortfolio, loadClimbing, loadProjects, loadHydro]);
 
   useEffect(() => {
     const handler = (e) => {
@@ -661,6 +727,10 @@ function AppInner({ authUser, onLogout }) {
       case 'climbing-routes':      return <Climbs />;
       case 'projects-tracker':     return <DevProjects />;
       case 'projects-board':       return <KanbanScreen />;
+      case 'hydro-dashboard':      return <HydroDashboard />;
+      case 'hydro-history':        return <HydroHistory />;
+      case 'hydro-plants':         return <HydroPlants />;
+      case 'hydro-dosing':         return <HydroDosing />;
       case 'profile':              return <Profile />;
       default:                     return null;
     }
@@ -842,7 +912,9 @@ export default function App() {
           <PortfolioProvider>
             <ClimbingProvider>
               <ProjectsProvider>
+              <HydroProvider>
                 <AppInner authUser={authUser} onLogout={handleLogout} />
+              </HydroProvider>
               </ProjectsProvider>
             </ClimbingProvider>
           </PortfolioProvider>
