@@ -45,7 +45,8 @@ nyomnyom_web/
 │   │   ├── FitnessContext.jsx    # workouts, sets, body metrics, weight history
 │   │   ├── PortfolioContext.jsx  # projects, skills, experience, about
 │   │   ├── ClimbingContext.jsx   # climb log, photo upload
-│   │   └── ProjectsContext.jsx   # dev projects, kanban tasks, commit cache
+│   │   ├── ProjectsContext.jsx   # dev projects, kanban tasks, commit cache
+│   │   └── HydroContext.jsx      # readings, pump schedule/log, dosing, plants
 │   └── screens/
 │       ├── spending/   Dashboard, Graphs, Categories, AddExpense
 │       ├── jobs/       Applications, Contacts
@@ -53,6 +54,7 @@ nyomnyom_web/
 │       ├── portfolio/  Projects, Skills, Experience, About
 │       ├── climbing/   Climbs
 │       ├── projects/   DevProjects, KanbanBoard, KanbanScreen
+│       ├── hydro/      Dashboard, History, Plants, Dosing
 │       ├── PublicPortfolio.jsx
 │       ├── SignIn.jsx
 │       └── Profile.jsx
@@ -73,7 +75,7 @@ All icons use [pixelarticons](https://pixelarticons.com/), imported as React SVG
 | Key | Action |
 |---|---|
 | `/` | Open command terminal |
-| `1` – `6` | Jump to section |
+| `1` – `7` | Jump to section |
 | `N` | New item in current section |
 | `← →` | Cycle tabs within a section |
 | `Esc` | Close modal → return to map |
@@ -87,21 +89,26 @@ All icons use [pixelarticons](https://pixelarticons.com/), imported as React SVG
 /climbing/new           → Log climb
 /projects/board         → Kanban board
 /jobs/contacts/new      → Add contact
+/hydro                  → Hydro dashboard
+/hydro/readings/new     → Log reading
+/hydro/dosing/new       → Log dosing
+/hydro/plants/new       → Add plant
 ```
 
 Supports `section`, `section/tab`, `section/tab/new`. Tab-completes; arrow keys navigate matches; Enter goes.
 
 ## Map UI
 
-The homepage is an SVG mountain (`viewBox="0 0 1000 600"`, `preserveAspectRatio="none"`). Six clickable station markers zoom the world toward the selected section. SVG coordinate `(x, y)` maps to CSS `left: x/10 %, top: y/6 %`.
+The homepage is an SVG mountain (`viewBox="0 0 1000 600"`, `preserveAspectRatio="none"`). Seven clickable station markers zoom the world toward the selected section. SVG coordinate `(x, y)` maps to CSS `left: x/10 %, top: y/6 %`.
 
-Station positions: fitness `(120,340)`, jobs `(260,255)`, portfolio `(200,180)`, climbing `(380,230)`, spending `(290,100)`, projects `(430,340)`.
+Station positions: fitness `(120,340)`, jobs `(260,255)`, portfolio `(200,180)`, climbing `(380,230)`, spending `(290,100)`, projects `(430,340)`, hydro `(490,410)`.
 
 ## Tracker features
 
 - **Spending** — expenses with categories and budgets, monthly analytics, multi-month history graphs
 - **Jobs** — kanban pipeline (applied → screening → interviewing → offer → rejected/withdrawn), contacts per job, URL extraction
-- **Fitness** — workout sessions with completion time; exercises as sets/reps/weight or time-based (seconds); edit sessions and individual sets inline; body weight log with history graph
+- **Fitness** — workout sessions with completion time; exercises as sets/reps/weight or time-based (seconds); edit sessions and individual sets inline; body weight log with history graph; Strava-connected running log with one-click incremental import
 - **Portfolio** — projects, skills, experience, about; public read-only view at `/` when unauthenticated
 - **Climbing** — boulder and sport climb log with grades, wall type, attempts, sent/flash flags, optional photo upload
 - **Dev Projects** — status/priority tracker, per-project todos, kanban board, GitHub last-commit fetch
+- **Hydroponics** — live sensor dashboard (pH, EC, water temp/level, air temp, humidity) with color-coded range indicators; pump schedule editor and manual trigger; dosing log with per-type totals; plant tracker with growth stage and active/archived views; history charts for all metrics
