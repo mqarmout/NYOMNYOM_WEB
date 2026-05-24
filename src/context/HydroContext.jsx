@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useRef } from 'react';
 import { apiFetch } from '../utils';
 
 const HydroContext = createContext(null);
@@ -11,8 +11,13 @@ export function HydroProvider({ children }) {
   const [dosing,  setDosing]  = useState([]);
   const [plants,  setPlants]  = useState([]);
   const [toast,   setToast]   = useState('');
+  const toastTimer = useRef(null);
 
-  const _toast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 3000); };
+  const _toast = useCallback((msg) => {
+    setToast(msg);
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(''), 2500);
+  }, []);
 
   const loadAll = useCallback(async () => {
     const [readings, pumpData, dosingData, plantsData, pumpLogData] = await Promise.all([

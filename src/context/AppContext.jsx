@@ -34,17 +34,19 @@ export function AppProvider({ children }) {
   }, []);
 
   const addExpense = useCallback(async (data) => {
-    await apiFetch('/api/expenses', { method: 'POST', body: JSON.stringify(data) });
+    const res = await apiFetch('/api/expenses', { method: 'POST', body: JSON.stringify(data) });
+    if (res.error) { showToast(res.error); return; }
     const month = new Date().toISOString().slice(0, 7);
     setExpenses(await apiFetch('/api/expenses?month=' + month));
-    showToast('Expense saved ✓');
+    showToast('Expense saved');
   }, [showToast]);
 
   const updateExpense = useCallback(async (id, data) => {
-    await apiFetch('/api/expenses/' + id, { method: 'PUT', body: JSON.stringify(data) });
+    const res = await apiFetch('/api/expenses/' + id, { method: 'PUT', body: JSON.stringify(data) });
+    if (res.error) { showToast(res.error); return; }
     const month = new Date().toISOString().slice(0, 7);
     setExpenses(await apiFetch('/api/expenses?month=' + month));
-    showToast('Expense updated ✓');
+    showToast('Expense updated');
   }, [showToast]);
 
   const deleteExpense = useCallback(async (id) => {
@@ -54,17 +56,19 @@ export function AppProvider({ children }) {
   }, [showToast]);
 
   const addIncome = useCallback(async (data) => {
-    await apiFetch('/api/income', { method: 'POST', body: JSON.stringify(data) });
+    const res = await apiFetch('/api/income', { method: 'POST', body: JSON.stringify(data) });
+    if (res.error) { showToast(res.error); return; }
     const month = new Date().toISOString().slice(0, 7);
     setIncome(await apiFetch('/api/income?month=' + month));
-    showToast('Income saved ✓');
+    showToast('Income saved');
   }, [showToast]);
 
   const updateIncome = useCallback(async (id, data) => {
-    await apiFetch('/api/income/' + id, { method: 'PUT', body: JSON.stringify(data) });
+    const res = await apiFetch('/api/income/' + id, { method: 'PUT', body: JSON.stringify(data) });
+    if (res.error) { showToast(res.error); return; }
     const month = new Date().toISOString().slice(0, 7);
     setIncome(await apiFetch('/api/income?month=' + month));
-    showToast('Income updated ✓');
+    showToast('Income updated');
   }, [showToast]);
 
   const deleteIncome = useCallback(async (id) => {
@@ -74,15 +78,17 @@ export function AppProvider({ children }) {
   }, [showToast]);
 
   const addCategory = useCallback(async (data) => {
-    await apiFetch('/api/categories', { method: 'POST', body: JSON.stringify(data) });
+    const res = await apiFetch('/api/categories', { method: 'POST', body: JSON.stringify(data) });
+    if (res.error) { showToast(res.error); return; }
     setCategories(await apiFetch('/api/categories'));
-    showToast('Category added ✓');
+    showToast('Category added');
   }, [showToast]);
 
   const updateCategory = useCallback(async (id, data) => {
-    await apiFetch('/api/categories/' + id, { method: 'PUT', body: JSON.stringify(data) });
+    const res = await apiFetch('/api/categories/' + id, { method: 'PUT', body: JSON.stringify(data) });
+    if (res.error) { showToast(res.error); return; }
     setCategories(await apiFetch('/api/categories'));
-    showToast('Category updated ✓');
+    showToast('Category updated');
   }, [showToast]);
 
   const deleteCategory = useCallback(async (id) => {
@@ -93,9 +99,10 @@ export function AppProvider({ children }) {
   }, [showToast]);
 
   const saveProfile = useCallback(async (data) => {
-    await apiFetch('/api/profile', { method: 'POST', body: JSON.stringify(data) });
+    const res = await apiFetch('/api/profile', { method: 'POST', body: JSON.stringify(data) });
+    if (res.error) { showToast(res.error); return; }
     setProfile(prev => ({ ...prev, ...data }));
-    showToast('Profile saved ✓');
+    showToast('Profile saved');
   }, [showToast]);
 
   return (

@@ -4,18 +4,23 @@ import { apiFetch } from '../utils';
 const FitnessContext = createContext(null);
 
 export function FitnessProvider({ children }) {
-  const [workouts,    setWorkouts]    = useState([]);
-  const [metrics,     setMetrics]     = useState([]);
-  const [history,     setHistory]     = useState([]);
-  const [runs,        setRuns]        = useState([]);
-  const [runHistory,  setRunHistory]  = useState([]);
-  const [toast,       setToast]       = useState('');
+  const [workouts,   setWorkouts]   = useState([]);
+  const [metrics,    setMetrics]    = useState([]);
+  const [history,    setHistory]    = useState([]);
+  const [runs,       setRuns]       = useState([]);
+  const [runHistory, setRunHistory] = useState([]);
+  const [toast,      setToast]      = useState('');
   const toastTimer = useRef(null);
 
   const showToast = useCallback((msg) => {
     setToast(msg);
     clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setToast(''), 2500);
+  }, []);
+
+  const loadWorkouts = useCallback(async () => {
+    const w = await apiFetch('/api/fitness/workouts');
+    if (!w.error) setWorkouts(w);
   }, []);
 
   const loadAll = useCallback(async () => {
@@ -26,25 +31,27 @@ export function FitnessProvider({ children }) {
       apiFetch('/api/runs'),
       apiFetch('/api/runs/history'),
     ]);
-    setWorkouts(w);
-    setMetrics(m);
-    setHistory(h);
-    setRuns(r);
-    setRunHistory(rh);
+    if (!w.error)  setWorkouts(w);
+    if (!m.error)  setMetrics(m);
+    if (!h.error)  setHistory(h);
+    if (!r.error)  setRuns(r);
+    if (!rh.error) setRunHistory(rh);
   }, []);
 
   const addWorkout = useCallback(async (data) => {
     const res = await apiFetch('/api/fitness/workouts', { method: 'POST', body: JSON.stringify(data) });
-    setWorkouts(await apiFetch('/api/fitness/workouts'));
-    showToast('Workout logged ✓');
+    if (res.error) { showToast(res.error); return; }
+    await loadWorkouts();
+    showToast('Workout logged');
     return res.id;
-  }, [showToast]);
+  }, [loadWorkouts, showToast]);
 
   const updateWorkout = useCallback(async (id, data) => {
-    await apiFetch('/api/fitness/workouts/' + id, { method: 'PUT', body: JSON.stringify(data) });
-    setWorkouts(await apiFetch('/api/fitness/workouts'));
-    showToast('Workout updated ✓');
-  }, [showToast]);
+    const res = await apiFetch('/api/fitness/workouts/' + id, { method: 'PUT', body: JSON.stringify(data) });
+    if (res.error) { showToast(res.error); return; }
+    await loadWorkouts();
+    showToast('Workout updated');
+  }, [loadWorkouts, showToast]);
 
   const deleteWorkout = useCallback(async (id) => {
     await apiFetch('/api/fitness/workouts/' + id, { method: 'DELETE' });
@@ -53,29 +60,30 @@ export function FitnessProvider({ children }) {
   }, [showToast]);
 
   const addSet = useCallback(async (workoutId, data) => {
-    await apiFetch('/api/fitness/workouts/' + workoutId + '/sets', { method: 'POST', body: JSON.stringify(data) });
-    setWorkouts(await apiFetch('/api/fitness/workouts'));
-  }, []);
+    const res = await apiFetch('/api/fitness/workouts/' + workoutId + '/sets', { method: 'POST', body: JSON.stringify(data) });
+    if (!res.error) await loadWorkouts();
+  }, [loadWorkouts]);
 
   const updateSet = useCallback(async (setId, data) => {
-    await apiFetch('/api/fitness/sets/' + setId, { method: 'PUT', body: JSON.stringify(data) });
-    setWorkouts(await apiFetch('/api/fitness/workouts'));
-  }, []);
+    const res = await apiFetch('/api/fitness/sets/' + setId, { method: 'PUT', body: JSON.stringify(data) });
+    if (!res.error) await loadWorkouts();
+  }, [loadWorkouts]);
 
   const deleteSet = useCallback(async (setId) => {
-    await apiFetch('/api/fitness/sets/' + setId, { method: 'DELETE' });
-    setWorkouts(await apiFetch('/api/fitness/workouts'));
-  }, []);
+    const res = await apiFetch('/api/fitness/sets/' + setId, { method: 'DELETE' });
+    if (!res.error) await loadWorkouts();
+  }, [loadWorkouts]);
 
   const addMetric = useCallback(async (data) => {
-    await apiFetch('/api/fitness/metrics', { method: 'POST', body: JSON.stringify(data) });
+    const res = await apiFetch('/api/fitness/metrics', { method: 'POST', body: JSON.stringify(data) });
+    if (res.error) { showToast(res.error); return; }
     const [m, h] = await Promise.all([
       apiFetch('/api/fitness/metrics'),
       apiFetch('/api/fitness/metrics/history'),
     ]);
-    setMetrics(m);
-    setHistory(h);
-    showToast('Measurement saved ✓');
+    if (!m.error) setMetrics(m);
+    if (!h.error) setHistory(h);
+    showToast('Measurement saved');
   }, [showToast]);
 
   const deleteMetric = useCallback(async (id) => {
@@ -84,27 +92,29 @@ export function FitnessProvider({ children }) {
       apiFetch('/api/fitness/metrics'),
       apiFetch('/api/fitness/metrics/history'),
     ]);
-    setMetrics(m);
-    setHistory(h);
+    if (!m.error) setMetrics(m);
+    if (!h.error) setHistory(h);
     showToast('Deleted');
   }, [showToast]);
 
   const refreshRuns = useCallback(async () => {
     const [r, rh] = await Promise.all([apiFetch('/api/runs'), apiFetch('/api/runs/history')]);
-    setRuns(r);
-    setRunHistory(rh);
+    if (!r.error)  setRuns(r);
+    if (!rh.error) setRunHistory(rh);
   }, []);
 
   const addRun = useCallback(async (data) => {
-    await apiFetch('/api/runs', { method: 'POST', body: JSON.stringify(data) });
+    const res = await apiFetch('/api/runs', { method: 'POST', body: JSON.stringify(data) });
+    if (res.error) { showToast(res.error); return; }
     await refreshRuns();
-    showToast('Run logged ✓');
+    showToast('Run logged');
   }, [refreshRuns, showToast]);
 
   const updateRun = useCallback(async (id, data) => {
-    await apiFetch('/api/runs/' + id, { method: 'PUT', body: JSON.stringify(data) });
+    const res = await apiFetch('/api/runs/' + id, { method: 'PUT', body: JSON.stringify(data) });
+    if (res.error) { showToast(res.error); return; }
     await refreshRuns();
-    showToast('Run updated ✓');
+    showToast('Run updated');
   }, [refreshRuns, showToast]);
 
   const deleteRun = useCallback(async (id) => {
