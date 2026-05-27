@@ -25,10 +25,11 @@ function TaskModal({ initial, projects, defaultProjectIds, onSave, onClose }) {
     return [];
   };
 
-  const [title,      setTitle]      = useState(initial?.title    || '');
-  const [priority,   setPriority]   = useState(initial?.priority || 'medium');
-  const [dueDate,    setDueDate]    = useState(initial?.due_date  || '');
-  const [projectIds, setProjectIds] = useState(initProjectIds);
+  const [title,       setTitle]       = useState(initial?.title       || '');
+  const [description, setDescription] = useState(initial?.description || '');
+  const [priority,    setPriority]    = useState(initial?.priority    || 'medium');
+  const [dueDate,     setDueDate]     = useState(initial?.due_date    || '');
+  const [projectIds,  setProjectIds]  = useState(initProjectIds);
 
   const toggleProject = (id) =>
     setProjectIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
@@ -37,6 +38,7 @@ function TaskModal({ initial, projects, defaultProjectIds, onSave, onClose }) {
     if (!title.trim()) return;
     onSave({
       title:       title.trim(),
+      description: description.trim() || null,
       priority,
       due_date:    dueDate || null,
       project_ids: projectIds,
@@ -71,6 +73,16 @@ function TaskModal({ initial, projects, defaultProjectIds, onSave, onClose }) {
           <label>Title</label>
           <input value={title} onChange={e => setTitle(e.target.value)}
             placeholder="What needs to be done?" autoFocus />
+        </div>
+
+        <div className="field">
+          <label>Description <span style={{ color: 'var(--muted)', fontWeight: 'normal' }}>(optional)</span></label>
+          <textarea
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+            placeholder="Add more context, links, or steps…"
+            rows={4}
+          />
         </div>
 
         <div className="field">
