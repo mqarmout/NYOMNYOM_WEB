@@ -229,14 +229,18 @@ const COMMANDS = [
   { cmd: 'logout',                  screen: '__logout__',           fire: false, label: 'Logout' },
 ];
 
-function TerminalLauncher({ onNavigate, onClose }) {
+function TerminalLauncher({ onNavigate, onClose, canAccess }) {
   const [query,    setQuery]    = useState('');
   const [selIdx,   setSelIdx]   = useState(0);
   const inputRef = useRef(null);
 
+  const allowedCmds = COMMANDS.filter(c => {
+    const section = c.cmd.split('/')[0];
+    return section === 'profile' || section === 'logout' || canAccess(section);
+  });
   const matches = query.trim() === ''
-    ? COMMANDS
-    : COMMANDS.filter(c => c.cmd.startsWith(query.toLowerCase()));
+    ? allowedCmds
+    : allowedCmds.filter(c => c.cmd.startsWith(query.toLowerCase()));
 
   useEffect(() => { setSelIdx(0); }, [query]);
 
@@ -638,6 +642,11 @@ function AppInner({ authUser, onLogout }) {
   const [screen,        setScreen]        = useState(null);
   const [showHelp,      setShowHelp]      = useState(false);
   const [showTerminal,  setShowTerminal]  = useState(false);
+
+  // null permissions = full access; array = restricted to those section IDs
+  const allowedSections = authUser.permissions ?? null;
+  const canAccess = (id) => allowedSections === null || allowedSections.includes(id);
+  const visibleSections = Object.entries(SECTIONS).filter(([id]) => canAccess(id));
   const { loadAll: loadApp }       = useApp();
   const { loadAll: loadJob }       = useJob();
   const { loadAll: loadFitness }   = useFitness();
@@ -692,7 +701,8 @@ function AppInner({ authUser, onLogout }) {
       }
       const idx = parseInt(e.key) - 1;
       if (idx >= 0 && idx < SECTION_ORDER.length) {
-        setScreen(SECTION_DEFAULT[SECTION_ORDER[idx]]);
+        const sectionId = SECTION_ORDER[idx];
+        if (canAccess(sectionId)) setScreen(SECTION_DEFAULT[sectionId]);
       }
     };
     document.addEventListener('keydown', handler);
@@ -768,7 +778,7 @@ function AppInner({ authUser, onLogout }) {
         </svg>
 
         <div className={'markers' + (isOpen ? ' markers-zoomed' : '')}>
-          {Object.entries(SECTIONS).map(([id, s]) => {
+          {visibleSections.map(([id, s]) => {
             const active = activeSection === id;
             return (
               <div
@@ -796,7 +806,7 @@ function AppInner({ authUser, onLogout }) {
           NYOMNYOM
         </div>
         <div className="tb-nav">
-          {Object.entries(SECTIONS).map(([id, s]) => (
+          {visibleSections.map(([id, s]) => (
             <button
               key={id}
               className={'tb-section-btn' + (!isProfile && activeSection === id ? ' active' : '')}
@@ -823,7 +833,7 @@ function AppInner({ authUser, onLogout }) {
       {/* Mobile home grid — shown only on small screens when no section is open */}
       {!isOpen && (
         <div className="mobile-home">
-          {Object.entries(SECTIONS).map(([id, s]) => (
+          {visibleSections.map(([id, s]) => (
             <button
               key={id}
               className="mobile-home-tile"
@@ -879,6 +889,7 @@ function AppInner({ authUser, onLogout }) {
         <TerminalLauncher
           onNavigate={handleTerminalNavigate}
           onClose={() => setShowTerminal(false)}
+          canAccess={canAccess}
         />
       )}
       <Toasts />
