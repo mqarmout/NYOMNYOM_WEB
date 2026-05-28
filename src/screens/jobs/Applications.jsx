@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useJob } from "../../context/JobContext";
 import { apiFetch } from "../../utils";
 import { IClose, IExtLink } from "../../icons";
+import styles from "./jobs.module.css";
 
 const STATUSES = ["applied", "screening", "interviewing", "offer", "rejected", "withdrawn"];
 
@@ -487,9 +488,9 @@ export default function Applications() {
   const archivedJobs = jobs.filter((j) => j.status === "withdrawn");
 
   const JobCard = ({ job }) => (
-    <div className="job-card" onClick={() => setModal({ mode: "edit", job })}>
-      <div className="job-card-header">
-        <div className="job-card-company">{job.company}</div>
+    <div className={styles.jobCard} onClick={() => setModal({ mode: "edit", job })}>
+      <div className={styles.jobCardHeader}>
+        <div className={styles.jobCardCompany}>{job.company}</div>
         <button
           className="tx-delete"
           onClick={(e) => {
@@ -500,15 +501,15 @@ export default function Applications() {
           <IClose />
         </button>
       </div>
-      <div className="job-card-role">{job.role}</div>
-      <div className="job-card-meta">
+      <div className={styles.jobCardRole}>{job.role}</div>
+      <div className={styles.jobCardMeta}>
         {job.date_applied && <span>{job.date_applied}</span>}
         {job.salary && <span>{job.salary}</span>}
         {job.site_used && <span>{job.site_used}</span>}
       </div>
       {job.url && (
         <a
-          className="job-card-link"
+          className={styles.jobCardLink}
           href={job.url}
           target="_blank"
           rel="noreferrer"
@@ -523,12 +524,12 @@ export default function Applications() {
   const Column = ({ status, label }) => {
     const col = boardJobs.filter((j) => j.status === status);
     return (
-      <div className="job-column">
-        <div className="job-column-header">
-          <span className="job-column-label">{label}</span>
-          <span className="job-column-count">{col.length}</span>
+      <div className={styles.jobColumn}>
+        <div className={styles.jobColumnHeader}>
+          <span className={styles.jobColumnLabel}>{label}</span>
+          <span className={styles.jobColumnCount}>{col.length}</span>
         </div>
-        <div className="job-column-body">
+        <div className={styles.jobColumnBody}>
           {col.map((j) => (
             <JobCard key={j.id} job={j} />
           ))}
@@ -558,7 +559,7 @@ export default function Applications() {
         </button>
       </div>
 
-      <div className="job-board">
+      <div className={styles.jobBoard}>
         {["applied", "screening", "interviewing", "offer", "rejected"].map((s) => (
           <Column key={s} status={s} label={STATUS_LABEL[s]} />
         ))}
@@ -569,19 +570,21 @@ export default function Applications() {
           <div className="section-title" style={{ marginTop: 32 }}>
             Withdrawn
           </div>
-          <div className="job-archive-list">
+          <div className={styles.jobArchiveList}>
             {archivedJobs.map((j) => (
               <div
-                className="job-archive-item"
+                className={styles.jobArchiveItem}
                 key={j.id}
                 onClick={() => setModal({ mode: "edit", job: j })}
               >
-                <div className="job-archive-info">
-                  <span className="job-archive-company">{j.company}</span>
-                  <span className="job-archive-role">{j.role}</span>
+                <div className={styles.jobArchiveInfo}>
+                  <span className={styles.jobArchiveCompany}>{j.company}</span>
+                  <span className={styles.jobArchiveRole}>{j.role}</span>
                 </div>
-                <div className="job-archive-right">
-                  <span className={"job-status-badge status-" + j.status}>
+                <div className={styles.jobArchiveRight}>
+                  <span
+                    className={`${styles.jobStatusBadge} ${styles["status-" + j.status] || ""}`}
+                  >
                     {STATUS_LABEL[j.status]}
                   </span>
                   <button

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { usePortfolio } from "../../context/PortfolioContext";
 import { IClose, IEdit } from "../../icons";
+import styles from "./portfolio.module.css";
 
 function ExperienceModal({ initial, onSave, onClose }) {
   const [company, setCompany] = useState(initial?.company || "");
@@ -169,16 +170,16 @@ export default function Experience() {
       {experience.length === 0 ? (
         <div className="empty-state">No experience yet.</div>
       ) : (
-        <div className="timeline">
+        <div className={styles.timeline}>
           {experience.map((e) => (
-            <div className="timeline-item" key={e.id}>
-              <div className="timeline-dot" />
-              <div className="timeline-content">
-                <div className="timeline-header">
+            <div className={styles.timelineItem} key={e.id}>
+              <div className={styles.timelineDot} />
+              <div className={styles.timelineContent}>
+                <div className={styles.timelineHeader}>
                   <div>
-                    <div className="timeline-role">{e.role}</div>
-                    <div className="timeline-company">{e.company}</div>
-                    <div className="timeline-dates">
+                    <div className={styles.timelineRole}>{e.role}</div>
+                    <div className={styles.timelineCompany}>{e.company}</div>
+                    <div className={styles.timelineDates}>
                       {formatDateRange(e.start_date, e.end_date)}
                     </div>
                   </div>
@@ -194,7 +195,7 @@ export default function Experience() {
                     </button>
                   </div>
                 </div>
-                {e.description && <p className="timeline-desc">{e.description}</p>}
+                {e.description && <p className={styles.timelineDesc}>{e.description}</p>}
               </div>
             </div>
           ))}

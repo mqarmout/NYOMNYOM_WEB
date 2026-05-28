@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { usePortfolio } from "../../context/PortfolioContext";
 import { IClose } from "../../icons";
+import styles from "./portfolio.module.css";
 
 export default function Skills() {
   const { skills, loadAll, addSkill, deleteSkill } = usePortfolio();
@@ -35,7 +36,7 @@ export default function Skills() {
         </p>
       </div>
 
-      <div className="skill-add-row">
+      <div className={styles.skillAddRow}>
         <div className="field" style={{ flex: 2, marginBottom: 0 }}>
           <label>Skill</label>
           <input
@@ -71,13 +72,13 @@ export default function Skills() {
           No skills yet. Add your first one above.
         </div>
       ) : (
-        <div className="skills-section-list">
+        <div className={styles.skillsSectionList}>
           {categories.map((cat) => (
-            <div className="skills-group" key={cat}>
-              <div className="skills-group-title">{cat}</div>
-              <div className="skill-chips">
+            <div key={cat}>
+              <div className={styles.skillsGroupTitle}>{cat}</div>
+              <div className={styles.skillChips}>
                 {grouped[cat].map((s) => (
-                  <div className="skill-chip" key={s.id}>
+                  <div className={styles.skillChip} key={s.id}>
                     {s.name}
                     <button onClick={() => deleteSkill(s.id)}>
                       <IClose />

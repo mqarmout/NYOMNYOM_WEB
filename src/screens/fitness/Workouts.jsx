@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useFitness } from "../../context/FitnessContext";
 import { fmtDate } from "../../utils";
 import { IClose, IEdit, IChevDown, IChevUp } from "../../icons";
+import styles from "./fitness.module.css";
 
 function SetRow({ s, onDelete, onUpdate }) {
   const [editing, setEditing] = useState(false);
@@ -25,12 +26,12 @@ function SetRow({ s, onDelete, onUpdate }) {
 
   if (editing) {
     return (
-      <div className="set-row set-row-editing">
+      <div className={`${styles.setRow} ${styles.setRowEditing}`}>
         <input
           type="text"
           value={exercise}
           onChange={(e) => setExercise(e.target.value)}
-          className="set-input"
+          className={styles.setInput}
           onKeyDown={(e) => e.key === "Enter" && handleSave()}
           autoFocus
         />
@@ -40,7 +41,7 @@ function SetRow({ s, onDelete, onUpdate }) {
           min="1"
           value={sets}
           onChange={(e) => setSets(e.target.value)}
-          className="set-input-sm"
+          className={styles.setInputSm}
         />
         <input
           type="number"
@@ -48,7 +49,7 @@ function SetRow({ s, onDelete, onUpdate }) {
           min="1"
           value={reps}
           onChange={(e) => setReps(e.target.value)}
-          className="set-input-sm"
+          className={styles.setInputSm}
         />
         <input
           type="number"
@@ -57,7 +58,7 @@ function SetRow({ s, onDelete, onUpdate }) {
           step="0.5"
           value={weight}
           onChange={(e) => setWeight(e.target.value)}
-          className="set-input-sm"
+          className={styles.setInputSm}
         />
         <input
           type="number"
@@ -65,12 +66,12 @@ function SetRow({ s, onDelete, onUpdate }) {
           min="1"
           value={duration}
           onChange={(e) => setDuration(e.target.value)}
-          className="set-input-sm"
+          className={styles.setInputSm}
         />
-        <button className="set-add-btn" onClick={handleSave} disabled={!exercise.trim()}>
+        <button className={styles.setAddBtn} onClick={handleSave} disabled={!exercise.trim()}>
           ✓
         </button>
-        <button className="set-done-btn" onClick={() => setEditing(false)}>
+        <button className={styles.setDoneBtn} onClick={() => setEditing(false)}>
           ✕
         </button>
       </div>
@@ -84,9 +85,9 @@ function SetRow({ s, onDelete, onUpdate }) {
   if (s.weight) parts.push(`${s.weight} lbs`);
   if (s.duration) parts.push(`${s.duration}s`);
   return (
-    <div className="set-row">
-      <span className="set-exercise">{s.exercise}</span>
-      <span className="set-details">{parts.join(" · ")}</span>
+    <div className={styles.setRow}>
+      <span className={styles.setExercise}>{s.exercise}</span>
+      <span className={styles.setDetails}>{parts.join(" · ")}</span>
       <button className="tx-delete" onClick={() => setEditing(true)}>
         <IEdit />
       </button>
@@ -127,7 +128,7 @@ function AddSetForm({ workoutId, onAdd, onDone }) {
   };
 
   return (
-    <div className="add-set-form">
+    <div className={styles.addSetForm}>
       <input
         ref={exerciseRef}
         type="text"
@@ -135,7 +136,7 @@ function AddSetForm({ workoutId, onAdd, onDone }) {
         value={exercise}
         onChange={(e) => setExercise(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && handleAdd()}
-        className="set-input"
+        className={styles.setInput}
       />
       <input
         type="number"
@@ -143,7 +144,7 @@ function AddSetForm({ workoutId, onAdd, onDone }) {
         min="1"
         value={sets}
         onChange={(e) => setSets(e.target.value)}
-        className="set-input-sm"
+        className={styles.setInputSm}
       />
       <input
         type="number"
@@ -151,7 +152,7 @@ function AddSetForm({ workoutId, onAdd, onDone }) {
         min="1"
         value={reps}
         onChange={(e) => setReps(e.target.value)}
-        className="set-input-sm"
+        className={styles.setInputSm}
       />
       <input
         type="number"
@@ -160,7 +161,7 @@ function AddSetForm({ workoutId, onAdd, onDone }) {
         step="0.5"
         value={weight}
         onChange={(e) => setWeight(e.target.value)}
-        className="set-input-sm"
+        className={styles.setInputSm}
       />
       <input
         type="number"
@@ -168,12 +169,12 @@ function AddSetForm({ workoutId, onAdd, onDone }) {
         min="1"
         value={duration}
         onChange={(e) => setDuration(e.target.value)}
-        className="set-input-sm"
+        className={styles.setInputSm}
       />
-      <button className="set-add-btn" onClick={handleAdd} disabled={!exercise.trim()}>
+      <button className={styles.setAddBtn} onClick={handleAdd} disabled={!exercise.trim()}>
         +
       </button>
-      <button className="set-done-btn" onClick={onDone}>
+      <button className={styles.setDoneBtn} onClick={onDone}>
         Done
       </button>
     </div>
@@ -344,24 +345,24 @@ export default function Workouts() {
           Click <strong>+ Log Workout</strong> to get started.
         </div>
       ) : (
-        <div className="workout-list">
+        <div className={styles.workoutList}>
           {workouts.map((w) => (
-            <div className="workout-item" key={w.id}>
+            <div className={styles.workoutItem} key={w.id}>
               <div
-                className="workout-header"
+                className={styles.workoutHeader}
                 onClick={() => setExpanded(expanded === w.id ? null : w.id)}
               >
-                <div className="workout-header-left">
-                  <div className="workout-name">{w.name}</div>
-                  <div className="workout-meta">
+                <div className={styles.workoutHeaderLeft}>
+                  <div className={styles.workoutName}>{w.name}</div>
+                  <div className={styles.workoutMeta}>
                     {fmtDate(w.date)}
                     {w.duration ? ` · ${fmtDuration(w.duration)}` : ""}
                     {" · "}
                     {w.sets.length} exercise{w.sets.length !== 1 ? "s" : ""}
                   </div>
                 </div>
-                <div className="workout-header-right">
-                  <span className="workout-chevron">
+                <div className={styles.workoutHeaderRight}>
+                  <span className={styles.workoutChevron}>
                     {expanded === w.id ? <IChevUp /> : <IChevDown />}
                   </span>
                   <button
@@ -386,9 +387,9 @@ export default function Workouts() {
               </div>
 
               {expanded === w.id && (
-                <div className="workout-body">
+                <div className={styles.workoutBody}>
                   {w.sets.length === 0 && addingTo !== w.id && (
-                    <div className="workout-empty">No exercises yet.</div>
+                    <div className={styles.workoutEmpty}>No exercises yet.</div>
                   )}
                   {w.sets.map((s) => (
                     <SetRow key={s.id} s={s} onDelete={deleteSet} onUpdate={updateSet} />
@@ -396,7 +397,7 @@ export default function Workouts() {
                   {addingTo === w.id ? (
                     <AddSetForm workoutId={w.id} onAdd={addSet} onDone={() => setAddingTo(null)} />
                   ) : (
-                    <button className="add-set-trigger" onClick={() => setAddingTo(w.id)}>
+                    <button className={styles.addSetTrigger} onClick={() => setAddingTo(w.id)}>
                       + Add Exercise
                     </button>
                   )}

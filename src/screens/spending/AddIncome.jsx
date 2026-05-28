@@ -3,6 +3,7 @@ import { useApp } from "../../context/AppContext";
 import { apiFetch } from "../../utils";
 import { IClose } from "../../icons";
 import AutocompleteInput from "./AutocompleteInput";
+import styles from "./spending.module.css";
 
 export default function AddIncome({ onClose, initial }) {
   const { addIncome, updateIncome, showToast, profile } = useApp();
@@ -75,11 +76,13 @@ export default function AddIncome({ onClose, initial }) {
         </button>
       </div>
 
-      <div className="amount-wrap">
-        <div className="amount-row">
-          <span className="currency-sym income-sym">{profile.currency || "$"}</span>
+      <div className={styles.amountWrap}>
+        <div className={styles.amountRow}>
+          <span className={`${styles.currencySym} ${styles.incomeSym}`}>
+            {profile.currency || "$"}
+          </span>
           <input
-            className="amount-big income-amount"
+            className={`${styles.amountBig} ${styles.incomeAmount}`}
             type="number"
             min="0"
             step="0.01"
@@ -89,7 +92,7 @@ export default function AddIncome({ onClose, initial }) {
             autoFocus
           />
         </div>
-        <div className="amount-hint">Enter amount received</div>
+        <div className={styles.amountHint}>Enter amount received</div>
       </div>
 
       <div className="field">
@@ -155,7 +158,11 @@ export default function AddIncome({ onClose, initial }) {
         </div>
       )}
 
-      <button className="modal-save-btn income-save-btn" onClick={handleSave} disabled={saving}>
+      <button
+        className={`modal-save-btn ${styles.incomeSaveBtn}`}
+        onClick={handleSave}
+        disabled={saving}
+      >
         {saving ? "Saving…" : isEdit ? "Save Changes" : "Save Income"}
       </button>
     </>

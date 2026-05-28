@@ -1,0 +1,234 @@
+/* ── Portfolio projects ── */
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+.project-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 18px 20px;
+  transition: border-color 0.1s;
+}
+.project-card:hover {
+  border-color: var(--accent);
+}
+.project-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.project-title {
+  font-size: 14px;
+  font-weight: 400;
+}
+.project-actions {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.project-desc {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.55;
+  margin-bottom: 10px;
+}
+.project-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+.project-tag {
+  font-size: 10px;
+  font-weight: 400;
+  padding: 2px 8px;
+  background: var(--accent-dim);
+  color: var(--accent);
+  border-radius: 0;
+  border: 1px solid rgba(0, 255, 65, 0.15);
+}
+.project-links {
+  display: flex;
+  gap: 10px;
+}
+.project-link {
+  font-size: 11px;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 400;
+}
+.project-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Skills ── */
+.skill-add-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  margin-bottom: 22px;
+}
+.skills-section-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.skills-group-title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 6px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.skill-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.skill-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px 5px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  font-size: 12px;
+  font-weight: 400;
+  transition: border-color 0.1s;
+}
+.skill-chip:hover {
+  border-color: var(--muted);
+}
+.skill-chip button {
+  background: none;
+  border: none;
+  color: var(--dim);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.1s;
+}
+.skill-chip button:hover {
+  color: var(--danger);
+}
+
+/* ── Portfolio experience ── */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding-left: 18px;
+  border-left: 1px solid var(--border);
+}
+.timeline-item {
+  display: flex;
+  gap: 18px;
+  padding-bottom: 24px;
+  position: relative;
+}
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+.timeline-dot {
+  position: absolute;
+  left: -22px;
+  top: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 0;
+  background: var(--accent);
+  border: 1px solid var(--bg);
+  flex-shrink: 0;
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+.timeline-content {
+  flex: 1;
+}
+.timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.timeline-role {
+  font-size: 14px;
+  font-weight: 400;
+}
+.timeline-company {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.timeline-dates {
+  font-size: 11px;
+  color: var(--dim);
+  margin-top: 3px;
+}
+.timeline-desc {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* ── Portfolio about ── */
+.about-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+.about-preview {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 24px 18px;
+  text-align: center;
+}
+.about-headline {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 5px;
+}
+.about-location {
+  font-size: 12px;
+  color: var(--dim);
+  margin-top: 5px;
+}
+.about-bio {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-top: 10px;
+  text-align: left;
+}
+.about-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 12px;
+}
+.about-links a {
+  font-size: 11px;
+  color: var(--accent);
+  text-decoration: none;
+  padding: 3px 9px;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  transition:
+    border-color 0.1s,
+    box-shadow 0.1s;
+}
+.about-links a:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+}

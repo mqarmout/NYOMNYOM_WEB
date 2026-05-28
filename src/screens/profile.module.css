@@ -1,0 +1,48 @@
+/* ── Profile screen ── */
+.profile-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+.profile-hero {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 24px 20px;
+  text-align: center;
+}
+.profile-since {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 5px;
+}
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 16px;
+}
+.stat-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 12px 14px;
+}
+.stat-card .s-lbl {
+  font-family: "Press Start 2P", monospace;
+  font-size: 6px;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+}
+.stat-card .s-val {
+  font-size: 18px;
+  font-weight: 400;
+  margin-top: 6px;
+}
+
+@media (max-width: 700px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+}

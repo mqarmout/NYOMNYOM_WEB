@@ -13,6 +13,7 @@ import {
   IExtLink,
   IRefresh,
 } from "../../icons";
+import styles from "./projects.module.css";
 
 const STATUSES = ["active", "paused", "completed", "idea"];
 const PRIORITIES = ["high", "medium", "low"];
@@ -223,25 +224,25 @@ function ProjectCard({ project, onEdit, onDelete, onOpenBoard }) {
     .filter(Boolean);
 
   return (
-    <div className="devp-card">
-      <div className="devp-card-header" onClick={() => setExpanded((e) => !e)}>
-        <div className="devp-card-header-left">
-          <span className="devp-name">{project.name}</span>
-          <span className={`devp-status-badge s-${project.status}`}>
+    <div className={styles.devpCard}>
+      <div className={styles.devpCardHeader} onClick={() => setExpanded((e) => !e)}>
+        <div className={styles.devpCardHeaderLeft}>
+          <span className={styles.devpName}>{project.name}</span>
+          <span className={`${styles.devpStatusBadge} ${styles["s-" + project.status]}`}>
             {STATUS_LABELS[project.status]}
           </span>
-          <span className={`devp-priority-badge p-${project.priority}`}>
+          <span className={`${styles.devpPriorityBadge} ${styles["p-" + project.priority]}`}>
             {PRIORITY_LABELS[project.priority]}
           </span>
           {isStale && (
-            <span className="devp-stale-badge">
+            <span className={styles.devpStaleBadge}>
               <IWarning /> STALE
             </span>
           )}
         </div>
-        <div className="devp-card-header-right">
+        <div className={styles.devpCardHeaderRight}>
           <button
-            className="devp-board-btn"
+            className={styles.devpBoardBtn}
             onClick={(e) => {
               e.stopPropagation();
               onOpenBoard(project);
@@ -250,7 +251,7 @@ function ProjectCard({ project, onEdit, onDelete, onOpenBoard }) {
           >
             <IBoard /> BOARD
           </button>
-          <span className="devp-chevron">{expanded ? <IChevUp /> : <IChevDown />}</span>
+          <span className={styles.devpChevron}>{expanded ? <IChevUp /> : <IChevDown />}</span>
           <button
             className="climb-card-action"
             onClick={(e) => {
@@ -275,20 +276,20 @@ function ProjectCard({ project, onEdit, onDelete, onOpenBoard }) {
       </div>
 
       {expanded && (
-        <div className="devp-card-body">
-          {project.description && <div className="devp-desc">{project.description}</div>}
+        <div className={styles.devpCardBody}>
+          {project.description && <div className={styles.devpDesc}>{project.description}</div>}
 
           {techChips.length > 0 && (
-            <div className="devp-tech-chips">
+            <div className={styles.devpTechChips}>
               {techChips.map((t) => (
-                <span key={t} className="devp-tech-chip">
+                <span key={t} className={styles.devpTechChip}>
                   {t}
                 </span>
               ))}
             </div>
           )}
 
-          <div className="devp-meta">
+          <div className={styles.devpMeta}>
             {daysActive !== null && (
               <span>
                 <ICal /> {daysActive}d active
@@ -299,7 +300,7 @@ function ProjectCard({ project, onEdit, onDelete, onOpenBoard }) {
                 href={project.github_url}
                 target="_blank"
                 rel="noreferrer"
-                className="devp-link"
+                className={styles.devpLink}
                 onClick={(e) => e.stopPropagation()}
               >
                 GitHub <IExtLink />
@@ -310,7 +311,7 @@ function ProjectCard({ project, onEdit, onDelete, onOpenBoard }) {
                 href={project.live_url}
                 target="_blank"
                 rel="noreferrer"
-                className="devp-link"
+                className={styles.devpLink}
                 onClick={(e) => e.stopPropagation()}
               >
                 Live <IExtLink />
@@ -319,20 +320,20 @@ function ProjectCard({ project, onEdit, onDelete, onOpenBoard }) {
           </div>
 
           {project.github_url && (
-            <div className="devp-commit">
-              {fetchingCommit && <span className="devp-commit-loading">fetching commit…</span>}
+            <div className={styles.devpCommit}>
+              {fetchingCommit && <span className={styles.devpCommitLoading}>fetching commit…</span>}
               {!fetchingCommit && commit && (
                 <>
-                  <span className="devp-commit-sha">{commit.sha}</span>
-                  <span className="devp-commit-msg">{commit.message}</span>
-                  <span className={`devp-commit-age${isStale ? " stale" : ""}`}>
+                  <span className={styles.devpCommitSha}>{commit.sha}</span>
+                  <span className={styles.devpCommitMsg}>{commit.message}</span>
+                  <span className={`${styles.devpCommitAge}${isStale ? " " + styles.stale : ""}`}>
                     {commitDaysAgo === 0 ? "today" : `${commitDaysAgo}d ago`}
                   </span>
                 </>
               )}
               {!fetchingCommit && !commit && (
                 <button
-                  className="devp-fetch-btn"
+                  className={styles.devpFetchBtn}
                   onClick={(e) => {
                     e.stopPropagation();
                     setFetchingCommit(true);
@@ -345,7 +346,7 @@ function ProjectCard({ project, onEdit, onDelete, onOpenBoard }) {
             </div>
           )}
 
-          {project.notes && <div className="devp-notes">{project.notes}</div>}
+          {project.notes && <div className={styles.devpNotes}>{project.notes}</div>}
         </div>
       )}
     </div>
@@ -447,7 +448,7 @@ export default function DevProjects() {
           Click + NEW PROJECT to get started.
         </div>
       ) : (
-        <div className="devp-list">
+        <div className={styles.devpList}>
           {filtered.map((p) => (
             <ProjectCard
               key={p.id}

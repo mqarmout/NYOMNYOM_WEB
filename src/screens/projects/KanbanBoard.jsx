@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { IClose, ICal, IBoard } from "../../icons";
+import styles from "./projects.module.css";
 
 const COLUMNS = [
   { id: "backlog", label: "BACKLOG", accentVar: "rgba(150,150,150,0.25)" },
@@ -163,7 +164,7 @@ function KanbanCard({ task, showProject, projects, onEdit, onDelete, dragHandler
 
   return (
     <div
-      className="kb-card"
+      className={styles.kbCard}
       draggable
       onClick={() => onEdit(task)}
       onDragStart={(e) => {
@@ -172,10 +173,10 @@ function KanbanCard({ task, showProject, projects, onEdit, onDelete, dragHandler
       }}
       onDragEnd={dragHandlers.end}
     >
-      <div className="kb-card-top">
-        <span className="kb-card-title">{task.title}</span>
+      <div className={styles.kbCardTop}>
+        <span className={styles.kbCardTitle}>{task.title}</span>
         <button
-          className="kb-delete-btn"
+          className={styles.kbDeleteBtn}
           onClick={(e) => {
             e.stopPropagation();
             onDelete(task.id);
@@ -184,23 +185,23 @@ function KanbanCard({ task, showProject, projects, onEdit, onDelete, dragHandler
           <IClose />
         </button>
       </div>
-      <div className="kb-card-meta">
+      <div className={styles.kbCardMeta}>
         {showProject &&
           taskProjects.map((p) => (
-            <span key={p.id} className="kb-card-project">
+            <span key={p.id} className={styles.kbCardProject}>
               {p.name}
             </span>
           ))}
-        <span className={`devp-priority-badge p-${task.priority}`}>
+        <span className={`${styles.devpPriorityBadge} ${styles["p-" + task.priority]}`}>
           {PRIORITY_LABELS[task.priority]}
         </span>
         {task.due_date && (
-          <span className={`kb-card-due${isOverdue ? " overdue" : ""}`}>
+          <span className={`${styles.kbCardDue}${isOverdue ? " " + styles.overdue : ""}`}>
             <ICal /> {task.due_date}
           </span>
         )}
         {startedDays !== null && (
-          <span className="kb-card-started">
+          <span className={styles.kbCardStarted}>
             ▶ {startedDays === 0 ? "today" : `${startedDays}d`}
           </span>
         )}
@@ -225,7 +226,7 @@ function KanbanColumn({
 
   return (
     <div
-      className={`kb-col${over ? " kb-col-over" : ""}`}
+      className={`${styles.kbCol}${over ? " " + styles.kbColOver : ""}`}
       style={{ borderTopColor: col.accentVar }}
       onDragOver={(e) => {
         e.preventDefault();
@@ -239,11 +240,11 @@ function KanbanColumn({
         if (id) onMove(id, col.id);
       }}
     >
-      <div className="kb-col-header">
-        <span className="kb-col-title">{col.label}</span>
-        <span className="kb-col-count">{tasks.length}</span>
+      <div className={styles.kbColHeader}>
+        <span className={styles.kbColTitle}>{col.label}</span>
+        <span className={styles.kbColCount}>{tasks.length}</span>
       </div>
-      <div className="kb-col-body">
+      <div className={styles.kbColBody}>
         {tasks.map((t) => (
           <KanbanCard
             key={t.id}
@@ -255,7 +256,7 @@ function KanbanColumn({
             dragHandlers={dragHandlers}
           />
         ))}
-        {tasks.length === 0 && <div className="kb-col-empty">Drop tasks here</div>}
+        {tasks.length === 0 && <div className={styles.kbColEmpty}>Drop tasks here</div>}
       </div>
     </div>
   );
@@ -289,8 +290,8 @@ export function KanbanBoard({
   };
 
   return (
-    <div className="kb-board">
-      <div className="kb-board-topbar">
+    <div className={styles.kbBoard}>
+      <div className={styles.kbBoardTopbar}>
         <button
           className="sidebar-add-btn"
           style={{ width: "auto", padding: "10px 20px" }}
@@ -300,7 +301,7 @@ export function KanbanBoard({
         </button>
       </div>
 
-      <div className="kb-columns">
+      <div className={styles.kbColumns}>
         {COLUMNS.map((col) => (
           <KanbanColumn
             key={col.id}
@@ -368,7 +369,7 @@ export function KanbanModal({
 
   return (
     <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="kb-modal-box">
+      <div className={styles.kbModalBox}>
         <div className="modal-header" style={{ padding: "14px 20px" }}>
           <span className="modal-title">
             <IBoard size={13} /> {project.name.toUpperCase()}
@@ -377,7 +378,7 @@ export function KanbanModal({
             <IClose />
           </button>
         </div>
-        <div className="kb-modal-body">
+        <div className={styles.kbModalBody}>
           <KanbanBoard
             tasks={tasks.filter((t) => (t.project_ids || []).includes(project.id))}
             projects={projects}

@@ -4,6 +4,9 @@ import svgr from 'vite-plugin-svgr'
 
 export default defineConfig({
   plugins: [react(), svgr()],
+  css: {
+    modules: { localsConvention: "camelCase" },
+  },
   server: {
     port: 5173,
     proxy: {

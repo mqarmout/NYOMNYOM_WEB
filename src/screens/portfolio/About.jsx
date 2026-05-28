@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { usePortfolio } from "../../context/PortfolioContext";
 import { getInitials } from "../../utils";
+import styles from "./portfolio.module.css";
 
 export default function About() {
   const { about, loadAll, saveAbout } = usePortfolio();
@@ -30,16 +31,16 @@ export default function About() {
         <p>Your public profile information</p>
       </div>
 
-      <div className="about-layout">
-        <div className="about-preview">
+      <div className={styles.aboutLayout}>
+        <div className={styles.aboutPreview}>
           <div className="profile-avatar" style={{ margin: "0 auto 16px" }}>
             {getInitials(form.display_name || "?")}
           </div>
           <div className="profile-name">{form.display_name || "Your Name"}</div>
-          {form.headline && <div className="about-headline">{form.headline}</div>}
-          {form.location && <div className="about-location">📍 {form.location}</div>}
-          {form.bio && <p className="about-bio">{form.bio}</p>}
-          <div className="about-links">
+          {form.headline && <div className={styles.aboutHeadline}>{form.headline}</div>}
+          {form.location && <div className={styles.aboutLocation}>📍 {form.location}</div>}
+          {form.bio && <p className={styles.aboutBio}>{form.bio}</p>}
+          <div className={styles.aboutLinks}>
             {form.website && (
               <a href={form.website} target="_blank" rel="noreferrer">
                 🌐 Website

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useJob } from "../../context/JobContext";
 import { IClose } from "../../icons";
+import styles from "./jobs.module.css";
 
 function ContactModal({ initial, jobs, onSave, onClose }) {
   const [name, setName] = useState(initial?.name || "");
@@ -217,21 +218,21 @@ export default function Contacts() {
             : "No contacts match your search."}
         </div>
       ) : (
-        <div className="contact-list">
+        <div className={styles.contactList}>
           {filtered.map((c) => (
             <div
-              className="contact-item"
+              className={styles.contactItem}
               key={c.id}
               onClick={() => setModal({ mode: "edit", contact: c })}
             >
-              <div className="contact-avatar">{getInitials(c.name)}</div>
-              <div className="contact-info">
-                <div className="contact-name">{c.name}</div>
-                <div className="contact-meta">
+              <div className={styles.contactAvatar}>{getInitials(c.name)}</div>
+              <div className={styles.contactInfo}>
+                <div className={styles.contactName}>{c.name}</div>
+                <div className={styles.contactMeta}>
                   {c.role && <span>{c.role}</span>}
                   {c.company && <span>@ {c.company}</span>}
                 </div>
-                <div className="contact-details">
+                <div className={styles.contactDetails}>
                   {c.email && (
                     <a href={"mailto:" + c.email} onClick={(e) => e.stopPropagation()}>
                       {c.email}

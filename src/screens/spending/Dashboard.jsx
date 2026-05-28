@@ -4,6 +4,7 @@ import { fmt, fmtDate } from "../../utils";
 import AddExpense from "./AddExpense";
 import AddIncome from "./AddIncome";
 import { Px, IClose } from "../../icons";
+import styles from "./spending.module.css";
 
 const SOURCE_ICONS = {
   salary: "briefcase",
@@ -84,7 +85,7 @@ export default function Dashboard() {
         </div>
         <div style={{ display: "flex", gap: 8 }}>
           <button
-            className="sidebar-add-btn income-add-btn"
+            className={`sidebar-add-btn ${styles.incomeAddBtn}`}
             onClick={() => setModal({ type: "income", item: null })}
           >
             + Income
@@ -124,8 +125,8 @@ export default function Dashboard() {
       </div>
 
       {totalBudget > 0 && (
-        <div className="budget-bar-wrap">
-          <div className="budget-bar-labels">
+        <div className={styles.budgetBarWrap}>
+          <div className={styles.budgetBarLabels}>
             <span>Budget: {fmt(totalBudget, currency)}</span>
             <span>
               {pct}% used · {fmt(Math.max(0, totalBudget - totalSpent), currency)} left
@@ -140,7 +141,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div className="tx-filter-tabs">
+      <div className={styles.txFilterTabs}>
         {[
           ["all", "All"],
           ["income", "Income"],
@@ -148,7 +149,7 @@ export default function Dashboard() {
         ].map(([v, l]) => (
           <button
             key={v}
-            className={"tx-filter-tab" + (txFilter === v ? " active" : "")}
+            className={`${styles.txFilterTab}${txFilter === v ? " active" : ""}`}
             onClick={() => setTxFilter(v)}
           >
             {l}
@@ -185,7 +186,9 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className="tx-right">
-                  <div className="tx-amount tx-amount-income">+{fmt(tx.amount, currency)}</div>
+                  <div className={`tx-amount ${styles.txAmountIncome}`}>
+                    +{fmt(tx.amount, currency)}
+                  </div>
                   <div className="tx-date">{fmtDate(tx.date)}</div>
                 </div>
                 <button

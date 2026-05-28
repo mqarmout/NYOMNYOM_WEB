@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useClimbing } from "../../context/ClimbingContext";
 import { Px, IClose, IEdit, IZap, ICheck, IMapPin, ICal } from "../../icons";
+import styles from "./climbing.module.css";
 
 const WALL_TYPES = ["Overhang", "Slab", "Vertical", "Comp", "Cave", "Arete", "Crimp", "Dynamic"];
 const today = () => new Date().toISOString().slice(0, 10);
@@ -234,11 +235,11 @@ function ClimbModal({ initial, onSave, onClose }) {
         {/* Photo upload */}
         <div className="field">
           <label>Photo</label>
-          <div className="climb-photo-upload" onClick={() => fileRef.current?.click()}>
+          <div className={styles.climbPhotoUpload} onClick={() => fileRef.current?.click()}>
             {preview ? (
-              <img src={preview} alt="climb" className="climb-photo-preview" />
+              <img src={preview} alt="climb" className={styles.climbPhotoPreview} />
             ) : (
-              <span className="climb-photo-placeholder">
+              <span className={styles.climbPhotoPlaceholder}>
                 <Px name="camera" size={16} /> Click to attach photo
               </span>
             )}
@@ -265,15 +266,15 @@ function ClimbCard({ climb, onEdit, onDelete }) {
   const flash = Boolean(climb.flash);
 
   return (
-    <div className="climb-card">
+    <div className={styles.climbCard}>
       {climb.photo_path && (
-        <div className="climb-card-photo">
+        <div className={styles.climbCardPhoto}>
           <img src={`/api/climbing/photos/${climb.photo_path}`} alt="climb" />
         </div>
       )}
-      <div className="climb-card-body">
-        <div className="climb-card-top">
-          <span className={`climb-type-badge ${climb.climb_type}`}>
+      <div className={styles.climbCardBody}>
+        <div className={styles.climbCardTop}>
+          <span className={`${styles.climbTypeBadge} ${styles[climb.climb_type] || ""}`}>
             {climb.climb_type === "boulder" ? (
               <Px name="target" size={12} />
             ) : (
@@ -282,7 +283,7 @@ function ClimbCard({ climb, onEdit, onDelete }) {
             {climb.climb_type.toUpperCase()}
           </span>
           {sent && (
-            <span className="climb-status-badge sent">
+            <span className={`${styles.climbStatusBadge} ${styles.sent}`}>
               {flash ? (
                 <>
                   <IZap /> FLASH
@@ -294,19 +295,23 @@ function ClimbCard({ climb, onEdit, onDelete }) {
               )}
             </span>
           )}
-          {!sent && <span className="climb-status-badge proj">PROJECT</span>}
+          {!sent && <span className={`${styles.climbStatusBadge} ${styles.proj}`}>PROJECT</span>}
           <div style={{ flex: 1 }} />
-          <button className="climb-card-action" onClick={onEdit} title="Edit">
+          <button className={styles.climbCardAction} onClick={onEdit} title="Edit">
             <IEdit />
           </button>
-          <button className="climb-card-action danger" onClick={onDelete} title="Delete">
+          <button
+            className={`${styles.climbCardAction} ${styles.danger}`}
+            onClick={onDelete}
+            title="Delete"
+          >
             <IClose />
           </button>
         </div>
 
-        <div className="climb-card-name">{climb.name || "(unnamed)"}</div>
+        <div className={styles.climbCardName}>{climb.name || "(unnamed)"}</div>
 
-        <div className="climb-card-meta">
+        <div className={styles.climbCardMeta}>
           {climb.location && (
             <span>
               <IMapPin /> {climb.location}
@@ -322,26 +327,26 @@ function ClimbCard({ climb, onEdit, onDelete }) {
           </span>
         </div>
 
-        <div className="climb-grade-row">
+        <div className={styles.climbGradeRow}>
           {climb.setter_grade && (
-            <div className="climb-grade-box">
-              <span className="climb-grade-lbl">SETTER</span>
-              <span className="climb-grade-val">{climb.setter_grade}</span>
+            <div className={styles.climbGradeBox}>
+              <span className={styles.climbGradeLbl}>SETTER</span>
+              <span className={styles.climbGradeVal}>{climb.setter_grade}</span>
             </div>
           )}
           {climb.my_grade && (
-            <div className="climb-grade-box my">
-              <span className="climb-grade-lbl">MINE</span>
-              <span className="climb-grade-val">{climb.my_grade}</span>
+            <div className={`${styles.climbGradeBox} ${styles.my}`}>
+              <span className={styles.climbGradeLbl}>MINE</span>
+              <span className={styles.climbGradeVal}>{climb.my_grade}</span>
             </div>
           )}
-          <div className="climb-grade-box attempts">
-            <span className="climb-grade-lbl">ATTEMPTS</span>
-            <span className="climb-grade-val">{climb.attempts}</span>
+          <div className={styles.climbGradeBox}>
+            <span className={styles.climbGradeLbl}>ATTEMPTS</span>
+            <span className={styles.climbGradeVal}>{climb.attempts}</span>
           </div>
         </div>
 
-        {climb.notes && <div className="climb-card-notes">{climb.notes}</div>}
+        {climb.notes && <div className={styles.climbCardNotes}>{climb.notes}</div>}
       </div>
     </div>
   );
@@ -431,7 +436,7 @@ export default function Climbs() {
           Log your first send!
         </div>
       ) : (
-        <div className="climb-grid">
+        <div className={styles.climbGrid}>
           {filtered.map((c) => (
             <ClimbCard
               key={c.id}

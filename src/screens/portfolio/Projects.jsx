@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { usePortfolio } from "../../context/PortfolioContext";
 import { IClose, IEdit, IExtLink } from "../../icons";
+import styles from "./portfolio.module.css";
 
 function ProjectModal({ initial, onSave, onClose }) {
   const [title, setTitle] = useState(initial?.title || "");
@@ -150,12 +151,12 @@ export default function Projects() {
           Add your first project to get started.
         </div>
       ) : (
-        <div className="project-grid">
+        <div className={styles.projectGrid}>
           {projects.map((p) => (
-            <div className="project-card" key={p.id}>
-              <div className="project-card-header">
-                <div className="project-title">{p.title}</div>
-                <div className="project-actions">
+            <div className={styles.projectCard} key={p.id}>
+              <div className={styles.projectCardHeader}>
+                <div className={styles.projectTitle}>{p.title}</div>
+                <div className={styles.projectActions}>
                   <button
                     className="cat-item-edit"
                     onClick={() => setModal({ mode: "edit", project: p })}
@@ -167,24 +168,34 @@ export default function Projects() {
                   </button>
                 </div>
               </div>
-              {p.description && <p className="project-desc">{p.description}</p>}
+              {p.description && <p className={styles.projectDesc}>{p.description}</p>}
               {p.tech_stack && (
-                <div className="project-tags">
+                <div className={styles.projectTags}>
                   {parseTechStack(p.tech_stack).map((t) => (
-                    <span className="project-tag" key={t}>
+                    <span className={styles.projectTag} key={t}>
                       {t}
                     </span>
                   ))}
                 </div>
               )}
-              <div className="project-links">
+              <div className={styles.projectLinks}>
                 {p.github_url && (
-                  <a href={p.github_url} target="_blank" rel="noreferrer" className="project-link">
+                  <a
+                    href={p.github_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={styles.projectLink}
+                  >
                     GitHub <IExtLink />
                   </a>
                 )}
                 {p.live_url && (
-                  <a href={p.live_url} target="_blank" rel="noreferrer" className="project-link">
+                  <a
+                    href={p.live_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={styles.projectLink}
+                  >
                     Live <IExtLink />
                   </a>
                 )}

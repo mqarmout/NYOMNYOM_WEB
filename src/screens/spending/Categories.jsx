@@ -3,6 +3,7 @@ import Fuse from "fuse.js";
 import { useApp } from "../../context/AppContext";
 import { fmt } from "../../utils";
 import { Px, IClose, IEdit, CATEGORY_ICONS } from "../../icons";
+import styles from "./spending.module.css";
 
 const _fuse = new Fuse(CATEGORY_ICONS, { threshold: 0.4, distance: 80 });
 
@@ -90,7 +91,7 @@ function CategoryModal({ initial, onSave, onClose }) {
             onChange={(e) => setIconSearch(e.target.value)}
             style={{ marginBottom: 8 }}
           />
-          <div className="icon-picker">
+          <div className={styles.iconPicker}>
             {filteredIcons.length === 0 ? (
               <div style={{ fontSize: 11, color: "var(--muted)", padding: "6px 2px" }}>
                 No icons match
@@ -99,7 +100,7 @@ function CategoryModal({ initial, onSave, onClose }) {
               filteredIcons.map((ic) => (
                 <button
                   key={ic}
-                  className={"icon-opt " + (icon === ic ? "selected" : "")}
+                  className={`${styles.iconOpt}${icon === ic ? " selected" : ""}`}
                   onClick={() => setIcon(ic)}
                   title={ic}
                 >
@@ -180,15 +181,15 @@ export default function Categories() {
         </button>
       </div>
 
-      <div className="cat-card-grid">
+      <div className={styles.catCardGrid}>
         {categories.map((c) => (
-          <div className="cat-card" key={c.id}>
-            <div className="cat-item-icon">
+          <div className={styles.catCard} key={c.id}>
+            <div className={styles.catItemIcon}>
               <Px name={c.icon} size={22} />
             </div>
-            <div className="cat-item-info">
-              <div className="cat-item-name">{c.name}</div>
-              <div className="cat-item-budget">
+            <div className={styles.catItemInfo}>
+              <div className={styles.catItemName}>{c.name}</div>
+              <div className={styles.catItemBudget}>
                 {c.budget != null ? "Budget: " + fmt(c.budget, currency) : "No budget set"}
               </div>
             </div>

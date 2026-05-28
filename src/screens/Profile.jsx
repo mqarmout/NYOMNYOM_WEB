@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useApp } from "../context/AppContext";
 import { fmt, fmtDate, getInitials } from "../utils";
+import styles from "./profile.module.css";
 
 export default function Profile() {
   const { profile, categories, expenses, saveProfile } = useApp();
@@ -26,28 +27,28 @@ export default function Profile() {
         <p>Your account and settings</p>
       </div>
 
-      <div className="profile-layout">
-        <div className="profile-hero">
+      <div className={styles.profileLayout}>
+        <div className={styles.profileHero}>
           <div className="profile-avatar">{getInitials(profile.name)}</div>
           <div className="profile-name">{profile.name || "Your Profile"}</div>
-          <div className="profile-since">
+          <div className={styles.profileSince}>
             {profile.since ? "Tracking since " + fmtDate(profile.since) : "No expenses logged yet"}
           </div>
 
-          <div className="stat-grid">
-            <div className="stat-card">
+          <div className={styles.statGrid}>
+            <div className={styles.statCard}>
               <div className="s-lbl">This Month</div>
               <div className="s-val">{fmt(monthTotal, currency)}</div>
             </div>
-            <div className="stat-card">
+            <div className={styles.statCard}>
               <div className="s-lbl">All Time</div>
               <div className="s-val">{fmt(profile.total_all_time || 0, currency)}</div>
             </div>
-            <div className="stat-card">
+            <div className={styles.statCard}>
               <div className="s-lbl">Transactions</div>
               <div className="s-val">{profile.tx_count || 0}</div>
             </div>
-            <div className="stat-card">
+            <div className={styles.statCard}>
               <div className="s-lbl">Categories</div>
               <div className="s-val">{categories.length}</div>
             </div>

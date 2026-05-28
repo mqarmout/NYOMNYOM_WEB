@@ -3,6 +3,7 @@ import { useApp } from "../../context/AppContext";
 import { apiFetch } from "../../utils";
 import { Px, IClose } from "../../icons";
 import AutocompleteInput from "./AutocompleteInput";
+import styles from "./spending.module.css";
 
 export default function AddExpense({ onClose, initial }) {
   const { categories, addExpense, updateExpense, showToast, profile } = useApp();
@@ -79,11 +80,11 @@ export default function AddExpense({ onClose, initial }) {
         </button>
       </div>
 
-      <div className="amount-wrap">
-        <div className="amount-row">
-          <span className="currency-sym">{profile.currency || "$"}</span>
+      <div className={styles.amountWrap}>
+        <div className={styles.amountRow}>
+          <span className={styles.currencySym}>{profile.currency || "$"}</span>
           <input
-            className="amount-big"
+            className={styles.amountBig}
             type="number"
             min="0"
             step="0.01"
@@ -93,7 +94,7 @@ export default function AddExpense({ onClose, initial }) {
             autoFocus
           />
         </div>
-        <div className="amount-hint">Enter amount</div>
+        <div className={styles.amountHint}>Enter amount</div>
       </div>
 
       <div className="field">
@@ -161,17 +162,17 @@ export default function AddExpense({ onClose, initial }) {
       <div className="section-title" style={{ marginBottom: 12, marginTop: recurring ? 16 : 0 }}>
         Category
       </div>
-      <div className="cat-grid">
+      <div className={styles.catGrid}>
         {categories.map((c) => (
           <div
             key={c.id}
-            className={"cat-tile " + (catId === c.id ? "selected" : "")}
+            className={`${styles.catTile}${catId === c.id ? " selected" : ""}`}
             onClick={() => setCatId(c.id)}
           >
-            <div className="cat-tile-icon">
+            <div className={styles.catTileIcon}>
               <Px name={c.icon} size={24} />
             </div>
-            <div className="cat-tile-label">{c.name}</div>
+            <div className={styles.catTileLabel}>{c.name}</div>
           </div>
         ))}
       </div>

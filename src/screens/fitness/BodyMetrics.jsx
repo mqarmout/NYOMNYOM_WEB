@@ -3,6 +3,7 @@ import { useFitness } from "../../context/FitnessContext";
 import { AreaChart } from "../../Charts";
 import { fmtDate } from "../../utils";
 import { IClose } from "../../icons";
+import styles from "./fitness.module.css";
 
 export default function BodyMetrics() {
   const { metrics, history, loadAll, addMetric, deleteMetric } = useFitness();
@@ -52,11 +53,11 @@ export default function BodyMetrics() {
       </div>
 
       {latest && (
-        <div className="metric-hero">
-          <div className="metric-hero-val">
-            {latest.weight} <span className="metric-hero-unit">lbs</span>
+        <div className={styles.metricHero}>
+          <div className={styles.metricHeroVal}>
+            {latest.weight} <span className={styles.metricHeroUnit}>lbs</span>
           </div>
-          <div className="metric-hero-lbl">Latest — {fmtDate(latest.date)}</div>
+          <div className={styles.metricHeroLbl}>Latest — {fmtDate(latest.date)}</div>
         </div>
       )}
 
@@ -66,7 +67,7 @@ export default function BodyMetrics() {
       </div>
 
       <div className="section-title">Log Measurement</div>
-      <div className="metric-add-row">
+      <div className={styles.metricAddRow}>
         <div className="field" style={{ flex: 1, marginBottom: 0 }}>
           <label>Weight (lbs)</label>
           <input
@@ -100,11 +101,11 @@ export default function BodyMetrics() {
       {metrics.length === 0 ? (
         <div className="empty-state">No measurements yet.</div>
       ) : (
-        <div className="metric-table">
+        <div className={styles.metricTable}>
           {metrics.map((m) => (
-            <div className="metric-row" key={m.id}>
-              <span className="metric-date">{fmtDate(m.date)}</span>
-              <span className="metric-val">{m.weight} lbs</span>
+            <div className={styles.metricRow} key={m.id}>
+              <span className={styles.metricDate}>{fmtDate(m.date)}</span>
+              <span className={styles.metricVal}>{m.weight} lbs</span>
               <button className="tx-delete" onClick={() => deleteMetric(m.id)}>
                 <IClose />
               </button>
