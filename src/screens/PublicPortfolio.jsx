@@ -181,12 +181,7 @@ export default function PublicPortfolio({ onLogin }) {
       </div>
 
       {showSignIn && (
-        <div
-          className="modal-overlay"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setShowSignIn(false);
-          }}
-        >
+        <div style={{ position: "fixed", inset: 0, zIndex: 200 }}>
           <SignIn onLogin={onLogin} onClose={() => setShowSignIn(false)} />
         </div>
       )}
