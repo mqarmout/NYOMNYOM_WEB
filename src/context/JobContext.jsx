@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useCallback, useRef } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
+import { useToast } from "../hooks/useToast";
 import { apiFetch } from "../utils";
 
 const JobContext = createContext(null);
@@ -6,14 +7,7 @@ const JobContext = createContext(null);
 export function JobProvider({ children }) {
   const [jobs, setJobs] = useState([]);
   const [contacts, setContacts] = useState([]);
-  const [toast, setToast] = useState("");
-  const toastTimer = useRef(null);
-
-  const showToast = useCallback((msg) => {
-    setToast(msg);
-    clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToast(""), 2500);
-  }, []);
+  const { toast, showToast } = useToast();
 
   const loadJobs = useCallback(async () => {
     setJobs(await apiFetch("/api/jobs"));

@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useCallback, useRef } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
+import { useToast } from "../hooks/useToast";
 import { apiFetch } from "../utils";
 
 const PortfolioContext = createContext(null);
@@ -16,14 +17,7 @@ export function PortfolioProvider({ children }) {
     github: "",
     linkedin: "",
   });
-  const [toast, setToast] = useState("");
-  const toastTimer = useRef(null);
-
-  const showToast = useCallback((msg) => {
-    setToast(msg);
-    clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToast(""), 2500);
-  }, []);
+  const { toast, showToast } = useToast();
 
   const loadAll = useCallback(async () => {
     const [p, s, e, a] = await Promise.all([

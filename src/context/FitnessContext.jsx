@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useCallback, useRef } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
+import { useToast } from "../hooks/useToast";
 import { apiFetch } from "../utils";
 
 const FitnessContext = createContext(null);
@@ -9,14 +10,7 @@ export function FitnessProvider({ children }) {
   const [history, setHistory] = useState([]);
   const [runs, setRuns] = useState([]);
   const [runHistory, setRunHistory] = useState([]);
-  const [toast, setToast] = useState("");
-  const toastTimer = useRef(null);
-
-  const showToast = useCallback((msg) => {
-    setToast(msg);
-    clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToast(""), 2500);
-  }, []);
+  const { toast, showToast } = useToast();
 
   const loadWorkouts = useCallback(async () => {
     const w = await apiFetch("/api/fitness/workouts");

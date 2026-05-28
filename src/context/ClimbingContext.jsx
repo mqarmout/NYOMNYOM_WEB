@@ -1,16 +1,12 @@
-import { createContext, useContext, useState, useCallback } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
+import { useToast } from "../hooks/useToast";
 import { apiFetch } from "../utils";
 
 const ClimbingContext = createContext(null);
 
 export function ClimbingProvider({ children }) {
   const [climbs, setClimbs] = useState([]);
-  const [toast, setToast] = useState("");
-
-  const showToast = (msg) => {
-    setToast(msg);
-    setTimeout(() => setToast(""), 2800);
-  };
+  const { toast, showToast } = useToast();
 
   const loadAll = useCallback(async () => {
     const data = await apiFetch("/api/climbing");

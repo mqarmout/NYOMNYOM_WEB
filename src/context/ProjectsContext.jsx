@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useCallback } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
+import { useToast } from "../hooks/useToast";
 import { apiFetch } from "../utils";
 
 const ProjectsContext = createContext(null);
@@ -7,12 +8,7 @@ export function ProjectsProvider({ children }) {
   const [projects, setProjects] = useState([]);
   const [kanbanTasks, setKanbanTasks] = useState([]);
   const [commits, setCommits] = useState({});
-  const [toast, setToast] = useState("");
-
-  const showToast = (msg) => {
-    setToast(msg);
-    setTimeout(() => setToast(""), 2800);
-  };
+  const { toast, showToast } = useToast();
 
   const loadAll = useCallback(async () => {
     const [proj, tasks] = await Promise.all([

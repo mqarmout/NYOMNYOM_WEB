@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useCallback, useRef } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
+import { useToast } from "../hooks/useToast";
 import { apiFetch } from "../utils";
 
 const AppContext = createContext(null);
@@ -14,14 +15,7 @@ export function AppProvider({ children }) {
     total_all_time: 0,
     since: null,
   });
-  const [toast, setToast] = useState("");
-  const toastTimer = useRef(null);
-
-  const showToast = useCallback((msg) => {
-    setToast(msg);
-    clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToast(""), 2500);
-  }, []);
+  const { toast, showToast } = useToast();
 
   const loadAll = useCallback(async () => {
     const month = new Date().toISOString().slice(0, 7);
