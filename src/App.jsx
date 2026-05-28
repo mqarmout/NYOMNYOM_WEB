@@ -655,9 +655,17 @@ function AppInner({ authUser, onLogout }) {
   const { loadAll: loadProjects }  = useDevProjects();
   const { loadAll: loadHydro }     = useHydro();
 
+  const perms = authUser.permissions;
   useEffect(() => {
-    loadApp(); loadJob(); loadFitness(); loadPortfolio(); loadClimbing(); loadProjects(); loadHydro();
-  }, [loadApp, loadJob, loadFitness, loadPortfolio, loadClimbing, loadProjects, loadHydro]);
+    const ok = (s) => !perms || perms.includes(s);
+    if (ok('spending'))  loadApp();
+    if (ok('jobs'))      loadJob();
+    if (ok('fitness'))   loadFitness();
+    if (ok('portfolio')) loadPortfolio();
+    if (ok('climbing'))  loadClimbing();
+    if (ok('projects'))  loadProjects();
+    if (ok('hydro'))     loadHydro();
+  }, [perms, loadApp, loadJob, loadFitness, loadPortfolio, loadClimbing, loadProjects, loadHydro]);
 
   useEffect(() => {
     const handler = (e) => {

@@ -27,10 +27,10 @@ export function AppProvider({ children }) {
       apiFetch('/api/income?month=' + month),
       apiFetch('/api/profile'),
     ]);
-    setCategories(cats);
-    setExpenses(exps);
-    setIncome(inc);
-    setProfile(prof);
+    if (!cats.error) setCategories(cats);
+    if (!exps.error) setExpenses(exps);
+    if (!inc.error)  setIncome(inc);
+    if (!prof.error) setProfile(prof);
   }, []);
 
   const addExpense = useCallback(async (data) => {

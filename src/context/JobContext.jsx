@@ -25,8 +25,8 @@ export function JobProvider({ children }) {
 
   const loadAll = useCallback(async () => {
     const [j, c] = await Promise.all([apiFetch('/api/jobs'), apiFetch('/api/contacts')]);
-    setJobs(j);
-    setContacts(c);
+    if (!j.error) setJobs(j);
+    if (!c.error) setContacts(c);
   }, []);
 
   const addJob = useCallback(async (data) => {

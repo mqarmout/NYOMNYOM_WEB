@@ -26,10 +26,10 @@ export function PortfolioProvider({ children }) {
       apiFetch('/api/portfolio/experience'),
       apiFetch('/api/portfolio/about'),
     ]);
-    setProjects(p);
-    setSkills(s);
-    setExperience(e);
-    setAbout(a);
+    if (!p.error) setProjects(p);
+    if (!s.error) setSkills(s);
+    if (!e.error) setExperience(e);
+    if (!a.error) setAbout(a);
   }, []);
 
   const addProject = useCallback(async (data) => {
