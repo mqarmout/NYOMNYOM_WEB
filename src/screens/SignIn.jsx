@@ -1,19 +1,19 @@
-import { useState } from 'react';
-import { apiFetch } from '../utils';
+import { useState } from "react";
+import { apiFetch } from "../utils";
 
 export default function SignIn({ onLogin, onClose }) {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error,    setError]    = useState('');
-  const [loading,  setLoading]  = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!username.trim() || !password) return;
-    setError('');
+    setError("");
     setLoading(true);
-    const res = await apiFetch('/api/auth/login', {
-      method: 'POST',
+    const res = await apiFetch("/api/auth/login", {
+      method: "POST",
       body: JSON.stringify({ username: username.trim(), password }),
     });
     setLoading(false);
@@ -43,7 +43,7 @@ export default function SignIn({ onLogin, onClose }) {
             type="text"
             placeholder="Enter your username"
             value={username}
-            onChange={e => setUsername(e.target.value)}
+            onChange={(e) => setUsername(e.target.value)}
             autoFocus
             autoComplete="username"
           />
@@ -54,7 +54,7 @@ export default function SignIn({ onLogin, onClose }) {
             type="password"
             placeholder="Enter your password"
             value={password}
-            onChange={e => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             autoComplete="current-password"
           />
         </div>
@@ -64,7 +64,7 @@ export default function SignIn({ onLogin, onClose }) {
           className="auth-submit"
           disabled={loading || !username.trim() || !password}
         >
-          {loading ? 'Please wait…' : 'Sign In'}
+          {loading ? "Please wait…" : "Sign In"}
         </button>
       </form>
     </div>

@@ -1,19 +1,19 @@
-import { useState, useEffect } from 'react';
-import { useApp } from '../context/AppContext';
-import { fmt, fmtDate, getInitials } from '../utils';
+import { useState, useEffect } from "react";
+import { useApp } from "../context/AppContext";
+import { fmt, fmtDate, getInitials } from "../utils";
 
 export default function Profile() {
   const { profile, categories, expenses, saveProfile } = useApp();
-  const [name, setName] = useState(profile.name || '');
-  const [curr, setCurr] = useState(profile.currency || '$');
+  const [name, setName] = useState(profile.name || "");
+  const [curr, setCurr] = useState(profile.currency || "$");
 
   useEffect(() => {
-    setName(profile.name || '');
-    setCurr(profile.currency || '$');
+    setName(profile.name || "");
+    setCurr(profile.currency || "$");
   }, [profile]);
 
   const monthTotal = expenses.reduce((s, e) => s + e.amount, 0);
-  const currency   = profile.currency || '$';
+  const currency = profile.currency || "$";
 
   const handleSave = () => {
     saveProfile({ name: name.trim(), currency: curr });
@@ -29,9 +29,9 @@ export default function Profile() {
       <div className="profile-layout">
         <div className="profile-hero">
           <div className="profile-avatar">{getInitials(profile.name)}</div>
-          <div className="profile-name">{profile.name || 'Your Profile'}</div>
+          <div className="profile-name">{profile.name || "Your Profile"}</div>
           <div className="profile-since">
-            {profile.since ? 'Tracking since ' + fmtDate(profile.since) : 'No expenses logged yet'}
+            {profile.since ? "Tracking since " + fmtDate(profile.since) : "No expenses logged yet"}
           </div>
 
           <div className="stat-grid">
@@ -64,7 +64,7 @@ export default function Profile() {
               type="text"
               placeholder="Your name"
               value={name}
-              onChange={e => setName(e.target.value)}
+              onChange={(e) => setName(e.target.value)}
             />
           </div>
           <div className="settings-row">
@@ -72,7 +72,7 @@ export default function Profile() {
             <select
               className="settings-row-input"
               value={curr}
-              onChange={e => setCurr(e.target.value)}
+              onChange={(e) => setCurr(e.target.value)}
             >
               <option value="$">$ Dollar</option>
               <option value="€">€ Euro</option>
@@ -83,7 +83,9 @@ export default function Profile() {
             </select>
           </div>
 
-          <button className="save-btn" onClick={handleSave}>Save Profile</button>
+          <button className="save-btn" onClick={handleSave}>
+            Save Profile
+          </button>
         </div>
       </div>
     </div>
