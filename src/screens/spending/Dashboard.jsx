@@ -124,7 +124,7 @@ export default function Dashboard() {
                 {tx.description}
                 {tx.recurring ? <span className="tx-recurring-badge">{tx.recurring_period}</span> : null}
               </div>
-              <div className="tx-cat">{SOURCE_LABELS[tx.source] || tx.source}</div>
+              <div className="tx-cat">{tx.source && tx.source !== 'other' ? (SOURCE_LABELS[tx.source] || tx.source) : ''}</div>
             </div>
             <div className="tx-right">
               <div className="tx-amount tx-amount-income">+{fmt(tx.amount, currency)}</div>
@@ -140,7 +140,7 @@ export default function Dashboard() {
                 {tx.description}
                 {tx.recurring ? <span className="tx-recurring-badge">{tx.recurring_period}</span> : null}
               </div>
-              <div className="tx-cat">{tx.category_name}</div>
+              <div className="tx-cat">{tx.category_name}{tx.target ? ` · ${tx.target}` : ''}</div>
             </div>
             <div className="tx-right">
               <div className="tx-amount">-{fmt(tx.amount, currency)}</div>

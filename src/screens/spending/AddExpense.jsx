@@ -1,18 +1,26 @@
 import { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
+import { apiFetch } from '../../utils';
 import { Px, IClose } from '../../icons';
+import AutocompleteInput from './AutocompleteInput';
 
 export default function AddExpense({ onClose, initial }) {
   const { categories, addExpense, updateExpense, showToast, profile } = useApp();
   const today = new Date().toISOString().split('T')[0];
   const [amount,          setAmount]          = useState(initial ? String(initial.amount) : '');
   const [desc,            setDesc]            = useState(initial?.description ?? '');
+  const [target,          setTarget]          = useState(initial?.target ?? '');
   const [date,            setDate]            = useState(initial?.date ?? today);
   const [catId,           setCatId]           = useState(initial?.category_id ?? null);
   const [saving,          setSaving]          = useState(false);
   const [recurring,       setRecurring]       = useState(initial?.recurring ? true : false);
   const [recurringPeriod, setRecurringPeriod] = useState(initial?.recurring_period ?? 'monthly');
   const [recurringStart,  setRecurringStart]  = useState(initial?.recurring_start ?? today);
+  const [targetSuggestions, setTargetSuggestions] = useState([]);
+
+  useEffect(() => {
+    apiFetch('/api/expenses/targets').then(r => { if (!r.error) setTargetSuggestions(r); });
+  }, []);
 
   const isEdit = !!initial;
 
@@ -25,6 +33,7 @@ export default function AddExpense({ onClose, initial }) {
     setSaving(true);
     const data = {
       amount: parseFloat(amount), description: desc.trim(), category_id: catId, date,
+      target: target.trim() || null,
       ...(recurring
         ? { recurring: true, recurring_period: recurringPeriod, recurring_start: recurringStart }
         : { recurring: false, recurring_period: null, recurring_start: null }),
@@ -84,6 +93,16 @@ export default function AddExpense({ onClose, initial }) {
           placeholder="e.g. Lunch at Subway"
           value={desc}
           onChange={e => setDesc(e.target.value)}
+        />
+      </div>
+
+      <div className="field">
+        <label>Target <span style={{ opacity: 0.5, fontWeight: 400, fontSize: '0.85em' }}>(optional)</span></label>
+        <AutocompleteInput
+          value={target}
+          onChange={setTarget}
+          suggestions={targetSuggestions}
+          placeholder="e.g. Subway, Netflix, Amazon"
         />
       </div>
 

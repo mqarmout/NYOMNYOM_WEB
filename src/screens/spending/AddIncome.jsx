@@ -1,27 +1,25 @@
 import { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
+import { apiFetch } from '../../utils';
 import { IClose } from '../../icons';
-
-const SOURCES = [
-  { value: 'salary',     label: 'Salary' },
-  { value: 'freelance',  label: 'Freelance' },
-  { value: 'e-transfer', label: 'E-Transfer' },
-  { value: 'gift',       label: 'Gift' },
-  { value: 'refund',     label: 'Refund' },
-  { value: 'other',      label: 'Other' },
-];
+import AutocompleteInput from './AutocompleteInput';
 
 export default function AddIncome({ onClose, initial }) {
   const { addIncome, updateIncome, showToast, profile } = useApp();
   const today = new Date().toISOString().split('T')[0];
   const [amount,          setAmount]          = useState(initial ? String(initial.amount) : '');
   const [desc,            setDesc]            = useState(initial?.description ?? '');
-  const [source,          setSource]          = useState(initial?.source ?? 'salary');
+  const [source,          setSource]          = useState(initial?.source ?? '');
   const [date,            setDate]            = useState(initial?.date ?? today);
   const [saving,          setSaving]          = useState(false);
   const [recurring,       setRecurring]       = useState(initial?.recurring ? true : false);
   const [recurringPeriod, setRecurringPeriod] = useState(initial?.recurring_period ?? 'monthly');
   const [recurringStart,  setRecurringStart]  = useState(initial?.recurring_start ?? today);
+  const [sourceSuggestions, setSourceSuggestions] = useState([]);
+
+  useEffect(() => {
+    apiFetch('/api/income/sources').then(r => { if (!r.error) setSourceSuggestions(r); });
+  }, []);
 
   const isEdit = !!initial;
 
@@ -31,7 +29,7 @@ export default function AddIncome({ onClose, initial }) {
     if (!date)        return showToast('Select a date');
     setSaving(true);
     const data = {
-      amount: parseFloat(amount), description: desc.trim(), source, date,
+      amount: parseFloat(amount), description: desc.trim(), source: source.trim() || null, date,
       ...(recurring
         ? { recurring: true, recurring_period: recurringPeriod, recurring_start: recurringStart }
         : { recurring: false, recurring_period: null, recurring_start: null }),
@@ -96,10 +94,13 @@ export default function AddIncome({ onClose, initial }) {
 
       <div style={{ display: 'flex', gap: 12 }}>
         <div className="field" style={{ flex: 1 }}>
-          <label>Source</label>
-          <select value={source} onChange={e => setSource(e.target.value)}>
-            {SOURCES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
-          </select>
+          <label>Source <span style={{ opacity: 0.5, fontWeight: 400, fontSize: '0.85em' }}>(optional)</span></label>
+          <AutocompleteInput
+            value={source}
+            onChange={setSource}
+            suggestions={sourceSuggestions}
+            placeholder="e.g. Employer, Client"
+          />
         </div>
         <div className="field" style={{ flex: 1 }}>
           <label>Date</label>
