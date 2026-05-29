@@ -255,14 +255,10 @@ export default function PublicPortfolio({ onLogin }) {
       >
         <main
           style={{
-            padding: "28px 40px",
+            padding: "20px",
             display: "flex",
             flexDirection: "column",
             gap: 20,
-            maxWidth: 960,
-            width: "100%",
-            margin: "0 auto",
-            boxSizing: "border-box",
           }}
         >
           {/* Hero */}
