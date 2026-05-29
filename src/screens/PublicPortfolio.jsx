@@ -255,10 +255,9 @@ export default function PublicPortfolio({ onLogin }) {
       >
         <main
           style={{
-            padding: "20px",
             display: "flex",
             flexDirection: "column",
-            gap: 20,
+            gap: 16,
           }}
         >
           {/* Hero */}
@@ -313,7 +312,6 @@ export default function PublicPortfolio({ onLogin }) {
                   color: theme.cream,
                   lineHeight: 1.7,
                   margin: "0 0 16px",
-                  maxWidth: 640,
                 }}
               >
                 {about.bio}
