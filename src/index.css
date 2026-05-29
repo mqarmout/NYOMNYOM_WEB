@@ -8,26 +8,26 @@
 
 :root {
   /* CRT green phosphor palette — overridden by ThemeContext at runtime */
-  --bg:           #020a06;
-  --surface:      #041208;
-  --surface2:     #08200e;
-  --surface3:     #0c2818;
-  --border:       #0e3a1a;
-  --border-hi:    #1c5a2c;
-  --accent:       #3aff7a;
-  --accent-hot:   #9affb8;
-  --accent-dim:   #1ea050;
+  --bg: #020a06;
+  --surface: #041208;
+  --surface2: #08200e;
+  --surface3: #0c2818;
+  --border: #0e3a1a;
+  --border-hi: #1c5a2c;
+  --accent: #3aff7a;
+  --accent-hot: #9affb8;
+  --accent-dim: #1ea050;
   --accent-faint: #0e5a2a;
-  --cream:        #cfffd9;
-  --muted:        #3c8a52;
-  --faint:        #1e4a2a;
-  --text:         #cfffd9;
-  --danger:       #ff6a5a;
-  --glow-mult:    1;
-  --font-mono:    "JetBrains Mono", monospace;
+  --cream: #cfffd9;
+  --muted: #3c8a52;
+  --faint: #1e4a2a;
+  --text: #cfffd9;
+  --danger: #ff6a5a;
+  --glow-mult: 1;
+  --font-mono: "JetBrains Mono", monospace;
   /* Legacy aliases used by existing screens */
-  --accent-glow:  rgba(58,255,122,0.4);
-  --dim:          #1e4a2a;
+  --accent-glow: rgba(58, 255, 122, 0.4);
+  --dim: #1e4a2a;
 }
 
 html,
@@ -38,7 +38,6 @@ body,
   font-family: var(--font-mono);
   color: var(--text);
 }
-
 
 /* ── Pixelart icons base ── */
 .px-icon {

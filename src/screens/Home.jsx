@@ -8,7 +8,6 @@ import { useHydro } from "../context/HydroContext";
 import Box from "../components/crt/Box";
 import BlockBar from "../components/crt/BlockBar";
 
-
 function StatTile({ label, value, unit = "", hot = false, warn = false }) {
   const { theme, tweaks } = useTheme();
   const color = warn ? STATUS.amber : hot ? theme.accentHot : theme.cream;
@@ -43,9 +42,7 @@ function StatTile({ label, value, unit = "", hot = false, warn = false }) {
         }}
       >
         {value}
-        {unit && (
-          <span style={{ fontSize: 13, color: theme.muted, marginLeft: 4 }}>{unit}</span>
-        )}
+        {unit && <span style={{ fontSize: 13, color: theme.muted, marginLeft: 4 }}>{unit}</span>}
       </div>
     </div>
   );
@@ -95,13 +92,42 @@ export default function Home({ username, onNav }) {
 
   // sections grid row
   const sectionStats = [
-    { id: "spending",  v: totalSpent > 0 ? `${currency}${totalSpent.toFixed(0)}` : "—",      sub: totalBudget > 0 ? `${budgetPct.toFixed(0)}% budget` : "no budget" },
-    { id: "jobs",      v: activeJobs.length > 0 ? String(activeJobs.length) : "—",             sub: offers > 0 ? `${offers} offer` : interviewing > 0 ? `${interviewing} interviewing` : "pipeline" },
-    { id: "fitness",   v: latestWeight ? `${latestWeight}` : workoutsThisMonth > 0 ? String(workoutsThisMonth) : "—", sub: latestWeight ? "lbs" : "workouts" },
-    { id: "portfolio", v: devProjects.length > 0 ? String(devProjects.length) : "—",           sub: "projects" },
-    { id: "climbing",  v: sentCount > 0 ? String(sentCount) : "—",                             sub: `${thisMonthC} this month` },
-    { id: "projects",  v: inProgress > 0 ? String(inProgress) : "—",                           sub: `${activeProjects} active` },
-    { id: "hydro",     v: hydroLatest?.ph != null ? hydroLatest.ph.toFixed(1) : "—",           sub: `${activePlants} plants` },
+    {
+      id: "spending",
+      v: totalSpent > 0 ? `${currency}${totalSpent.toFixed(0)}` : "—",
+      sub: totalBudget > 0 ? `${budgetPct.toFixed(0)}% budget` : "no budget",
+    },
+    {
+      id: "jobs",
+      v: activeJobs.length > 0 ? String(activeJobs.length) : "—",
+      sub:
+        offers > 0
+          ? `${offers} offer`
+          : interviewing > 0
+            ? `${interviewing} interviewing`
+            : "pipeline",
+    },
+    {
+      id: "fitness",
+      v: latestWeight ? `${latestWeight}` : workoutsThisMonth > 0 ? String(workoutsThisMonth) : "—",
+      sub: latestWeight ? "lbs" : "workouts",
+    },
+    {
+      id: "portfolio",
+      v: devProjects.length > 0 ? String(devProjects.length) : "—",
+      sub: "projects",
+    },
+    { id: "climbing", v: sentCount > 0 ? String(sentCount) : "—", sub: `${thisMonthC} this month` },
+    {
+      id: "projects",
+      v: inProgress > 0 ? String(inProgress) : "—",
+      sub: `${activeProjects} active`,
+    },
+    {
+      id: "hydro",
+      v: hydroLatest?.ph != null ? hydroLatest.ph.toFixed(1) : "—",
+      sub: `${activePlants} plants`,
+    },
   ];
 
   return (
@@ -132,13 +158,23 @@ export default function Home({ username, onNav }) {
           &gt; hello, {username || "user"}
         </div>
         <div style={{ fontSize: 12, color: theme.accentDim, marginTop: 8 }}>
-          {new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+          {new Date().toLocaleDateString("en-GB", {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          })}
         </div>
       </Box>
 
       {/* Stats row */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
-        <StatTile label="SPENT THIS MONTH" value={`${currency}${totalSpent.toFixed(0)}`} hot={!overBudget} warn={overBudget} />
+        <StatTile
+          label="SPENT THIS MONTH"
+          value={`${currency}${totalSpent.toFixed(0)}`}
+          hot={!overBudget}
+          warn={overBudget}
+        />
         <StatTile label="ACTIVE JOBS" value={activeJobs.length} hot />
         <StatTile label="WORKOUTS THIS MONTH" value={workoutsThisMonth} hot />
         <StatTile label="CLIMBS SENT" value={sentCount} hot />
@@ -149,18 +185,15 @@ export default function Home({ username, onNav }) {
         <Box title="BUDGET · THIS MONTH" padding="14px 18px">
           <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 8 }}>
             <span style={{ fontSize: 11, color: theme.cream }}>
-              {currency}{totalSpent.toFixed(0)} / {currency}{totalBudget.toFixed(0)}
+              {currency}
+              {totalSpent.toFixed(0)} / {currency}
+              {totalBudget.toFixed(0)}
             </span>
             <span style={{ fontSize: 11, color: overBudget ? STATUS.red : theme.muted }}>
               {overBudget ? "OVER BUDGET" : `${(totalBudget - totalSpent).toFixed(0)} remaining`}
             </span>
           </div>
-          <BlockBar
-            value={totalSpent}
-            max={totalBudget}
-            width={48}
-            over={overBudget}
-          />
+          <BlockBar value={totalSpent} max={totalBudget} width={48} over={overBudget} />
         </Box>
       )}
 
@@ -214,10 +247,22 @@ export default function Home({ username, onNav }) {
         <Box title="HYDRO · LIVE">
           <div style={{ display: "flex", gap: 28 }}>
             {[
-              ["pH",   hydroLatest.ph?.toFixed(1) ?? "—",  hydroLatest.ph >= 5.8 && hydroLatest.ph <= 6.4],
-              ["EC",   hydroLatest.ec_ppm?.toFixed(0) ?? "—", true],
-              ["H₂O",  hydroLatest.water_level != null ? hydroLatest.water_level.toFixed(0) + "%" : "—", hydroLatest.water_level > 30],
-              ["TEMP", hydroLatest.water_temp != null ? hydroLatest.water_temp.toFixed(1) + "°C" : "—", true],
+              [
+                "pH",
+                hydroLatest.ph?.toFixed(1) ?? "—",
+                hydroLatest.ph >= 5.8 && hydroLatest.ph <= 6.4,
+              ],
+              ["EC", hydroLatest.ec_ppm?.toFixed(0) ?? "—", true],
+              [
+                "H₂O",
+                hydroLatest.water_level != null ? hydroLatest.water_level.toFixed(0) + "%" : "—",
+                hydroLatest.water_level > 30,
+              ],
+              [
+                "TEMP",
+                hydroLatest.water_temp != null ? hydroLatest.water_temp.toFixed(1) + "°C" : "—",
+                true,
+              ],
             ].map(([k, v, ok]) => (
               <div key={k}>
                 <div style={{ fontSize: 10, color: theme.muted, letterSpacing: "0.12em" }}>{k}</div>
@@ -233,7 +278,14 @@ export default function Home({ username, onNav }) {
                 </div>
               </div>
             ))}
-            <div style={{ marginLeft: "auto", fontSize: 10, color: theme.muted, alignSelf: "flex-end" }}>
+            <div
+              style={{
+                marginLeft: "auto",
+                fontSize: 10,
+                color: theme.muted,
+                alignSelf: "flex-end",
+              }}
+            >
               {activePlants} plant{activePlants !== 1 ? "s" : ""} active
             </div>
           </div>
@@ -245,14 +297,20 @@ export default function Home({ username, onNav }) {
         <Box title="JOBS · PIPELINE">
           <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
             {[
-              ["APPLIED",      jobs.filter((j) => j.status === "applied").length,      theme.muted],
-              ["SCREENING",    jobs.filter((j) => j.status === "screening").length,    STATUS.amber],
-              ["INTERVIEWING", jobs.filter((j) => j.status === "interviewing").length, theme.accent],
-              ["OFFERS",       jobs.filter((j) => j.status === "offer").length,        theme.accentHot],
-              ["REJECTED",     jobs.filter((j) => j.status === "rejected").length,     STATUS.red],
+              ["APPLIED", jobs.filter((j) => j.status === "applied").length, theme.muted],
+              ["SCREENING", jobs.filter((j) => j.status === "screening").length, STATUS.amber],
+              [
+                "INTERVIEWING",
+                jobs.filter((j) => j.status === "interviewing").length,
+                theme.accent,
+              ],
+              ["OFFERS", jobs.filter((j) => j.status === "offer").length, theme.accentHot],
+              ["REJECTED", jobs.filter((j) => j.status === "rejected").length, STATUS.red],
             ].map(([label, count, color]) => (
               <div key={label} style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                <div style={{ fontSize: 10, color: theme.muted, letterSpacing: "0.12em" }}>{label}</div>
+                <div style={{ fontSize: 10, color: theme.muted, letterSpacing: "0.12em" }}>
+                  {label}
+                </div>
                 <div
                   style={{
                     fontSize: 24,
@@ -272,7 +330,13 @@ export default function Home({ username, onNav }) {
       {/* Run distance this month */}
       {runKm > 0 && (
         <Box title="RUNNING · THIS MONTH">
-          <div style={{ fontSize: 28, color: theme.accentHot, textShadow: glowFn(theme, tweaks.glow * 0.8) }}>
+          <div
+            style={{
+              fontSize: 28,
+              color: theme.accentHot,
+              textShadow: glowFn(theme, tweaks.glow * 0.8),
+            }}
+          >
             {runKm.toFixed(1)}
             <span style={{ fontSize: 13, color: theme.muted, marginLeft: 4 }}>km</span>
           </div>

@@ -34,13 +34,13 @@ import Shell from "./components/crt/Shell";
 import { apiFetch } from "./utils";
 
 const SECTION_DEFAULT = {
-  spending:  "dashboard",
-  jobs:      "jobs-applications",
-  fitness:   "fitness-workouts",
+  spending: "dashboard",
+  jobs: "jobs-applications",
+  fitness: "fitness-workouts",
   portfolio: "portfolio-projects",
-  climbing:  "climbing-routes",
-  projects:  "projects-tracker",
-  hydro:     "hydro-dashboard",
+  climbing: "climbing-routes",
+  projects: "projects-tracker",
+  hydro: "hydro-dashboard",
 };
 
 const SECTION_ORDER = ["spending", "jobs", "fitness", "portfolio", "climbing", "projects", "hydro"];
@@ -68,88 +68,189 @@ const SCREEN_TO_SECTION = {
 };
 
 const COMMANDS = [
-  { cmd: "spending",              screen: "dashboard",           fire: false, label: "Spending → Dashboard" },
-  { cmd: "spending/new",          screen: "dashboard",           fire: true,  label: "Spending → Add Expense" },
-  { cmd: "spending/new-income",   screen: "dashboard",           fire: true,  event: "shortcut:new-income", label: "Spending → Add Income" },
-  { cmd: "spending/graphs",       screen: "graphs",              fire: false, label: "Spending → Graphs" },
-  { cmd: "spending/categories",   screen: "categories",          fire: false, label: "Spending → Categories" },
-  { cmd: "spending/categories/new", screen: "categories",        fire: true,  label: "Spending → New Category" },
-  { cmd: "jobs",                  screen: "jobs-applications",   fire: false, label: "Jobs → Applications" },
-  { cmd: "jobs/new",              screen: "jobs-applications",   fire: true,  label: "Jobs → Add Application" },
-  { cmd: "jobs/contacts",         screen: "jobs-contacts",       fire: false, label: "Jobs → Contacts" },
-  { cmd: "jobs/contacts/new",     screen: "jobs-contacts",       fire: true,  label: "Jobs → Add Contact" },
-  { cmd: "fitness",               screen: "fitness-workouts",    fire: false, label: "Fitness → Workouts" },
-  { cmd: "fitness/new",           screen: "fitness-workouts",    fire: true,  label: "Fitness → Log Workout" },
-  { cmd: "fitness/runs",          screen: "fitness-runs",        fire: false, label: "Fitness → Running" },
-  { cmd: "fitness/runs/new",      screen: "fitness-runs",        fire: true,  label: "Fitness → Log Run" },
-  { cmd: "fitness/metrics",       screen: "fitness-metrics",     fire: false, label: "Fitness → Body Metrics" },
-  { cmd: "portfolio",             screen: "portfolio-projects",  fire: false, label: "Portfolio → Projects" },
-  { cmd: "portfolio/projects",    screen: "portfolio-projects",  fire: false, label: "Portfolio → Projects" },
-  { cmd: "portfolio/skills",      screen: "portfolio-skills",    fire: false, label: "Portfolio → Skills" },
-  { cmd: "portfolio/experience",  screen: "portfolio-experience",fire: false, label: "Portfolio → Experience" },
-  { cmd: "portfolio/about",       screen: "portfolio-about",     fire: false, label: "Portfolio → About" },
-  { cmd: "climbing",              screen: "climbing-routes",     fire: false, label: "Climbing → Routes" },
-  { cmd: "climbing/new",          screen: "climbing-routes",     fire: true,  label: "Climbing → Log Climb" },
-  { cmd: "projects",              screen: "projects-tracker",    fire: false, label: "Projects → Tracker" },
-  { cmd: "projects/new",          screen: "projects-tracker",    fire: true,  label: "Projects → New Project" },
-  { cmd: "projects/board",        screen: "projects-board",      fire: false, label: "Projects → Board" },
-  { cmd: "projects/board/new",    screen: "projects-board",      fire: true,  label: "Projects → Add Task" },
-  { cmd: "hydro",                 screen: "hydro-dashboard",     fire: false, label: "Hydro → Dashboard" },
-  { cmd: "hydro/new",             screen: "hydro-dashboard",     fire: true,  label: "Hydro → Log Reading" },
-  { cmd: "hydro/history",         screen: "hydro-history",       fire: false, label: "Hydro → History" },
-  { cmd: "hydro/plants",          screen: "hydro-plants",        fire: false, label: "Hydro → Plants" },
-  { cmd: "hydro/plants/new",      screen: "hydro-plants",        fire: true,  label: "Hydro → Add Plant" },
-  { cmd: "hydro/dosing",          screen: "hydro-dosing",        fire: false, label: "Hydro → Dosing Log" },
-  { cmd: "hydro/dosing/new",      screen: "hydro-dosing",        fire: true,  label: "Hydro → Log Dosing" },
-  { cmd: "profile",               screen: "profile",             fire: false, label: "Profile" },
-  { cmd: "logout",                screen: "__logout__",          fire: false, label: "Logout" },
+  { cmd: "spending", screen: "dashboard", fire: false, label: "Spending → Dashboard" },
+  { cmd: "spending/new", screen: "dashboard", fire: true, label: "Spending → Add Expense" },
+  {
+    cmd: "spending/new-income",
+    screen: "dashboard",
+    fire: true,
+    event: "shortcut:new-income",
+    label: "Spending → Add Income",
+  },
+  { cmd: "spending/graphs", screen: "graphs", fire: false, label: "Spending → Graphs" },
+  { cmd: "spending/categories", screen: "categories", fire: false, label: "Spending → Categories" },
+  {
+    cmd: "spending/categories/new",
+    screen: "categories",
+    fire: true,
+    label: "Spending → New Category",
+  },
+  { cmd: "jobs", screen: "jobs-applications", fire: false, label: "Jobs → Applications" },
+  { cmd: "jobs/new", screen: "jobs-applications", fire: true, label: "Jobs → Add Application" },
+  { cmd: "jobs/contacts", screen: "jobs-contacts", fire: false, label: "Jobs → Contacts" },
+  { cmd: "jobs/contacts/new", screen: "jobs-contacts", fire: true, label: "Jobs → Add Contact" },
+  { cmd: "fitness", screen: "fitness-workouts", fire: false, label: "Fitness → Workouts" },
+  { cmd: "fitness/new", screen: "fitness-workouts", fire: true, label: "Fitness → Log Workout" },
+  { cmd: "fitness/runs", screen: "fitness-runs", fire: false, label: "Fitness → Running" },
+  { cmd: "fitness/runs/new", screen: "fitness-runs", fire: true, label: "Fitness → Log Run" },
+  {
+    cmd: "fitness/metrics",
+    screen: "fitness-metrics",
+    fire: false,
+    label: "Fitness → Body Metrics",
+  },
+  { cmd: "portfolio", screen: "portfolio-projects", fire: false, label: "Portfolio → Projects" },
+  {
+    cmd: "portfolio/projects",
+    screen: "portfolio-projects",
+    fire: false,
+    label: "Portfolio → Projects",
+  },
+  { cmd: "portfolio/skills", screen: "portfolio-skills", fire: false, label: "Portfolio → Skills" },
+  {
+    cmd: "portfolio/experience",
+    screen: "portfolio-experience",
+    fire: false,
+    label: "Portfolio → Experience",
+  },
+  { cmd: "portfolio/about", screen: "portfolio-about", fire: false, label: "Portfolio → About" },
+  { cmd: "climbing", screen: "climbing-routes", fire: false, label: "Climbing → Routes" },
+  { cmd: "climbing/new", screen: "climbing-routes", fire: true, label: "Climbing → Log Climb" },
+  { cmd: "projects", screen: "projects-tracker", fire: false, label: "Projects → Tracker" },
+  { cmd: "projects/new", screen: "projects-tracker", fire: true, label: "Projects → New Project" },
+  { cmd: "projects/board", screen: "projects-board", fire: false, label: "Projects → Board" },
+  { cmd: "projects/board/new", screen: "projects-board", fire: true, label: "Projects → Add Task" },
+  { cmd: "hydro", screen: "hydro-dashboard", fire: false, label: "Hydro → Dashboard" },
+  { cmd: "hydro/new", screen: "hydro-dashboard", fire: true, label: "Hydro → Log Reading" },
+  { cmd: "hydro/history", screen: "hydro-history", fire: false, label: "Hydro → History" },
+  { cmd: "hydro/plants", screen: "hydro-plants", fire: false, label: "Hydro → Plants" },
+  { cmd: "hydro/plants/new", screen: "hydro-plants", fire: true, label: "Hydro → Add Plant" },
+  { cmd: "hydro/dosing", screen: "hydro-dosing", fire: false, label: "Hydro → Dosing Log" },
+  { cmd: "hydro/dosing/new", screen: "hydro-dosing", fire: true, label: "Hydro → Log Dosing" },
+  { cmd: "profile", screen: "profile", fire: false, label: "Profile" },
+  { cmd: "logout", screen: "__logout__", fire: false, label: "Logout" },
 ];
 
 const PATH_MAP = {
-  home:      "/dashboard",
-  spending:  "/spending",
-  jobs:      "/jobs",
-  fitness:   "/fitness",
-  climbing:  "/climbing",
+  home: "/dashboard",
+  spending: "/spending",
+  jobs: "/jobs",
+  fitness: "/fitness",
+  climbing: "/climbing",
   portfolio: "/portfolio",
-  projects:  "/projects",
-  hydro:     "/hydro",
-  profile:   "/profile",
+  projects: "/projects",
+  hydro: "/hydro",
+  profile: "/profile",
 };
 
 const CMD_MAP = {
-  home:      "./status --live",
-  spending:  "./report --month",
-  jobs:      "./pipeline --active",
-  fitness:   "./log --month",
-  climbing:  "./sends --max",
+  home: "./status --live",
+  spending: "./report --month",
+  jobs: "./pipeline --active",
+  fitness: "./log --month",
+  climbing: "./sends --max",
   portfolio: "./public --serve",
-  projects:  "./kanban --board",
-  hydro:     "./sensors --live",
-  profile:   "./profile --edit",
+  projects: "./kanban --board",
+  hydro: "./sensors --live",
+  profile: "./profile --edit",
 };
 
 const FKEY_MAP = {
-  home:      [["F1", "help"], ["F2", "sync"], ["F3", "search"], ["F4", "new"], ["F10", "menu"]],
-  spending:  [["F1", "help"], ["F2", "save"], ["F3", "find"], ["F4", "new"],  ["Esc", "home"]],
-  fitness:   [["F1", "help"], ["F2", "save"], ["F3", "find"], ["F4", "log"],  ["Esc", "home"]],
-  climbing:  [["F1", "help"], ["F2", "save"], ["F3", "find"], ["F4", "send"], ["Esc", "home"]],
-  jobs:      [["F1", "help"], ["F2", "save"], ["F3", "find"], ["F4", "apply"],["Esc", "home"]],
-  projects:  [["F1", "help"], ["F2", "save"], ["F3", "find"], ["F4", "task"], ["Esc", "home"]],
-  hydro:     [["F1", "help"], ["F2", "sync"], ["F3", "find"], ["F4", "dose"], ["Esc", "home"]],
-  portfolio: [["F1", "help"], ["F2", "save"], ["F3", "find"], ["F4", "new"],  ["Esc", "home"]],
-  profile:   [["F1", "help"], ["Esc", "home"]],
+  home: [
+    ["F1", "help"],
+    ["F2", "sync"],
+    ["F3", "search"],
+    ["F4", "new"],
+    ["F10", "menu"],
+  ],
+  spending: [
+    ["F1", "help"],
+    ["F2", "save"],
+    ["F3", "find"],
+    ["F4", "new"],
+    ["Esc", "home"],
+  ],
+  fitness: [
+    ["F1", "help"],
+    ["F2", "save"],
+    ["F3", "find"],
+    ["F4", "log"],
+    ["Esc", "home"],
+  ],
+  climbing: [
+    ["F1", "help"],
+    ["F2", "save"],
+    ["F3", "find"],
+    ["F4", "send"],
+    ["Esc", "home"],
+  ],
+  jobs: [
+    ["F1", "help"],
+    ["F2", "save"],
+    ["F3", "find"],
+    ["F4", "apply"],
+    ["Esc", "home"],
+  ],
+  projects: [
+    ["F1", "help"],
+    ["F2", "save"],
+    ["F3", "find"],
+    ["F4", "task"],
+    ["Esc", "home"],
+  ],
+  hydro: [
+    ["F1", "help"],
+    ["F2", "sync"],
+    ["F3", "find"],
+    ["F4", "dose"],
+    ["Esc", "home"],
+  ],
+  portfolio: [
+    ["F1", "help"],
+    ["F2", "save"],
+    ["F3", "find"],
+    ["F4", "new"],
+    ["Esc", "home"],
+  ],
+  profile: [
+    ["F1", "help"],
+    ["Esc", "home"],
+  ],
 };
 
 // Section sub-tabs
 const SECTION_TABS = {
-  spending:  [["dashboard", "DASHBOARD"], ["graphs", "GRAPHS"], ["categories", "CATEGORIES"]],
-  jobs:      [["jobs-applications", "APPLICATIONS"], ["jobs-contacts", "CONTACTS"]],
-  fitness:   [["fitness-workouts", "WORKOUTS"], ["fitness-runs", "RUNNING"], ["fitness-metrics", "BODY"]],
-  portfolio: [["portfolio-projects", "PROJECTS"], ["portfolio-skills", "SKILLS"], ["portfolio-experience", "EXPERIENCE"], ["portfolio-about", "ABOUT"]],
-  climbing:  [["climbing-routes", "ROUTES"]],
-  projects:  [["projects-tracker", "PROJECTS"], ["projects-board", "BOARD"]],
-  hydro:     [["hydro-dashboard", "DASHBOARD"], ["hydro-history", "HISTORY"], ["hydro-plants", "PLANTS"], ["hydro-dosing", "DOSING"]],
+  spending: [
+    ["dashboard", "DASHBOARD"],
+    ["graphs", "GRAPHS"],
+    ["categories", "CATEGORIES"],
+  ],
+  jobs: [
+    ["jobs-applications", "APPLICATIONS"],
+    ["jobs-contacts", "CONTACTS"],
+  ],
+  fitness: [
+    ["fitness-workouts", "WORKOUTS"],
+    ["fitness-runs", "RUNNING"],
+    ["fitness-metrics", "BODY"],
+  ],
+  portfolio: [
+    ["portfolio-projects", "PROJECTS"],
+    ["portfolio-skills", "SKILLS"],
+    ["portfolio-experience", "EXPERIENCE"],
+    ["portfolio-about", "ABOUT"],
+  ],
+  climbing: [["climbing-routes", "ROUTES"]],
+  projects: [
+    ["projects-tracker", "PROJECTS"],
+    ["projects-board", "BOARD"],
+  ],
+  hydro: [
+    ["hydro-dashboard", "DASHBOARD"],
+    ["hydro-history", "HISTORY"],
+    ["hydro-plants", "PLANTS"],
+    ["hydro-dosing", "DOSING"],
+  ],
 };
 
 function Toasts() {
@@ -202,21 +303,43 @@ function TerminalLauncher({ onNavigate, onClose, canAccess }) {
       ? allowedCmds
       : allowedCmds.filter((c) => c.cmd.startsWith(query.toLowerCase()));
 
-  useEffect(() => { setSelIdx(0); }, [query]);
+  useEffect(() => {
+    setSelIdx(0);
+  }, [query]);
 
   useEffect(() => {
     inputRef.current?.focus();
     const handler = (e) => {
-      if (e.key === "Escape") { e.stopImmediatePropagation(); onClose(); return; }
-      if (e.key === "ArrowDown") { e.preventDefault(); setSelIdx((i) => Math.min(i + 1, matches.length - 1)); return; }
-      if (e.key === "ArrowUp")   { e.preventDefault(); setSelIdx((i) => Math.max(i - 1, 0)); return; }
+      if (e.key === "Escape") {
+        e.stopImmediatePropagation();
+        onClose();
+        return;
+      }
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setSelIdx((i) => Math.min(i + 1, matches.length - 1));
+        return;
+      }
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setSelIdx((i) => Math.max(i - 1, 0));
+        return;
+      }
       if (e.key === "Enter") {
         e.preventDefault();
         const hit = matches[selIdx] ?? matches[0];
-        if (hit) { onNavigate(hit.screen, hit.fire, hit.event); onClose(); }
+        if (hit) {
+          onNavigate(hit.screen, hit.fire, hit.event);
+          onClose();
+        }
         return;
       }
-      if (e.key === "Tab") { e.preventDefault(); const hit = matches[selIdx] ?? matches[0]; if (hit) setQuery(hit.cmd); return; }
+      if (e.key === "Tab") {
+        e.preventDefault();
+        const hit = matches[selIdx] ?? matches[0];
+        if (hit) setQuery(hit.cmd);
+        return;
+      }
     };
     document.addEventListener("keydown", handler, true);
     return () => document.removeEventListener("keydown", handler, true);
@@ -281,7 +404,10 @@ function TerminalLauncher({ onNavigate, onClose, canAccess }) {
               <div
                 key={c.cmd}
                 onMouseEnter={() => setSelIdx(i)}
-                onClick={() => { onNavigate(c.screen, c.fire, c.event); onClose(); }}
+                onClick={() => {
+                  onNavigate(c.screen, c.fire, c.event);
+                  onClose();
+                }}
                 style={{
                   padding: "9px 14px",
                   display: "flex",
@@ -292,7 +418,9 @@ function TerminalLauncher({ onNavigate, onClose, canAccess }) {
                   borderLeft: i === selIdx ? `2px solid ${theme.accent}` : "2px solid transparent",
                 }}
               >
-                <span style={{ color: i === selIdx ? theme.accent : theme.accentDim }}>/{c.cmd}</span>
+                <span style={{ color: i === selIdx ? theme.accent : theme.accentDim }}>
+                  /{c.cmd}
+                </span>
                 <span style={{ color: theme.muted, fontSize: 11 }}>{c.label}</span>
               </div>
             ))}
@@ -351,27 +479,48 @@ function SectionTabs({ section, screen, onNav }) {
 
 function renderScreen(screen) {
   switch (screen) {
-    case "dashboard":          return <Dashboard />;
-    case "graphs":             return <Graphs />;
-    case "categories":         return <Categories />;
-    case "jobs-applications":  return <Applications />;
-    case "jobs-contacts":      return <Contacts />;
-    case "fitness-workouts":   return <Workouts />;
-    case "fitness-runs":       return <Runs />;
-    case "fitness-metrics":    return <BodyMetrics />;
-    case "portfolio-projects": return <Projects />;
-    case "portfolio-skills":   return <Skills />;
-    case "portfolio-experience": return <Experience />;
-    case "portfolio-about":    return <About />;
-    case "climbing-routes":    return <Climbs />;
-    case "projects-tracker":   return <DevProjects />;
-    case "projects-board":     return <KanbanScreen />;
-    case "hydro-dashboard":    return <HydroDashboard />;
-    case "hydro-history":      return <HydroHistory />;
-    case "hydro-plants":       return <HydroPlants />;
-    case "hydro-dosing":       return <HydroDosing />;
-    case "profile":            return <Profile />;
-    default:                   return null;
+    case "dashboard":
+      return <Dashboard />;
+    case "graphs":
+      return <Graphs />;
+    case "categories":
+      return <Categories />;
+    case "jobs-applications":
+      return <Applications />;
+    case "jobs-contacts":
+      return <Contacts />;
+    case "fitness-workouts":
+      return <Workouts />;
+    case "fitness-runs":
+      return <Runs />;
+    case "fitness-metrics":
+      return <BodyMetrics />;
+    case "portfolio-projects":
+      return <Projects />;
+    case "portfolio-skills":
+      return <Skills />;
+    case "portfolio-experience":
+      return <Experience />;
+    case "portfolio-about":
+      return <About />;
+    case "climbing-routes":
+      return <Climbs />;
+    case "projects-tracker":
+      return <DevProjects />;
+    case "projects-board":
+      return <KanbanScreen />;
+    case "hydro-dashboard":
+      return <HydroDashboard />;
+    case "hydro-history":
+      return <HydroHistory />;
+    case "hydro-plants":
+      return <HydroPlants />;
+    case "hydro-dosing":
+      return <HydroDosing />;
+    case "profile":
+      return <Profile />;
+    default:
+      return null;
   }
 }
 
@@ -382,24 +531,24 @@ function AppInner({ authUser, onLogout }) {
   const allowedSections = authUser.permissions ?? null;
   const canAccess = (id) => allowedSections === null || allowedSections.includes(id);
 
-  const { loadAll: loadApp }       = useApp();
-  const { loadAll: loadJob }       = useJob();
-  const { loadAll: loadFitness }   = useFitness();
+  const { loadAll: loadApp } = useApp();
+  const { loadAll: loadJob } = useJob();
+  const { loadAll: loadFitness } = useFitness();
   const { loadAll: loadPortfolio } = usePortfolio();
-  const { loadAll: loadClimbing }  = useClimbing();
-  const { loadAll: loadProjects }  = useDevProjects();
-  const { loadAll: loadHydro }     = useHydro();
+  const { loadAll: loadClimbing } = useClimbing();
+  const { loadAll: loadProjects } = useDevProjects();
+  const { loadAll: loadHydro } = useHydro();
 
   const perms = authUser.permissions;
   useEffect(() => {
     const ok = (s) => !perms || perms.includes(s);
-    if (ok("spending"))  loadApp();
-    if (ok("jobs"))      loadJob();
-    if (ok("fitness"))   loadFitness();
+    if (ok("spending")) loadApp();
+    if (ok("jobs")) loadJob();
+    if (ok("fitness")) loadFitness();
     if (ok("portfolio")) loadPortfolio();
-    if (ok("climbing"))  loadClimbing();
-    if (ok("projects"))  loadProjects();
-    if (ok("hydro"))     loadHydro();
+    if (ok("climbing")) loadClimbing();
+    if (ok("projects")) loadProjects();
+    if (ok("hydro")) loadHydro();
   }, [perms, loadApp, loadJob, loadFitness, loadPortfolio, loadClimbing, loadProjects, loadHydro]);
 
   // Keyboard navigation
@@ -424,7 +573,10 @@ function AppInner({ authUser, onLogout }) {
         return;
       }
       const k = e.key.toLowerCase();
-      if (k === "h") { setScreen(null); return; }
+      if (k === "h") {
+        setScreen(null);
+        return;
+      }
       if ((e.key === "ArrowRight" || e.key === "ArrowLeft") && screen !== null) {
         const sec = SCREEN_TO_SECTION[screen];
         if (!sec) return;
@@ -432,9 +584,10 @@ function AppInner({ authUser, onLogout }) {
         const tabs = SECTION_TABS[sec] || [];
         const idx = tabs.findIndex(([id]) => id === screen);
         if (idx === -1) return;
-        const next = e.key === "ArrowRight"
-          ? tabs[(idx + 1) % tabs.length]
-          : tabs[(idx - 1 + tabs.length) % tabs.length];
+        const next =
+          e.key === "ArrowRight"
+            ? tabs[(idx + 1) % tabs.length]
+            : tabs[(idx - 1 + tabs.length) % tabs.length];
         setScreen(next[0]);
         return;
       }
@@ -449,17 +602,25 @@ function AppInner({ authUser, onLogout }) {
   }, [screen, showTerminal]);
 
   const handleTerminalNavigate = (targetScreen, fireNew, fireEvent) => {
-    if (targetScreen === "__logout__") { setShowTerminal(false); onLogout(); return; }
+    if (targetScreen === "__logout__") {
+      setShowTerminal(false);
+      onLogout();
+      return;
+    }
     setScreen(targetScreen);
-    if (fireNew) setTimeout(() => window.dispatchEvent(new Event(fireEvent || "shortcut:new")), 120);
+    if (fireNew)
+      setTimeout(() => window.dispatchEvent(new Event(fireEvent || "shortcut:new")), 120);
   };
 
   const handleSidebarNav = (sectionId) => {
-    if (sectionId === "home") { setScreen(null); return; }
+    if (sectionId === "home") {
+      setScreen(null);
+      return;
+    }
     if (canAccess(sectionId)) setScreen(SECTION_DEFAULT[sectionId]);
   };
 
-  const activeSection = screen ? SCREEN_TO_SECTION[screen] : (screen === null ? null : null);
+  const activeSection = screen ? SCREEN_TO_SECTION[screen] : screen === null ? null : null;
 
   // Determine the "active" item for the sidebar highlight
   const sidebarActive = screen === null ? "home" : (activeSection ?? screen);
@@ -467,7 +628,7 @@ function AppInner({ authUser, onLogout }) {
   // Path and cmd for StatusLine
   const pathKey = screen === null ? "home" : (activeSection ?? screen);
   const path = PATH_MAP[pathKey] ?? PATH_MAP.home;
-  const cmd  = CMD_MAP[pathKey]  ?? CMD_MAP.home;
+  const cmd = CMD_MAP[pathKey] ?? CMD_MAP.home;
   const fkeys = FKEY_MAP[pathKey] ?? FKEY_MAP.home;
 
   const { theme } = useTheme();
@@ -484,8 +645,8 @@ function AppInner({ authUser, onLogout }) {
         onLogout={onLogout}
         footerExtra={
           <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: theme.muted }}>
-            vim: <span style={{ color: theme.accent }}>NORMAL</span>{" "}
-            · {screen ? `${screen}.tsx` : "home.tsx"}
+            vim: <span style={{ color: theme.accent }}>NORMAL</span> ·{" "}
+            {screen ? `${screen}.tsx` : "home.tsx"}
           </span>
         }
       >
@@ -496,9 +657,7 @@ function AppInner({ authUser, onLogout }) {
             {activeSection && (
               <SectionTabs section={activeSection} screen={screen} onNav={setScreen} />
             )}
-            <div style={{ flex: 1, overflow: "auto" }}>
-              {renderScreen(screen)}
-            </div>
+            <div style={{ flex: 1, overflow: "auto" }}>{renderScreen(screen)}</div>
           </div>
         )}
       </Shell>

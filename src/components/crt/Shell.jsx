@@ -3,13 +3,13 @@ import { useTheme, glow as glowFn } from "../../context/ThemeContext";
 import PixelIcon from "./PixelIcon";
 
 const SECTION_META = [
-  { id: "spending",  label: "spending",  icon: "coins",     key: "1" },
-  { id: "jobs",      label: "jobs",      icon: "briefcase", key: "2" },
-  { id: "fitness",   label: "fitness",   icon: "fitness",   key: "3" },
+  { id: "spending", label: "spending", icon: "coins", key: "1" },
+  { id: "jobs", label: "jobs", icon: "briefcase", key: "2" },
+  { id: "fitness", label: "fitness", icon: "fitness", key: "3" },
   { id: "portfolio", label: "portfolio", icon: "portfolio", key: "4" },
-  { id: "climbing",  label: "climbing",  icon: "climb",     key: "5" },
-  { id: "projects",  label: "projects",  icon: "code",      key: "6" },
-  { id: "hydro",     label: "hydro",     icon: "drop",      key: "7" },
+  { id: "climbing", label: "climbing", icon: "climb", key: "5" },
+  { id: "projects", label: "projects", icon: "code", key: "6" },
+  { id: "hydro", label: "hydro", icon: "drop", key: "7" },
 ];
 
 function Scanlines({ strength }) {
@@ -53,8 +53,10 @@ function StatusLine({ path, cmd, username }) {
   }, []);
 
   const time = now.toTimeString().slice(0, 8);
-  const dateStr = now.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })
-    .toUpperCase().replace(/ /g, "·");
+  const dateStr = now
+    .toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })
+    .toUpperCase()
+    .replace(/ /g, "·");
 
   return (
     <div
@@ -191,7 +193,11 @@ function Sidebar({ active, onNav, username, onLogout }) {
         >
           {active === "home" ? "▸ 0" : "  0"}
         </span>
-        <PixelIcon kind="map" size={11} color={active === "home" ? theme.accent : theme.accentDim} />
+        <PixelIcon
+          kind="map"
+          size={11}
+          color={active === "home" ? theme.accent : theme.accentDim}
+        />
         <span style={{ flex: 1 }}>home</span>
         <span style={{ color: theme.muted, fontSize: 10 }}>[h]</span>
       </button>
@@ -230,11 +236,7 @@ function Sidebar({ active, onNav, username, onLogout }) {
             >
               {isActive ? `▸ ${i + 1}` : `  ${i + 1}`}
             </span>
-            <PixelIcon
-              kind={s.icon}
-              size={11}
-              color={isActive ? theme.accent : theme.accentDim}
-            />
+            <PixelIcon kind={s.icon} size={11} color={isActive ? theme.accent : theme.accentDim} />
             <span style={{ flex: 1 }}>{s.label}</span>
             <span style={{ color: theme.muted, fontSize: 10 }}>[{s.key}]</span>
           </button>
@@ -254,16 +256,16 @@ function Sidebar({ active, onNav, username, onLogout }) {
       >
         <div style={{ color: theme.muted, letterSpacing: "0.14em" }}>{"// HOTKEYS"}</div>
         <div>
-          <span style={{ color: theme.accent }}>1-7</span>  section
+          <span style={{ color: theme.accent }}>1-7</span> section
         </div>
         <div>
-          <span style={{ color: theme.accent }}>h</span>    home
+          <span style={{ color: theme.accent }}>h</span> home
         </div>
         <div>
-          <span style={{ color: theme.accent }}>/</span>    search
+          <span style={{ color: theme.accent }}>/</span> search
         </div>
         <div>
-          <span style={{ color: theme.accent }}>?</span>    help
+          <span style={{ color: theme.accent }}>?</span> help
         </div>
       </div>
 
@@ -318,7 +320,17 @@ function Sidebar({ active, onNav, username, onLogout }) {
   );
 }
 
-export default function Shell({ active, onNav, path, cmd, fkeys, username, onLogout, footerExtra, children }) {
+export default function Shell({
+  active,
+  onNav,
+  path,
+  cmd,
+  fkeys,
+  username,
+  onLogout,
+  footerExtra,
+  children,
+}) {
   const { theme, tweaks } = useTheme();
   return (
     <div

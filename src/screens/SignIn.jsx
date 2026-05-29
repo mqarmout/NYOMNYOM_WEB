@@ -50,7 +50,9 @@ function BootSequence() {
                 {isOk && <span style={{ color: theme.accent }}>[OK]</span>}
               </>
             ) : line === "login:" ? (
-              <span style={{ color: theme.accentHot, textShadow: glowFn(theme, tweaks.glow * 0.6) }}>
+              <span
+                style={{ color: theme.accentHot, textShadow: glowFn(theme, tweaks.glow * 0.6) }}
+              >
                 {line}
               </span>
             ) : (
@@ -127,7 +129,8 @@ export default function SignIn({ onLogin, onClose }) {
           inset: 0,
           pointerEvents: "none",
           zIndex: 9,
-          background: "repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.18) 1px, rgba(0,0,0,0.18) 2px)",
+          background:
+            "repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.18) 1px, rgba(0,0,0,0.18) 2px)",
         }}
       />
 
@@ -209,7 +212,14 @@ export default function SignIn({ onLogin, onClose }) {
 
           {/* Right — auth form */}
           <div style={{ padding: "36px 32px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: 20,
+              }}
+            >
               <div
                 style={{
                   fontFamily: "var(--font-mono)",
@@ -265,7 +275,10 @@ export default function SignIn({ onLogin, onClose }) {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <form
+              onSubmit={handleSubmit}
+              style={{ display: "flex", flexDirection: "column", gap: 14 }}
+            >
               <div>
                 <label
                   style={{

@@ -1,6 +1,12 @@
 import { useTheme, glow as glowFn } from "../../context/ThemeContext";
 
-export default function Box({ title, children, glowing = false, style = {}, padding = "14px 18px" }) {
+export default function Box({
+  title,
+  children,
+  glowing = false,
+  style = {},
+  padding = "14px 18px",
+}) {
   const { theme, tweaks } = useTheme();
   return (
     <div
