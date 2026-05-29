@@ -37,6 +37,7 @@ body,
   background: var(--bg);
   font-family: var(--font-mono);
   color: var(--text);
+  overflow-x: hidden;
 }
 
 /* ── Pixelart icons base ── */

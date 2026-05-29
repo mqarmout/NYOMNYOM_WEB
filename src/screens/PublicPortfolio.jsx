@@ -233,23 +233,21 @@ export default function PublicPortfolio({ onLogin }) {
     <>
       <div
         style={{
-          width: "100vw",
-          height: "100vh",
+          minHeight: "100vh",
           background: theme.bg,
           color: theme.cream,
           display: "flex",
           flexDirection: "column",
-          position: "relative",
-          overflow: "hidden",
           fontFamily: "var(--font-mono)",
         }}
       >
-        <StatusLine onSignIn={() => setShowSignIn(true)} />
+        <div style={{ position: "sticky", top: 0, zIndex: 90 }}>
+          <StatusLine onSignIn={() => setShowSignIn(true)} />
+        </div>
 
         <main
           style={{
             flex: 1,
-            overflowY: "auto",
             padding: "28px 40px",
             display: "flex",
             flexDirection: "column",
@@ -543,7 +541,9 @@ export default function PublicPortfolio({ onLogin }) {
           )}
         </main>
 
-        <FKeyBar about={about} />
+        <div style={{ position: "sticky", bottom: 0, zIndex: 90 }}>
+          <FKeyBar about={about} />
+        </div>
         <Scanlines strength={tweaks.scanlines} />
         <Vignette strength={tweaks.vignette} />
       </div>
