@@ -231,23 +231,30 @@ export default function PublicPortfolio({ onLogin }) {
 
   return (
     <>
+      {/* Fixed chrome — always at viewport top/bottom */}
+      <div style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 90 }}>
+        <StatusLine onSignIn={() => setShowSignIn(true)} />
+      </div>
+      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 90 }}>
+        <FKeyBar about={about} />
+      </div>
+
+      <Scanlines strength={tweaks.scanlines} />
+      <Vignette strength={tweaks.vignette} />
+
+      {/* Scrollable content — padded to clear the fixed bars */}
       <div
         style={{
           minHeight: "100vh",
           background: theme.bg,
           color: theme.cream,
-          display: "flex",
-          flexDirection: "column",
           fontFamily: "var(--font-mono)",
+          paddingTop: 28,
+          paddingBottom: 28,
         }}
       >
-        <div style={{ position: "sticky", top: 0, zIndex: 90 }}>
-          <StatusLine onSignIn={() => setShowSignIn(true)} />
-        </div>
-
         <main
           style={{
-            flex: 1,
             padding: "28px 40px",
             display: "flex",
             flexDirection: "column",
@@ -540,12 +547,6 @@ export default function PublicPortfolio({ onLogin }) {
             </Box>
           )}
         </main>
-
-        <div style={{ position: "sticky", bottom: 0, zIndex: 90 }}>
-          <FKeyBar about={about} />
-        </div>
-        <Scanlines strength={tweaks.scanlines} />
-        <Vignette strength={tweaks.vignette} />
       </div>
 
       {showSignIn && (
