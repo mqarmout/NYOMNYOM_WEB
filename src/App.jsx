@@ -448,7 +448,7 @@ function SectionTabs({ section, screen, onNav }) {
   const tabs = SECTION_TABS[section];
   if (!tabs || tabs.length <= 1) return null;
   return (
-    <div style={{ display: "flex", borderBottom: `1px solid ${theme.border}`, flexShrink: 0 }}>
+    <div style={{ display: "flex", borderBottom: `1px solid ${theme.border}`, flexShrink: 0, overflowX: "auto", WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}>
       {tabs.map(([id, label]) => {
         const active = screen === id;
         return (
@@ -615,6 +615,10 @@ function AppInner({ authUser, onLogout }) {
   const handleSidebarNav = (sectionId) => {
     if (sectionId === "home") {
       setScreen(null);
+      return;
+    }
+    if (sectionId === "profile") {
+      setScreen("profile");
       return;
     }
     if (canAccess(sectionId)) setScreen(SECTION_DEFAULT[sectionId]);

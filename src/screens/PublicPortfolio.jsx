@@ -4,6 +4,7 @@ import SignIn from "./SignIn";
 import Box from "../components/crt/Box";
 import { useTheme, glow as glowFn } from "../context/ThemeContext";
 import { IExtLink } from "../icons";
+import { useBreakpoint } from "../hooks/useBreakpoint";
 
 function formatDateRange(start, end) {
   if (!start) return "";
@@ -177,6 +178,7 @@ function FKeyBar({ about }) {
 
 export default function PublicPortfolio({ onLogin }) {
   const { theme, tweaks } = useTheme();
+  const bp = useBreakpoint();
   const [data, setData] = useState(null);
   const [showSignIn, setShowSignIn] = useState(false);
 
@@ -229,15 +231,19 @@ export default function PublicPortfolio({ onLogin }) {
     return acc;
   }, {});
 
+  const isPhone = bp === "phone";
+
   return (
     <>
       {/* Fixed chrome — always at viewport top/bottom */}
       <div style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 90 }}>
         <StatusLine onSignIn={() => setShowSignIn(true)} />
       </div>
-      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 90 }}>
-        <FKeyBar about={about} />
-      </div>
+      {!isPhone && (
+        <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 90 }}>
+          <FKeyBar about={about} />
+        </div>
+      )}
 
       <Scanlines strength={tweaks.scanlines} />
       <Vignette strength={tweaks.vignette} />
@@ -250,7 +256,7 @@ export default function PublicPortfolio({ onLogin }) {
           color: theme.cream,
           fontFamily: "var(--font-mono)",
           paddingTop: 28,
-          paddingBottom: 28,
+          paddingBottom: isPhone ? 16 : 28,
         }}
       >
         <main
@@ -258,7 +264,7 @@ export default function PublicPortfolio({ onLogin }) {
             display: "flex",
             flexDirection: "column",
             gap: 16,
-            margin: "2% 5%",
+            margin: isPhone ? "12px 4%" : "2% 5%",
           }}
         >
           {/* Hero */}
@@ -354,7 +360,9 @@ export default function PublicPortfolio({ onLogin }) {
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+                  gridTemplateColumns: isPhone
+                    ? "1fr"
+                    : "repeat(auto-fill, minmax(260px, 1fr))",
                   gap: 12,
                 }}
               >

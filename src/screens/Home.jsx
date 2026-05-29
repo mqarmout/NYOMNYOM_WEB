@@ -7,6 +7,7 @@ import { useDevProjects } from "../context/ProjectsContext";
 import { useHydro } from "../context/HydroContext";
 import Box from "../components/crt/Box";
 import BlockBar from "../components/crt/BlockBar";
+import { useBreakpoint } from "../hooks/useBreakpoint";
 
 function StatTile({ label, value, unit = "", hot = false, warn = false }) {
   const { theme, tweaks } = useTheme();
@@ -50,6 +51,7 @@ function StatTile({ label, value, unit = "", hot = false, warn = false }) {
 
 export default function Home({ username, onNav }) {
   const { theme, tweaks } = useTheme();
+  const bp = useBreakpoint();
 
   // pull live data from all contexts
   const { expenses, categories, profile } = useApp();
@@ -168,7 +170,7 @@ export default function Home({ username, onNav }) {
       </Box>
 
       {/* Stats row */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
+      <div style={{ display: "grid", gridTemplateColumns: bp === "phone" ? "repeat(2, 1fr)" : "repeat(4, 1fr)", gap: 10 }}>
         <StatTile
           label="SPENT THIS MONTH"
           value={`${currency}${totalSpent.toFixed(0)}`}
@@ -198,7 +200,7 @@ export default function Home({ username, onNav }) {
       )}
 
       {/* Sections grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 8, marginTop: 4 }}>
+      <div style={{ display: "grid", gridTemplateColumns: bp === "phone" ? "repeat(2, 1fr)" : bp === "tablet" ? "repeat(4, 1fr)" : "repeat(7, 1fr)", gap: 8, marginTop: 4 }}>
         {sectionStats.map((s) => (
           <button
             key={s.id}
