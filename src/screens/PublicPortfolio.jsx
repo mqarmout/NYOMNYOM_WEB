@@ -258,6 +258,7 @@ export default function PublicPortfolio({ onLogin }) {
             display: "flex",
             flexDirection: "column",
             gap: 16,
+            margin: "0 5%",
           }}
         >
           {/* Hero */}
