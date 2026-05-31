@@ -24,12 +24,53 @@ export default function Graphs() {
   const active = data ? data.by_category.filter((c) => c.spent > 0) : [];
   const total = data ? data.total : 0;
 
+  const effBudget = data?.effective_budget || 0;
+  const baseBudget = data?.base_budget || 0;
+  const rolloverIn = data?.rollover_carried_in || 0;
+  const budgetPct = effBudget > 0 ? Math.min(100, Math.round((total / effBudget) * 100)) : 0;
+
   return (
     <div className="screen">
       <div className="page-header">
         <h1>Graphs</h1>
         <p>{month}</p>
       </div>
+
+      {effBudget > 0 && (
+        <div className="graph-card" style={{ marginBottom: 16 }}>
+          <div className="graph-card-title">Monthly Budget</div>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 8, color: "var(--muted)" }}>
+            <span>
+              {fmt(baseBudget, currency)} base
+              {rolloverIn > 0 && (
+                <span style={{ marginLeft: 6, color: "var(--accent)", fontSize: 11 }}>
+                  +{fmt(rolloverIn, currency)} rollover = {fmt(effBudget, currency)}
+                </span>
+              )}
+            </span>
+            <span style={{ color: budgetPct > 85 ? "var(--danger)" : "inherit" }}>
+              {fmt(total, currency)} / {fmt(effBudget, currency)} ({budgetPct}%)
+            </span>
+          </div>
+          <div className="prog-wrap">
+            <div
+              className="prog-fill"
+              style={{
+                width: budgetPct + "%",
+                background: budgetPct > 85 ? "var(--danger)" : "var(--accent)",
+              }}
+            />
+          </div>
+          {effBudget > total && (
+            <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 6 }}>
+              {fmt(effBudget - total, currency)} remaining ·{" "}
+              {Math.round(((effBudget - total) * (profile.rollover_pct || 0)) / 100) > 0
+                ? `${fmt(Math.round(((effBudget - total) * (profile.rollover_pct || 0)) / 100), currency)} will roll over next month`
+                : "no rollover configured"}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="graphs-grid">
         <div className="graph-card span-2">

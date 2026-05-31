@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useApp } from "../../context/AppContext";
-import { fmt, fmtDate } from "../../utils";
+import { fmt, fmtDate, apiFetch } from "../../utils";
 import AddExpense from "./AddExpense";
 import AddIncome from "./AddIncome";
 import { Px, IClose } from "../../icons";
@@ -28,6 +28,14 @@ export default function Dashboard() {
   const { categories, expenses, income, profile, deleteExpense, deleteIncome } = useApp();
   const [modal, setModal] = useState(null); // { type: 'expense'|'income', item: obj|null }
   const [txFilter, setTxFilter] = useState("all"); // 'all' | 'income' | 'expenses'
+  const [analytics, setAnalytics] = useState(null);
+
+  useEffect(() => {
+    const month = new Date().toISOString().slice(0, 7);
+    apiFetch("/api/analytics?month=" + month).then((d) => {
+      if (!d.error) setAnalytics(d);
+    });
+  }, [expenses]);
 
   useEffect(() => {
     const onExpense = () => setModal({ type: "expense", item: null });
@@ -124,7 +132,39 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {totalBudget > 0 && (
+      {analytics?.effective_budget > 0 && (() => {
+        const effBudget = analytics.effective_budget;
+        const base = analytics.base_budget;
+        const rollover = analytics.rollover_carried_in;
+        const budgetPct = Math.min(100, Math.round((totalSpent / effBudget) * 100));
+        const remaining = Math.max(0, effBudget - totalSpent);
+        return (
+          <div className={styles.budgetBarWrap}>
+            <div className={styles.budgetBarLabels}>
+              <span>
+                {fmt(base, currency)}
+                {rollover > 0 && (
+                  <span className={styles.rolloverTag}>+{fmt(rollover, currency)} rollover</span>
+                )}
+                {" = "}{fmt(effBudget, currency)} budget
+              </span>
+              <span style={{ color: budgetPct > 85 ? "var(--danger)" : "inherit" }}>
+                {budgetPct}% used · {fmt(remaining, currency)} left
+              </span>
+            </div>
+            <div className="prog-wrap">
+              <div
+                className="prog-fill"
+                style={{
+                  width: budgetPct + "%",
+                  background: budgetPct > 85 ? "var(--danger)" : "var(--accent)",
+                }}
+              />
+            </div>
+          </div>
+        );
+      })()}
+      {totalBudget > 0 && analytics?.effective_budget === 0 && (
         <div className={styles.budgetBarWrap}>
           <div className={styles.budgetBarLabels}>
             <span>Budget: {fmt(totalBudget, currency)}</span>

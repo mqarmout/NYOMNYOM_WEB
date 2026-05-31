@@ -11,6 +11,8 @@ export function AppProvider({ children }) {
   const [profile, setProfile] = useState({
     name: "",
     currency: "$",
+    monthly_budget: 0,
+    rollover_pct: 0,
     tx_count: 0,
     total_all_time: 0,
     since: null,

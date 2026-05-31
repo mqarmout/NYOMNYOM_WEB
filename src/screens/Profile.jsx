@@ -7,17 +7,26 @@ export default function Profile() {
   const { profile, categories, expenses, saveProfile } = useApp();
   const [name, setName] = useState(profile.name || "");
   const [curr, setCurr] = useState(profile.currency || "$");
+  const [monthlyBudget, setMonthlyBudget] = useState(profile.monthly_budget || "");
+  const [rolloverPct, setRolloverPct] = useState(profile.rollover_pct || "");
 
   useEffect(() => {
     setName(profile.name || "");
     setCurr(profile.currency || "$");
+    setMonthlyBudget(profile.monthly_budget || "");
+    setRolloverPct(profile.rollover_pct || "");
   }, [profile]);
 
   const monthTotal = expenses.reduce((s, e) => s + e.amount, 0);
   const currency = profile.currency || "$";
 
   const handleSave = () => {
-    saveProfile({ name: name.trim(), currency: curr });
+    saveProfile({
+      name: name.trim(),
+      currency: curr,
+      monthly_budget: parseFloat(monthlyBudget) || 0,
+      rollover_pct: Math.min(100, Math.max(0, parseFloat(rolloverPct) || 0)),
+    });
   };
 
   return (
@@ -82,6 +91,31 @@ export default function Profile() {
               <option value="₹">₹ Rupee</option>
               <option value="ر.س">ر.س Riyal</option>
             </select>
+          </div>
+          <div className="settings-row">
+            <div className="settings-row-label">Monthly Budget</div>
+            <input
+              className="settings-row-input"
+              type="number"
+              min="0"
+              step="any"
+              placeholder="0 = disabled"
+              value={monthlyBudget}
+              onChange={(e) => setMonthlyBudget(e.target.value)}
+            />
+          </div>
+          <div className="settings-row">
+            <div className="settings-row-label">Rollover %</div>
+            <input
+              className="settings-row-input"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              placeholder="% of leftover to carry forward"
+              value={rolloverPct}
+              onChange={(e) => setRolloverPct(e.target.value)}
+            />
           </div>
 
           <button className="save-btn" onClick={handleSave}>

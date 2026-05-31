@@ -11,6 +11,16 @@
   font-size: 11px;
   color: var(--muted);
 }
+.rollover-tag {
+  display: inline-block;
+  margin-left: 5px;
+  padding: 1px 5px;
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  color: var(--accent);
+  font-size: 10px;
+  letter-spacing: 0.02em;
+}
 
 .tx-filter-tabs {
   display: flex;
