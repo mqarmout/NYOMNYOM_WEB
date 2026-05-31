@@ -30,16 +30,21 @@ import HydroDosing from "./screens/hydro/Dosing";
 import Profile from "./screens/Profile";
 import Home from "./screens/Home";
 import PublicPortfolio from "./screens/PublicPortfolio";
+import JobsAnalytics from "./screens/jobs/Analytics";
+import FitnessAnalytics from "./screens/fitness/Analytics";
+import PortfolioAnalytics from "./screens/portfolio/Analytics";
+import ClimbingAnalytics from "./screens/climbing/Analytics";
+import ProjectsAnalytics from "./screens/projects/Analytics";
 import Shell from "./components/crt/Shell";
 import { apiFetch } from "./utils";
 
 const SECTION_DEFAULT = {
-  spending: "dashboard",
-  jobs: "jobs-applications",
-  fitness: "fitness-workouts",
-  portfolio: "portfolio-projects",
-  climbing: "climbing-routes",
-  projects: "projects-tracker",
+  spending: "graphs",
+  jobs: "jobs-analytics",
+  fitness: "fitness-analytics",
+  portfolio: "portfolio-analytics",
+  climbing: "climbing-analytics",
+  projects: "projects-analytics",
   hydro: "hydro-dashboard",
 };
 
@@ -49,16 +54,21 @@ const SCREEN_TO_SECTION = {
   dashboard: "spending",
   graphs: "spending",
   categories: "spending",
+  "jobs-analytics": "jobs",
   "jobs-applications": "jobs",
   "jobs-contacts": "jobs",
+  "fitness-analytics": "fitness",
   "fitness-workouts": "fitness",
   "fitness-runs": "fitness",
   "fitness-metrics": "fitness",
+  "portfolio-analytics": "portfolio",
   "portfolio-projects": "portfolio",
   "portfolio-skills": "portfolio",
   "portfolio-experience": "portfolio",
   "portfolio-about": "portfolio",
+  "climbing-analytics": "climbing",
   "climbing-routes": "climbing",
+  "projects-analytics": "projects",
   "projects-tracker": "projects",
   "projects-board": "projects",
   "hydro-dashboard": "hydro",
@@ -85,12 +95,16 @@ const COMMANDS = [
     fire: true,
     label: "Spending → New Category",
   },
-  { cmd: "jobs", screen: "jobs-applications", fire: false, label: "Jobs → Applications" },
+  { cmd: "jobs", screen: "jobs-analytics", fire: false, label: "Jobs → Analytics" },
+  { cmd: "jobs/analytics", screen: "jobs-analytics", fire: false, label: "Jobs → Analytics" },
+  { cmd: "jobs/applications", screen: "jobs-applications", fire: false, label: "Jobs → Applications" },
   { cmd: "jobs/new", screen: "jobs-applications", fire: true, label: "Jobs → Add Application" },
   { cmd: "jobs/contacts", screen: "jobs-contacts", fire: false, label: "Jobs → Contacts" },
   { cmd: "jobs/contacts/new", screen: "jobs-contacts", fire: true, label: "Jobs → Add Contact" },
-  { cmd: "fitness", screen: "fitness-workouts", fire: false, label: "Fitness → Workouts" },
+  { cmd: "fitness", screen: "fitness-analytics", fire: false, label: "Fitness → Analytics" },
+  { cmd: "fitness/analytics", screen: "fitness-analytics", fire: false, label: "Fitness → Analytics" },
   { cmd: "fitness/new", screen: "fitness-workouts", fire: true, label: "Fitness → Log Workout" },
+  { cmd: "fitness/workouts", screen: "fitness-workouts", fire: false, label: "Fitness → Workouts" },
   { cmd: "fitness/runs", screen: "fitness-runs", fire: false, label: "Fitness → Running" },
   { cmd: "fitness/runs/new", screen: "fitness-runs", fire: true, label: "Fitness → Log Run" },
   {
@@ -99,7 +113,8 @@ const COMMANDS = [
     fire: false,
     label: "Fitness → Body Metrics",
   },
-  { cmd: "portfolio", screen: "portfolio-projects", fire: false, label: "Portfolio → Projects" },
+  { cmd: "portfolio", screen: "portfolio-analytics", fire: false, label: "Portfolio → Analytics" },
+  { cmd: "portfolio/analytics", screen: "portfolio-analytics", fire: false, label: "Portfolio → Analytics" },
   {
     cmd: "portfolio/projects",
     screen: "portfolio-projects",
@@ -114,9 +129,13 @@ const COMMANDS = [
     label: "Portfolio → Experience",
   },
   { cmd: "portfolio/about", screen: "portfolio-about", fire: false, label: "Portfolio → About" },
-  { cmd: "climbing", screen: "climbing-routes", fire: false, label: "Climbing → Routes" },
+  { cmd: "climbing", screen: "climbing-analytics", fire: false, label: "Climbing → Analytics" },
+  { cmd: "climbing/analytics", screen: "climbing-analytics", fire: false, label: "Climbing → Analytics" },
+  { cmd: "climbing/routes", screen: "climbing-routes", fire: false, label: "Climbing → Routes" },
   { cmd: "climbing/new", screen: "climbing-routes", fire: true, label: "Climbing → Log Climb" },
-  { cmd: "projects", screen: "projects-tracker", fire: false, label: "Projects → Tracker" },
+  { cmd: "projects", screen: "projects-analytics", fire: false, label: "Projects → Analytics" },
+  { cmd: "projects/analytics", screen: "projects-analytics", fire: false, label: "Projects → Analytics" },
+  { cmd: "projects/tracker", screen: "projects-tracker", fire: false, label: "Projects → Tracker" },
   { cmd: "projects/new", screen: "projects-tracker", fire: true, label: "Projects → New Project" },
   { cmd: "projects/board", screen: "projects-board", fire: false, label: "Projects → Board" },
   { cmd: "projects/board/new", screen: "projects-board", fire: true, label: "Projects → Add Task" },
@@ -221,27 +240,34 @@ const FKEY_MAP = {
 // Section sub-tabs
 const SECTION_TABS = {
   spending: [
-    ["dashboard", "DASHBOARD"],
     ["graphs", "GRAPHS"],
+    ["dashboard", "DASHBOARD"],
     ["categories", "CATEGORIES"],
   ],
   jobs: [
+    ["jobs-analytics", "ANALYTICS"],
     ["jobs-applications", "APPLICATIONS"],
     ["jobs-contacts", "CONTACTS"],
   ],
   fitness: [
+    ["fitness-analytics", "ANALYTICS"],
     ["fitness-workouts", "WORKOUTS"],
     ["fitness-runs", "RUNNING"],
     ["fitness-metrics", "BODY"],
   ],
   portfolio: [
+    ["portfolio-analytics", "ANALYTICS"],
     ["portfolio-projects", "PROJECTS"],
     ["portfolio-skills", "SKILLS"],
     ["portfolio-experience", "EXPERIENCE"],
     ["portfolio-about", "ABOUT"],
   ],
-  climbing: [["climbing-routes", "ROUTES"]],
+  climbing: [
+    ["climbing-analytics", "ANALYTICS"],
+    ["climbing-routes", "ROUTES"],
+  ],
   projects: [
+    ["projects-analytics", "ANALYTICS"],
     ["projects-tracker", "PROJECTS"],
     ["projects-board", "BOARD"],
   ],
@@ -503,6 +529,16 @@ function renderScreen(screen) {
       return <Experience />;
     case "portfolio-about":
       return <About />;
+    case "jobs-analytics":
+      return <JobsAnalytics />;
+    case "fitness-analytics":
+      return <FitnessAnalytics />;
+    case "portfolio-analytics":
+      return <PortfolioAnalytics />;
+    case "climbing-analytics":
+      return <ClimbingAnalytics />;
+    case "projects-analytics":
+      return <ProjectsAnalytics />;
     case "climbing-routes":
       return <Climbs />;
     case "projects-tracker":
