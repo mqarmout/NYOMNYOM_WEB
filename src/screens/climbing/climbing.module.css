@@ -49,12 +49,12 @@
 }
 .climb-type-badge.boulder {
   border-color: rgba(212, 160, 64, 0.4);
-  color: #d4a040;
+  color: #ffc55a;
   background: rgba(212, 160, 64, 0.06);
 }
 .climb-type-badge.sport {
   border-color: rgba(90, 158, 212, 0.4);
-  color: #5a9ed4;
+  color: #7ab5ff;
   background: rgba(90, 158, 212, 0.06);
 }
 
@@ -73,13 +73,13 @@
 }
 .climb-status-badge.proj {
   border-color: var(--border);
-  color: var(--dim);
+  color: var(--muted);
 }
 
 .climb-card-action {
   background: none;
   border: none;
-  color: var(--dim);
+  color: var(--muted);
   cursor: pointer;
   font-size: 14px;
   padding: 3px 6px;
@@ -89,7 +89,7 @@
   color: var(--accent);
 }
 .climb-card-action.danger:hover {
-  color: var(--danger);
+  color: #ff6a5a;
 }
 
 .climb-card-name {

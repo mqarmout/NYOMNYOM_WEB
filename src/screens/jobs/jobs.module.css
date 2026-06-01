@@ -74,7 +74,7 @@
 }
 .job-card-meta span {
   font-size: 10px;
-  color: var(--dim);
+  color: var(--muted);
 }
 .job-card-link {
   font-size: 10px;
@@ -129,15 +129,15 @@
 }
 .status-rejected {
   border-color: rgba(255, 48, 48, 0.3);
-  color: var(--danger);
+  color: #ff6a5a;
   background: rgba(255, 48, 48, 0.06);
 }
 .status-withdrawn {
   border-color: var(--border);
-  color: var(--dim);
+  color: var(--muted);
 }
 .status-offer {
-  border-color: rgba(0, 255, 65, 0.3);
+  border-color: var(--accent-faint);
   color: var(--text);
   background: rgba(0, 255, 65, 0.05);
 }
@@ -197,7 +197,7 @@
 .contact-details a,
 .contact-details span {
   font-size: 11px;
-  color: var(--dim);
+  color: var(--muted);
   text-decoration: none;
 }
 .contact-details a:hover {

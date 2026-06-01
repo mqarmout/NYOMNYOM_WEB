@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useJob } from "../../context/JobContext";
+import { useTheme, STATUS } from "../../context/ThemeContext";
 import { apiFetch } from "../../utils";
 import { IClose, IExtLink } from "../../icons";
 import styles from "./jobs.module.css";
@@ -251,9 +252,9 @@ function DescriptionModal({ url, errorMsg, onContinue, onClose }) {
         <div
           style={{
             fontSize: 12,
-            color: "var(--danger)",
-            background: "rgba(255,48,48,0.06)",
-            border: "1px solid rgba(255,48,48,0.2)",
+            color: STATUS.red,
+            background: "rgba(255,106,90,0.06)",
+            border: `1px solid rgba(255,106,90,0.2)`,
             padding: "10px 12px",
             marginBottom: 16,
           }}
@@ -465,8 +466,18 @@ function JobModal({ initial, onSave, onClose }) {
 
 export default function Applications() {
   const { jobs, loadAll, addJob, updateJob, deleteJob } = useJob();
+  const { theme } = useTheme();
   // modal: null | { mode: 'url' | 'preview' | 'description' | 'add' | 'edit', ...data }
   const [modal, setModal] = useState(null);
+
+  const STATUS_COLORS = {
+    applied: theme.muted,
+    screening: STATUS.amber,
+    interviewing: theme.accent,
+    offer: theme.accentHot,
+    rejected: STATUS.red,
+    withdrawn: theme.faint,
+  };
 
   useEffect(() => {
     loadAll();
@@ -490,7 +501,7 @@ export default function Applications() {
   const JobCard = ({ job }) => (
     <div className={styles.jobCard} onClick={() => setModal({ mode: "edit", job })}>
       <div className={styles.jobCardHeader}>
-        <div className={styles.jobCardCompany}>{job.company}</div>
+        <div className={styles.jobCardCompany} style={{ color: theme.accentHot }}>{job.company}</div>
         <button
           className="tx-delete"
           onClick={(e) => {
@@ -501,10 +512,10 @@ export default function Applications() {
           <IClose />
         </button>
       </div>
-      <div className={styles.jobCardRole}>{job.role}</div>
+      <div className={styles.jobCardRole} style={{ color: theme.cream }}>{job.role}</div>
       <div className={styles.jobCardMeta}>
+        {job.salary && <span style={{ color: theme.accent }}>{job.salary}</span>}
         {job.date_applied && <span>{job.date_applied}</span>}
-        {job.salary && <span>{job.salary}</span>}
         {job.site_used && <span>{job.site_used}</span>}
       </div>
       {job.url && (
@@ -523,16 +534,36 @@ export default function Applications() {
 
   const Column = ({ status, label }) => {
     const col = boardJobs.filter((j) => j.status === status);
+    const color = STATUS_COLORS[status] || theme.muted;
     return (
-      <div className={styles.jobColumn}>
+      <div className={styles.jobColumn} style={{ borderTop: `2px solid ${color}` }}>
         <div className={styles.jobColumnHeader}>
-          <span className={styles.jobColumnLabel}>{label}</span>
+          <span className={styles.jobColumnLabel} style={{ color }}>
+            <span style={{ marginRight: 5, fontSize: 7 }}>●</span>{label}
+          </span>
           <span className={styles.jobColumnCount}>{col.length}</span>
         </div>
         <div className={styles.jobColumnBody}>
           {col.map((j) => (
             <JobCard key={j.id} job={j} />
           ))}
+          <button
+            style={{
+              width: "100%",
+              marginTop: col.length > 0 ? 6 : 0,
+              padding: "6px",
+              background: "transparent",
+              border: `1px dashed ${theme.border}`,
+              color: theme.muted,
+              cursor: "pointer",
+              fontSize: 11,
+              fontFamily: "var(--font-mono)",
+              textAlign: "center",
+            }}
+            onClick={() => setModal({ mode: "url" })}
+          >
+            + add
+          </button>
         </div>
       </div>
     );
@@ -583,7 +614,11 @@ export default function Applications() {
                 </div>
                 <div className={styles.jobArchiveRight}>
                   <span
-                    className={`${styles.jobStatusBadge} ${styles["status-" + j.status] || ""}`}
+                    className={styles.jobStatusBadge}
+                    style={{
+                      color: STATUS_COLORS[j.status] || theme.muted,
+                      borderColor: STATUS_COLORS[j.status] || theme.border,
+                    }}
                   >
                     {STATUS_LABEL[j.status]}
                   </span>

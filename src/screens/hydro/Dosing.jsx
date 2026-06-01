@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useHydro } from "../../context/HydroContext";
+import { STATUS } from "../../context/ThemeContext";
 import { fmtDate } from "../../utils";
 import { IClose } from "../../icons";
 
@@ -13,12 +14,12 @@ const DOSE_LABELS = {
   other: "Other",
 };
 const DOSE_COLORS = {
-  nutrient_a: "#4ab87a",
-  nutrient_b: "#2eb8a0",
-  ph_up: "#e05a5a",
-  ph_down: "#5a9ed4",
-  cal_mag: "#d4a040",
-  other: "var(--fg-dim)",
+  nutrient_a: "var(--accent)",
+  nutrient_b: "var(--accent-dim)",
+  ph_up: STATUS.red,
+  ph_down: STATUS.blue,
+  cal_mag: STATUS.amber,
+  other: "var(--muted)",
 };
 
 function DosingModal({ onSave, onClose }) {

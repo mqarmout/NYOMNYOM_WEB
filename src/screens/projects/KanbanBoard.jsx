@@ -1,12 +1,7 @@
 import { useState, useEffect, useRef } from "react";
+import { useTheme } from "../../context/ThemeContext";
 import { IClose, ICal, IBoard } from "../../icons";
 import styles from "./projects.module.css";
-
-const COLUMNS = [
-  { id: "backlog", label: "BACKLOG", accentVar: "rgba(150,150,150,0.25)" },
-  { id: "in_progress", label: "IN PROGRESS", accentVar: "rgba(224,180,58,0.25)" },
-  { id: "done", label: "DONE", accentVar: "rgba(74,184,122,0.25)" },
-];
 
 const PRIORITY_LABELS = { high: "HIGH+", medium: "MED", low: "LOW-" };
 
@@ -227,7 +222,7 @@ function KanbanColumn({
   return (
     <div
       className={`${styles.kbCol}${over ? " " + styles.kbColOver : ""}`}
-      style={{ borderTopColor: col.accentVar }}
+      style={{ borderTopColor: col.color }}
       onDragOver={(e) => {
         e.preventDefault();
         setOver(true);
@@ -241,7 +236,9 @@ function KanbanColumn({
       }}
     >
       <div className={styles.kbColHeader}>
-        <span className={styles.kbColTitle}>{col.label}</span>
+        <span className={styles.kbColTitle} style={{ color: col.color }}>
+          <span style={{ marginRight: 4, fontSize: 7 }}>●</span>{col.label}
+        </span>
         <span className={styles.kbColCount}>{tasks.length}</span>
       </div>
       <div className={styles.kbColBody}>
@@ -274,6 +271,13 @@ export function KanbanBoard({
   onDelete,
   defaultProjectIds,
 }) {
+  const { theme } = useTheme();
+  const COLUMNS = [
+    { id: "backlog", label: "BACKLOG", color: theme.muted },
+    { id: "in_progress", label: "IN PROGRESS", color: theme.accent },
+    { id: "done", label: "DONE", color: theme.accentHot },
+  ];
+
   const [showAdd, setShowAdd] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [draggingId, setDraggingId] = useState(null);

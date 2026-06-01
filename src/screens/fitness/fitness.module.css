@@ -40,7 +40,7 @@
 }
 .workout-chevron {
   font-size: 10px;
-  color: var(--dim);
+  color: var(--muted);
 }
 .workout-body {
   border-top: 1px solid var(--border);
@@ -48,7 +48,7 @@
 }
 .workout-empty {
   font-size: 12px;
-  color: var(--dim);
+  color: var(--muted);
   margin-bottom: 10px;
 }
 .set-row {
@@ -130,7 +130,7 @@
 }
 .set-add-btn:hover {
   background: var(--accent);
-  color: #000;
+  color: var(--bg);
   box-shadow: 0 0 10px var(--accent-glow);
 }
 .set-add-btn:disabled {
@@ -160,7 +160,7 @@
   background: none;
   border: 1px dashed var(--border);
   border-radius: 0;
-  color: var(--dim);
+  color: var(--muted);
   font-size: 12px;
   cursor: pointer;
   width: 100%;

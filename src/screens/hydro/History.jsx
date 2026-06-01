@@ -2,12 +2,12 @@ import { useEffect } from "react";
 import { useHydro } from "../../context/HydroContext";
 import { AreaChart } from "../../Charts";
 
-function MetricChart({ title, data, color, unit }) {
+function MetricChart({ title, data, unit }) {
   if (data.filter((d) => d.v !== null).length < 2) return null;
   return (
     <div className="graph-card" style={{ marginBottom: 20 }}>
       <div className="graph-card-title">{title}</div>
-      <AreaChart data={data} color={color} />
+      <AreaChart data={data} />
       <div style={{ textAlign: "right", fontSize: 11, color: "var(--fg-dim)", marginTop: 4 }}>
         {unit}
       </div>
@@ -43,37 +43,12 @@ export default function History() {
         <div className="empty-state">Log at least 2 readings to see charts.</div>
       ) : (
         <>
-          <MetricChart title="pH" data={make("ph")} color="#4ab87a" unit="target range 5.5–6.5" />
-          <MetricChart
-            title="EC (ppm)"
-            data={make("ec_ppm")}
-            color="var(--accent)"
-            unit="nutrient concentration"
-          />
-          <MetricChart
-            title="Water Temperature (°C)"
-            data={make("water_temp")}
-            color="#5a9ed4"
-            unit="target range 18–24°C"
-          />
-          <MetricChart
-            title="Water Level (%)"
-            data={make("water_level")}
-            color="#2eb8a0"
-            unit="reservoir fill level"
-          />
-          <MetricChart
-            title="Air Temperature (°C)"
-            data={make("air_temp")}
-            color="#d4a040"
-            unit="ambient"
-          />
-          <MetricChart
-            title="Humidity (%)"
-            data={make("humidity")}
-            color="#b87ad4"
-            unit="relative humidity"
-          />
+          <MetricChart title="pH" data={make("ph")} unit="target range 5.5–6.5" />
+          <MetricChart title="EC (ppm)" data={make("ec_ppm")} unit="nutrient concentration" />
+          <MetricChart title="Water Temperature (°C)" data={make("water_temp")} unit="target range 18–24°C" />
+          <MetricChart title="Water Level (%)" data={make("water_level")} unit="reservoir fill level" />
+          <MetricChart title="Air Temperature (°C)" data={make("air_temp")} unit="ambient" />
+          <MetricChart title="Humidity (%)" data={make("humidity")} unit="relative humidity" />
 
           <div style={{ marginTop: 16 }}>
             <div className="graph-card-title" style={{ marginBottom: 10 }}>

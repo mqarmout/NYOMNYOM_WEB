@@ -3,15 +3,16 @@ import { useFitness } from "../../context/FitnessContext";
 import { AreaChart } from "../../Charts";
 import { fmtDate, apiFetch } from "../../utils";
 import { IClose, IEdit } from "../../icons";
+import { STATUS } from "../../context/ThemeContext";
 
 const RUN_TYPES = ["easy", "tempo", "long", "intervals", "race"];
 
 const TYPE_COLORS = {
   easy: "var(--accent)",
-  tempo: "#e07840",
-  long: "#7c6fef",
-  intervals: "#d4a040",
-  race: "#e04060",
+  tempo: STATUS.amber,
+  long: "var(--accent-dim)",
+  intervals: STATUS.amber,
+  race: STATUS.red,
 };
 
 function fmtDuration(secs) {
@@ -273,10 +274,10 @@ export default function Runs() {
             top: 20,
             left: "50%",
             transform: "translateX(-50%)",
-            background: toast.type === "ok" ? "var(--accent)" : "#c0392b",
-            color: "#fff",
+            background: toast.type === "ok" ? "var(--accent)" : STATUS.red,
+            color: "var(--bg)",
             padding: "10px 20px",
-            borderRadius: 8,
+            borderRadius: 0,
             zIndex: 9999,
             fontWeight: 600,
             fontSize: 14,

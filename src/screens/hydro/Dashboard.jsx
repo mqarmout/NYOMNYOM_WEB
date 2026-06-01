@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useHydro } from "../../context/HydroContext";
+import { useTheme, STATUS } from "../../context/ThemeContext";
 import { fmtDate } from "../../utils";
 import { IClose } from "../../icons";
 
@@ -8,18 +9,18 @@ const PH_OK = [5.0, 7.0];
 const TEMP_IDEAL = [18, 24];
 const TEMP_OK = [16, 26];
 
-function statusColor(val, ideal, ok) {
-  if (val === null || val === undefined) return "var(--fg-dim)";
-  if (val >= ideal[0] && val <= ideal[1]) return "#4ab87a";
-  if (val >= ok[0] && val <= ok[1]) return "#d4a040";
-  return "#e05a5a";
+function statusColor(val, ideal, ok, accent) {
+  if (val === null || val === undefined) return "var(--muted)";
+  if (val >= ideal[0] && val <= ideal[1]) return accent;
+  if (val >= ok[0] && val <= ok[1]) return STATUS.amber;
+  return STATUS.red;
 }
 
-function levelColor(pct) {
-  if (pct === null || pct === undefined) return "var(--fg-dim)";
-  if (pct >= 50) return "#4ab87a";
-  if (pct >= 25) return "#d4a040";
-  return "#e05a5a";
+function levelColor(pct, accent) {
+  if (pct === null || pct === undefined) return "var(--muted)";
+  if (pct >= 50) return accent;
+  if (pct >= 25) return STATUS.amber;
+  return STATUS.red;
 }
 
 function MetricCard({ label, value, unit, color, sub }) {
@@ -191,6 +192,7 @@ function PumpScheduleModal({ pump, onSave, onClose }) {
 export default function Dashboard() {
   const { latest, pumpLog, pump, plants, loadAll, addReading, updatePump, triggerPump } =
     useHydro();
+  const { theme } = useTheme();
   const [showReading, setShowReading] = useState(false);
   const [showSchedule, setShowSchedule] = useState(false);
 
@@ -205,9 +207,9 @@ export default function Dashboard() {
   }, []);
 
   const r = latest;
-  const phColor = r ? statusColor(r.ph, PH_IDEAL, PH_OK) : "var(--fg-dim)";
-  const tmpColor = r ? statusColor(r.water_temp, TEMP_IDEAL, TEMP_OK) : "var(--fg-dim)";
-  const lvlColor = r ? levelColor(r.water_level) : "var(--fg-dim)";
+  const phColor = r ? statusColor(r.ph, PH_IDEAL, PH_OK, theme.accentHot) : theme.muted;
+  const tmpColor = r ? statusColor(r.water_temp, TEMP_IDEAL, TEMP_OK, theme.accentHot) : theme.muted;
+  const lvlColor = r ? levelColor(r.water_level, theme.accentHot) : theme.muted;
 
   const activePlants = plants.filter((p) => p.active);
   const recentPumps = pumpLog.slice(0, 5);
@@ -325,7 +327,7 @@ export default function Dashboard() {
           <div style={{ fontSize: 12, color: "var(--fg-dim)", marginBottom: 4 }}>SCHEDULE</div>
           {pump ? (
             <div>
-              <span style={{ color: pump.enabled ? "#4ab87a" : "#e05a5a", fontWeight: 700 }}>
+              <span style={{ color: pump.enabled ? theme.accentHot : STATUS.red, fontWeight: 700 }}>
                 {pump.enabled ? "ENABLED" : "DISABLED"}
               </span>
               <span style={{ color: "var(--fg-dim)", fontSize: 13, marginLeft: 10 }}>
@@ -361,7 +363,7 @@ export default function Dashboard() {
               fontWeight: 600,
               background: "var(--accent)",
               border: "none",
-              color: "#000",
+              color: "var(--bg)",
               cursor: "pointer",
             }}
           >

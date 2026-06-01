@@ -55,9 +55,9 @@ export default function AutocompleteInput({ value, onChange, suggestions, placeh
             left: 0,
             right: 0,
             zIndex: 100,
-            background: "var(--bg2, #1a1a2e)",
-            border: "1px solid var(--border, #333)",
-            borderRadius: 6,
+            background: "var(--surface2)",
+            border: "1px solid var(--border)",
+            borderRadius: 0,
             margin: "2px 0 0",
             padding: 0,
             listStyle: "none",
@@ -74,9 +74,9 @@ export default function AutocompleteInput({ value, onChange, suggestions, placeh
                 padding: "8px 12px",
                 cursor: "pointer",
                 fontSize: "0.85rem",
-                borderBottom: "1px solid var(--border, #222)",
+                borderBottom: "1px solid var(--border)",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "var(--bg3, #252540)")}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "var(--surface3)")}
               onMouseLeave={(e) => (e.currentTarget.style.background = "")}
             >
               {s}

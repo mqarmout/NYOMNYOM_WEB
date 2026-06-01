@@ -1,12 +1,14 @@
+// CRT-palette safe fallback colors (used where dynamic theme access isn't available).
+// Prefer theme.accent / STATUS.* via useTheme() in components.
 export const COLORS = [
-  "#7c6fef",
-  "#5b8dee",
-  "#ef6f6f",
-  "#6fefd0",
-  "#efb96f",
-  "#ef6fcd",
-  "#8deed0",
-  "#d0ef6f",
+  "var(--accent)",
+  "var(--accent-dim)",
+  "#7ab5ff",
+  "#ffc55a",
+  "var(--accent-hot)",
+  "#ff6a5a",
+  "var(--faint)",
+  "var(--muted)",
 ];
 
 export function fmt(n, currency = "$") {

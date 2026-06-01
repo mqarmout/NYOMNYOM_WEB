@@ -1,20 +1,34 @@
-import { COLORS } from "./utils";
+import { useId } from "react";
+import { useTheme, STATUS } from "./context/ThemeContext";
+
+// CRT-friendly donut color ramp: derived from active theme + STATUS colors
+function crtRamp(theme) {
+  return [
+    theme.accent,
+    theme.accentDim,
+    STATUS.blue,
+    STATUS.amber,
+    theme.accentHot,
+    STATUS.red,
+    theme.faint,
+    theme.muted,
+  ];
+}
 
 // ── Area line chart ────────────────────────────────────────────────────────────
-export function AreaChart({ data, color = "#7c6fef" }) {
-  const W = 340,
-    H = 110,
-    pL = 10,
-    pR = 10,
-    pT = 10,
-    pB = 24;
-  const iW = W - pL - pR,
-    iH = H - pT - pB;
+export function AreaChart({ data }) {
+  const { theme, tweaks } = useTheme();
+  const uid = useId();
+  const gradId = `ag-${uid}`;
+  const glowId = `agl-${uid}`;
+
+  const W = 340, H = 110, pL = 10, pR = 10, pT = 10, pB = 24;
+  const iW = W - pL - pR, iH = H - pT - pB;
 
   if (!data.length)
     return (
       <svg viewBox={`0 0 ${W} ${H}`} className="svg-chart">
-        <text x={W / 2} y={H / 2} textAnchor="middle" fill="#555" fontSize="12">
+        <text x={W / 2} y={H / 2} textAnchor="middle" fill={theme.muted} fontSize="12">
           No data yet
         </text>
       </svg>
@@ -40,25 +54,44 @@ export function AreaChart({ data, color = "#7c6fef" }) {
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="svg-chart">
       <defs>
-        <linearGradient id="ag" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.35" />
-          <stop offset="100%" stopColor={color} stopOpacity="0" />
+        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={theme.accent} stopOpacity="0.35" />
+          <stop offset="100%" stopColor={theme.accent} stopOpacity="0" />
         </linearGradient>
+        {tweaks.glow > 0 && (
+          <filter id={glowId}>
+            <feGaussianBlur stdDeviation={1 * tweaks.glow} result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        )}
       </defs>
-      <path d={area} fill="url(#ag)" />
+      <path d={area} fill={`url(#${gradId})`} />
       <path
         d={line}
         fill="none"
-        stroke={color}
-        strokeWidth="2"
+        stroke={theme.accent}
+        strokeWidth="1.6"
         strokeLinecap="round"
         strokeLinejoin="round"
+        filter={tweaks.glow > 0 ? `url(#${glowId})` : undefined}
       />
-      {coords.map((p, i) => (
-        <circle key={i} cx={p.x} cy={p.y} r="2.5" fill={color} />
-      ))}
+      {coords.map((p, i) => {
+        const isLast = i === coords.length - 1;
+        return (
+          <circle
+            key={i}
+            cx={p.x}
+            cy={p.y}
+            r={isLast ? 3.5 : 2.5}
+            fill={isLast ? theme.accentHot : theme.accent}
+          />
+        );
+      })}
       {lblCoords.map((p, i) => (
-        <text key={i} x={p.x} y={H - 4} textAnchor="middle" fill="#555" fontSize="9">
+        <text key={i} x={p.x} y={H - 4} textAnchor="middle" fill={theme.muted} fontSize="9">
           {p.lbl}
         </text>
       ))}
@@ -74,26 +107,22 @@ function polar(cx, cy, r, deg) {
 
 function donutArc(cx, cy, R, r, a1, a2) {
   if (a2 - a1 >= 360) a2 = a1 + 359.99;
-  const s1 = polar(cx, cy, R, a1),
-    e1 = polar(cx, cy, R, a2);
-  const s2 = polar(cx, cy, r, a2),
-    e2 = polar(cx, cy, r, a1);
+  const s1 = polar(cx, cy, R, a1), e1 = polar(cx, cy, R, a2);
+  const s2 = polar(cx, cy, r, a2), e2 = polar(cx, cy, r, a1);
   const lg = a2 - a1 > 180 ? 1 : 0;
   return `M${s1.x} ${s1.y} A${R} ${R} 0 ${lg} 1 ${e1.x} ${e1.y} L${s2.x} ${s2.y} A${r} ${r} 0 ${lg} 0 ${e2.x} ${e2.y}Z`;
 }
 
 export function DonutChart({ segments, total, currency = "$" }) {
-  const size = 160,
-    cx = 80,
-    cy = 80,
-    R = 66,
-    r = 46;
+  const { theme } = useTheme();
+  const size = 160, cx = 80, cy = 80, R = 66, r = 46;
+  const COLORS = crtRamp(theme);
 
   if (!segments.length || total === 0)
     return (
       <svg viewBox={`0 0 ${size} ${size}`}>
-        <circle cx={cx} cy={cy} r={(R + r) / 2} fill="none" stroke="#2a2a3a" strokeWidth={R - r} />
-        <text x={cx} y={cy + 5} textAnchor="middle" fill="#555" fontSize="11">
+        <circle cx={cx} cy={cy} r={(R + r) / 2} fill="none" stroke={theme.border} strokeWidth={R - r} />
+        <text x={cx} y={cy + 5} textAnchor="middle" fill={theme.muted} fontSize="11">
           No data
         </text>
       </svg>
@@ -110,10 +139,10 @@ export function DonutChart({ segments, total, currency = "$" }) {
         angle += sweep;
         return <path key={i} d={d} fill={COLORS[i % COLORS.length]} />;
       })}
-      <text x={cx} y={cy - 8} textAnchor="middle" fill="#888" fontSize="10">
+      <text x={cx} y={cy - 8} textAnchor="middle" fill={theme.muted} fontSize="10">
         TOTAL
       </text>
-      <text x={cx} y={cy + 10} textAnchor="middle" fill="#e0e0ee" fontSize="15" fontWeight="800">
+      <text x={cx} y={cy + 10} textAnchor="middle" fill={theme.cream} fontSize="15" fontWeight="800">
         {totalFmt}
       </text>
     </svg>
@@ -121,20 +150,18 @@ export function DonutChart({ segments, total, currency = "$" }) {
 }
 
 // ── Monthly history bar chart ──────────────────────────────────────────────────
-export function HistoryBars({ months, color = "#5b8dee" }) {
-  const W = 340,
-    H = 110,
-    pL = 10,
-    pR = 10,
-    pT = 10,
-    pB = 28;
-  const iW = W - pL - pR,
-    iH = H - pT - pB;
+export function HistoryBars({ months }) {
+  const { theme, tweaks } = useTheme();
+  const uid = useId();
+  const glowId = `hbl-${uid}`;
+
+  const W = 340, H = 110, pL = 10, pR = 10, pT = 10, pB = 28;
+  const iW = W - pL - pR, iH = H - pT - pB;
 
   if (!months.length)
     return (
       <svg viewBox={`0 0 ${W} ${H}`} className="svg-chart">
-        <text x={W / 2} y={H / 2} textAnchor="middle" fill="#555" fontSize="12">
+        <text x={W / 2} y={H / 2} textAnchor="middle" fill={theme.muted} fontSize="12">
           No data yet
         </text>
       </svg>
@@ -148,23 +175,37 @@ export function HistoryBars({ months, color = "#5b8dee" }) {
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="svg-chart">
+      <defs>
+        {tweaks.glow > 0 && (
+          <filter id={glowId}>
+            <feGaussianBlur stdDeviation={0.8 * tweaks.glow} result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        )}
+      </defs>
       {hasIncome && (
         <g>
-          <rect x={12} y={pT} width={8} height={4} rx="1" fill="#4caf82" />
-          <text x={23} y={pT + 4} fill="#555" fontSize="8">
+          <rect x={12} y={pT} width={8} height={4} fill={STATUS.blue} />
+          <text x={23} y={pT + 4} fill={theme.muted} fontSize="8">
             Income
           </text>
-          <rect x={65} y={pT} width={8} height={4} rx="1" fill={color} />
-          <text x={76} y={pT + 4} fill="#555" fontSize="8">
+          <rect x={65} y={pT} width={8} height={4} fill={theme.accent} />
+          <text x={76} y={pT + 4} fill={theme.muted} fontSize="8">
             Spent
           </text>
         </g>
       )}
       {months.map((m, i) => {
+        const isLast = i === months.length - 1;
         const expH = Math.max((m.total / max) * iH, 2);
         const incH = Math.max(((m.income || 0) / max) * iH, m.income ? 2 : 0);
         const slotX = pL + i * slot + (slot - (hasIncome ? bW * 2 + gap : bW)) / 2;
         const lbl = m.month.slice(5, 7) + "/" + m.month.slice(2, 4);
+        const barColor = isLast ? theme.accentHot : theme.accent;
+        const barOpacity = isLast ? 1 : 0.55;
         return (
           <g key={i}>
             {hasIncome && incH > 0 && (
@@ -173,8 +214,8 @@ export function HistoryBars({ months, color = "#5b8dee" }) {
                 y={+(pT + iH - incH).toFixed(2)}
                 width={+bW.toFixed(2)}
                 height={+incH.toFixed(2)}
-                rx="3"
-                fill="#4caf82"
+                fill={STATUS.blue}
+                opacity={isLast ? 1 : 0.55}
               />
             )}
             <rect
@@ -182,14 +223,15 @@ export function HistoryBars({ months, color = "#5b8dee" }) {
               y={+(pT + iH - expH).toFixed(2)}
               width={+bW.toFixed(2)}
               height={+expH.toFixed(2)}
-              rx="3"
-              fill={color}
+              fill={barColor}
+              opacity={barOpacity}
+              filter={isLast && tweaks.glow > 0 ? `url(#${glowId})` : undefined}
             />
             <text
               x={+(slotX + (hasIncome ? bW + gap / 2 : bW / 2)).toFixed(2)}
               y={H - 6}
               textAnchor="middle"
-              fill="#555"
+              fill={isLast ? theme.accentHot : theme.muted}
               fontSize="9"
             >
               {lbl}

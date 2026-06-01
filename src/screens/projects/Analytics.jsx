@@ -1,110 +1,239 @@
-import { useTheme, glow as glowFn } from "../../context/ThemeContext";
+import { useEffect, useMemo } from "react";
+import { useTheme, STATUS, glow as glowFn } from "../../context/ThemeContext";
 import Box from "../../components/crt/Box";
 import { useDevProjects } from "../../context/ProjectsContext";
 
-function VBar({ data, theme, h = 100 }) {
-  const W = 320, H = h, pL = 6, pR = 6, pT = 8, pB = 20;
-  const iW = W - pL - pR, iH = H - pT - pB;
-  if (!data.length) return <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%" }}><text x={W / 2} y={H / 2} textAnchor="middle" fill={theme.muted} fontSize="11">no data</text></svg>;
-  const max = Math.max(...data.map(d => d.v), 1);
-  const slot = iW / data.length;
-  const bW = Math.min(slot * 0.6, 28);
-  return (
-    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%" }}>
-      {data.map((d, i) => {
-        const bH = Math.max((d.v / max) * iH, d.v > 0 ? 2 : 0);
-        const x = pL + i * slot + (slot - bW) / 2;
-        return (
-          <g key={i}>
-            <rect x={x} y={pT + iH - bH} width={bW} height={bH} fill={d.hot ? theme.accentHot : theme.accent} opacity={d.hot ? 1 : 0.65} />
-            <text x={x + bW / 2} y={H - 4} textAnchor="middle" fill={theme.muted} fontSize="8" fontFamily="monospace">{d.lbl}</text>
-          </g>
-        );
-      })}
-    </svg>
-  );
-}
+const PRIORITY_COLOR = (theme) => ({
+  critical: STATUS.red,
+  high: STATUS.amber,
+  medium: theme.muted,
+  low: theme.faint,
+});
 
-function HBar({ data, theme, h = 20 }) {
-  const W = 300, rowH = h + 10;
-  const max = Math.max(...data.map(d => d.v), 1);
-  return (
-    <svg viewBox={`0 0 ${W} ${data.length * rowH}`} style={{ width: "100%", height: data.length * rowH }}>
-      {data.map((d, i) => {
-        const bW = (d.v / max) * 200;
-        const y = i * rowH;
-        return (
-          <g key={i}>
-            <text x={0} y={y + rowH * 0.65} fill={theme.cream} fontSize="10" fontFamily="monospace">{d.lbl}</text>
-            <rect x={90} y={y + 3} width={bW} height={h - 2} fill={theme.accent} opacity={0.7} />
-            {bW > 0 && <rect x={90} y={y + 3} width={2} height={h - 2} fill={theme.accentHot} />}
-            <text x={296} y={y + rowH * 0.65} textAnchor="end" fill={theme.accentDim} fontSize="10" fontFamily="monospace">{d.v}</text>
-          </g>
-        );
-      })}
-    </svg>
-  );
-}
+const STATUS_ORDER = ["active", "paused", "idea", "completed"];
+const STATUS_LABELS = { active: "ACTIVE", paused: "PAUSED", idea: "IDEA", completed: "DONE" };
+const STATUS_COLOR = (theme) => ({
+  active: theme.accentHot,
+  paused: STATUS.amber,
+  idea: theme.accentDim,
+  completed: theme.muted,
+});
 
-function Stat({ label, value, sub, hot, theme, tweaks }) {
-  return (
-    <div style={{ padding: "12px 16px", background: theme.surface, border: `1px solid ${theme.borderHi}`, display: "flex", flexDirection: "column", gap: 4 }}>
-      <div style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: theme.muted, letterSpacing: "0.14em" }}>{label}</div>
-      <div style={{ fontFamily: "var(--font-mono)", fontSize: 26, color: hot ? theme.accentHot : theme.cream, lineHeight: 1, textShadow: hot ? glowFn(theme, tweaks.glow * 0.7) : "none" }}>{value}</div>
-      {sub && <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: theme.accentDim }}>{sub}</div>}
-    </div>
-  );
+function taskCountsFor(projectId, kanbanTasks) {
+  const linked = (kanbanTasks || []).filter((t) => {
+    try {
+      const ids = typeof t.project_ids === "string" ? JSON.parse(t.project_ids || "[]") : (t.project_ids || []);
+      return ids.includes(String(projectId)) || ids.includes(projectId);
+    } catch { return false; }
+  });
+  return {
+    backlog: linked.filter((t) => t.status === "backlog").length,
+    in_progress: linked.filter((t) => t.status === "in_progress").length,
+    done: linked.filter((t) => t.status === "done").length,
+    total: linked.length,
+  };
 }
 
 export default function ProjectsAnalytics() {
   const { theme, tweaks } = useTheme();
-  const { projects, kanbanTasks } = useDevProjects();
+  const { projects, kanbanTasks, commits, fetchCommit } = useDevProjects();
 
-  const activeProjects = (projects || []).filter(p => p.status === "active").length;
-  const inProgress = (kanbanTasks || []).filter(t => t.status === "in_progress").length;
-  const done = (kanbanTasks || []).filter(t => t.status === "done").length;
-  const backlog = (kanbanTasks || []).filter(t => t.status === "backlog").length;
+  const now = new Date();
+  const monthName = now.toLocaleString("en", { month: "long" }).toUpperCase();
+  const year = now.getFullYear();
 
-  const kanbanData = [
-    { lbl: "backlog", v: backlog },
-    { lbl: "in_progress", v: inProgress },
-    { lbl: "done", v: done },
-  ];
+  const activeProjects = (projects || []).filter((p) => p.status === "active");
+  const totalActive = activeProjects.length;
+  const totalInProgress = (kanbanTasks || []).filter((t) => t.status === "in_progress").length;
+  const totalBacklog = (kanbanTasks || []).filter((t) => t.status === "backlog").length;
+  const totalDone = (kanbanTasks || []).filter((t) => t.status === "done").length;
 
-  const statusData = [
-    { lbl: "active", v: (projects || []).filter(p => p.status === "active").length },
-    { lbl: "paused", v: (projects || []).filter(p => p.status === "paused").length },
-    { lbl: "completed", v: (projects || []).filter(p => p.status === "completed").length },
-  ];
+  useEffect(() => {
+    activeProjects.forEach((p) => {
+      if (p.github_url && !commits[p.id]) fetchCommit(p.id);
+    });
+  }, [projects]);
 
-  const nonDone = (kanbanTasks || []).filter(t => t.status !== "done");
-  const priorityData = [
-    { lbl: "critical", v: nonDone.filter(t => t.priority === "critical").length },
-    { lbl: "high", v: nonDone.filter(t => t.priority === "high").length },
-    { lbl: "medium", v: nonDone.filter(t => t.priority === "medium").length },
-    { lbl: "low", v: nonDone.filter(t => t.priority === "low").length },
-  ];
+  const statusBars = useMemo(() => {
+    const colors = STATUS_COLOR(theme);
+    return STATUS_ORDER.map((s) => ({
+      status: s,
+      count: (projects || []).filter((p) => p.status === s).length,
+      color: colors[s],
+    })).filter((d) => d.count > 0);
+  }, [projects, theme]);
+  const maxStatus = Math.max(...statusBars.map((d) => d.count), 1);
+
+  const openTasks = useMemo(() => {
+    const PRIO = { critical: 0, high: 1, medium: 2, low: 3 };
+    return (kanbanTasks || [])
+      .filter((t) => t.status !== "done")
+      .sort((a, b) => {
+        const pd = (PRIO[a.priority] ?? 4) - (PRIO[b.priority] ?? 4);
+        if (pd !== 0) return pd;
+        return (a.status === "in_progress" ? 0 : 1) - (b.status === "in_progress" ? 0 : 1);
+      })
+      .slice(0, 14);
+  }, [kanbanTasks]);
+
+  const priorityColors = PRIORITY_COLOR(theme);
+
+  function linkedProjectNames(task) {
+    try {
+      const ids = typeof task.project_ids === "string" ? JSON.parse(task.project_ids || "[]") : (task.project_ids || []);
+      return ids.map((id) => (projects || []).find((p) => String(p.id) === String(id))?.name).filter(Boolean);
+    } catch { return []; }
+  }
 
   return (
-    <div style={{ padding: 18, display: "flex", flexDirection: "column", gap: 14, height: "100%", overflow: "auto", fontFamily: "var(--font-mono)" }}>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
-        <Stat label="ACTIVE PROJECTS" value={activeProjects} hot={activeProjects > 0} theme={theme} tweaks={tweaks} />
-        <Stat label="IN PROGRESS TASKS" value={inProgress} theme={theme} tweaks={tweaks} />
-        <Stat label="DONE TASKS" value={done} theme={theme} tweaks={tweaks} />
-        <Stat label="BACKLOG TASKS" value={backlog} theme={theme} tweaks={tweaks} />
+    <div style={{ padding: 18, display: "flex", flexDirection: "column", gap: 14, fontFamily: "var(--font-mono)" }}>
+      {/* Hero */}
+      <Box glowing padding="16px 20px">
+        <div style={{ fontSize: 10, color: theme.muted, letterSpacing: "0.18em", marginBottom: 8 }}>
+          // PROJECTS · {monthName} · {year}
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 14 }}>
+          {[
+            ["ACTIVE", String(totalActive), "projects"],
+            ["IN PROGRESS", String(totalInProgress), "tasks"],
+            ["BACKLOG", String(totalBacklog), "queued"],
+            ["DONE", String(totalDone), "completed"],
+          ].map(([l, v, s]) => (
+            <div key={l}>
+              <div style={{ fontSize: 10, color: theme.muted, letterSpacing: "0.14em" }}>{l}</div>
+              <div style={{ fontSize: 34, color: theme.accentHot, lineHeight: 1, textShadow: glowFn(theme, tweaks.glow * 1.2), marginTop: 2 }}>{v}</div>
+              <div style={{ fontSize: 10, color: theme.accentDim, marginTop: 3 }}>{s}</div>
+            </div>
+          ))}
+        </div>
+      </Box>
+
+      {/* Two-column */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+        {/* Left: active project cards + status breakdown */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <Box title="ACTIVE.PROJECTS" padding="14px 18px">
+            {activeProjects.length === 0 ? (
+              <div style={{ color: theme.muted, fontSize: 11, padding: "8px 0" }}>no active projects</div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {activeProjects.map((p) => {
+                  const counts = taskCountsFor(p.id, kanbanTasks);
+                  const commit = commits[p.id];
+                  return (
+                    <div key={p.id} style={{
+                      padding: "10px 12px",
+                      background: theme.surface2,
+                      border: `1px solid ${theme.border}`,
+                      borderLeft: `3px solid ${theme.accentHot}`,
+                    }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
+                        <span style={{ fontSize: 12, color: theme.accentHot, fontWeight: 700, letterSpacing: "0.06em" }}>
+                          {p.name}
+                        </span>
+                        <span style={{ fontSize: 9, color: theme.muted, letterSpacing: "0.04em" }}>
+                          {p.tech_stack?.split(",")[0]?.trim() || ""}
+                        </span>
+                      </div>
+                      <div style={{ display: "flex", gap: 12, fontSize: 10 }}>
+                        <span style={{ color: theme.muted }}>backlog <span style={{ color: theme.cream }}>{counts.backlog}</span></span>
+                        <span style={{ color: theme.accent }}>doing <span style={{ color: theme.cream }}>{counts.in_progress}</span></span>
+                        <span style={{ color: theme.accentDim }}>done <span style={{ color: theme.cream }}>{counts.done}</span></span>
+                        {commit?.date && (
+                          <span style={{ color: theme.faint, marginLeft: "auto" }}>
+                            ↑ {new Date(commit.date).toLocaleDateString("en", { month: "short", day: "numeric" })}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </Box>
+
+          <Box title="STATUS.BREAKDOWN" padding="14px 18px">
+            {statusBars.length === 0 ? (
+              <div style={{ color: theme.muted, fontSize: 11 }}>no projects yet</div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {statusBars.map(({ status, count, color }) => (
+                  <div key={status} style={{ display: "grid", gridTemplateColumns: "70px 1fr 26px", gap: 10, alignItems: "center" }}>
+                    <span style={{ fontSize: 10, color, letterSpacing: "0.06em" }}>
+                      <span style={{ marginRight: 5 }}>●</span>{STATUS_LABELS[status]}
+                    </span>
+                    <div style={{ position: "relative", height: 14, background: theme.surface2, border: `1px solid ${theme.border}` }}>
+                      <div style={{
+                        position: "absolute", top: 0, left: 0, bottom: 0,
+                        width: `${(count / maxStatus) * 100}%`,
+                        background: color,
+                        boxShadow: `0 0 6px ${color}60`,
+                      }} />
+                    </div>
+                    <span style={{ fontSize: 11, color: theme.cream, textAlign: "right" }}>{count}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {(projects || []).length > 0 && (
+              <div style={{ marginTop: 10, fontSize: 10, color: theme.muted, borderTop: `1px dashed ${theme.border}`, paddingTop: 8 }}>
+                {(projects || []).length} total · {totalActive} active
+              </div>
+            )}
+          </Box>
+        </div>
+
+        {/* Right: open tasks */}
+        <Box title="OPEN.TASKS" padding="14px 18px" style={{ display: "flex", flexDirection: "column" }}>
+          <div style={{
+            fontSize: 10, color: theme.muted, letterSpacing: "0.08em",
+            display: "grid", gridTemplateColumns: "60px 1fr 60px",
+            gap: 8, padding: "4px 0", borderBottom: `1px dashed ${theme.border}`, marginBottom: 4
+          }}>
+            <span>priority</span><span>task</span><span style={{ textAlign: "right" }}>status</span>
+          </div>
+          <div style={{ flex: 1, overflowY: "auto" }}>
+            {openTasks.length === 0 ? (
+              <div style={{ color: theme.muted, fontSize: 11, padding: "12px 0" }}>
+                no open tasks · use the Kanban tab to add
+              </div>
+            ) : (
+              openTasks.map((t) => {
+                const pColor = priorityColors[t.priority] || theme.muted;
+                const names = linkedProjectNames(t);
+                return (
+                  <div key={t.id} style={{
+                    fontSize: 11, color: theme.cream, padding: "7px 0",
+                    display: "grid", gridTemplateColumns: "60px 1fr 60px",
+                    gap: 8, alignItems: "start", borderBottom: `1px dashed ${theme.border}`
+                  }}>
+                    <span style={{ color: pColor, fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", paddingTop: 1 }}>
+                      {(t.priority || "medium").toUpperCase()}
+                    </span>
+                    <div>
+                      <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.title}</div>
+                      {names.length > 0 && (
+                        <div style={{ fontSize: 9, color: theme.accentDim, marginTop: 2 }}>{names.join(", ")}</div>
+                      )}
+                    </div>
+                    <span style={{
+                      textAlign: "right", fontSize: 9, fontWeight: 600,
+                      color: t.status === "in_progress" ? theme.accent : theme.muted,
+                    }}>
+                      {t.status === "in_progress" ? "DOING" : "BACKLOG"}
+                    </span>
+                  </div>
+                );
+              })
+            )}
+          </div>
+          {(kanbanTasks || []).length > 0 && (
+            <div style={{ marginTop: 10, fontSize: 10, color: theme.muted, borderTop: `1px dashed ${theme.border}`, paddingTop: 8 }}>
+              {openTasks.length} open · {totalDone} done · {(kanbanTasks || []).length} total
+            </div>
+          )}
+        </Box>
       </div>
-
-      <Box title="KANBAN BREAKDOWN">
-        <HBar data={kanbanData} theme={theme} />
-      </Box>
-
-      <Box title="PROJECTS BY STATUS">
-        <HBar data={statusData} theme={theme} />
-      </Box>
-
-      <Box title="TASKS BY PRIORITY">
-        <HBar data={priorityData} theme={theme} />
-      </Box>
     </div>
   );
 }

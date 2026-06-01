@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
 import { useHydro } from "../../context/HydroContext";
+import { STATUS } from "../../context/ThemeContext";
 import { fmtDate } from "../../utils";
 import { IClose, IEdit } from "../../icons";
 
 const STAGES = ["seedling", "vegetative", "fruiting", "harvest", "done"];
 const STAGE_COLORS = {
-  seedling: "#4ab87a",
-  vegetative: "#2eb8a0",
-  fruiting: "#d4a040",
-  harvest: "#e07b3a",
-  done: "var(--fg-dim)",
+  seedling: "var(--accent)",
+  vegetative: "var(--accent-dim)",
+  fruiting: STATUS.amber,
+  harvest: STATUS.amber,
+  done: "var(--muted)",
 };
 
 function PlantModal({ initial, onSave, onClose }) {

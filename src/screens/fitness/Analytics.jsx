@@ -1,23 +1,40 @@
+import { useMemo } from "react";
+import { useFitness } from "../../context/FitnessContext";
 import { useTheme, glow as glowFn } from "../../context/ThemeContext";
 import Box from "../../components/crt/Box";
-import { useFitness } from "../../context/FitnessContext";
 
-function VBar({ data, theme, h = 100 }) {
-  const W = 320, H = h, pL = 6, pR = 6, pT = 8, pB = 20;
-  const iW = W - pL - pR, iH = H - pT - pB;
-  if (!data.length) return <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%" }}><text x={W / 2} y={H / 2} textAnchor="middle" fill={theme.muted} fontSize="11">no data</text></svg>;
-  const max = Math.max(...data.map(d => d.v), 1);
-  const slot = iW / data.length;
-  const bW = Math.min(slot * 0.6, 28);
+function weekStart(dateStr) {
+  const d = new Date(dateStr + "T00:00:00");
+  const day = d.getDay();
+  d.setDate(d.getDate() - (day === 0 ? 6 : day - 1));
+  return d.toISOString().slice(0, 10);
+}
+
+function BarChart({ data, h = 110, theme }) {
+  if (!data.length) return null;
+  const max = Math.max(...data.map((d) => d.v), 1);
+  const W = 760, H = h;
+  const slot = W / data.length;
+  const bW = Math.min(slot * 0.55, 32);
+  const pB = 16;
+  const iH = H - pB;
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%" }}>
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={h} preserveAspectRatio="none">
+      <line x1="0" y1={iH} x2={W} y2={iH} stroke={theme.borderHi} strokeWidth="0.5" />
       {data.map((d, i) => {
         const bH = Math.max((d.v / max) * iH, d.v > 0 ? 2 : 0);
-        const x = pL + i * slot + (slot - bW) / 2;
+        const x = i * slot + (slot - bW) / 2;
+        const isHot = d.hot || i === data.length - 1;
         return (
           <g key={i}>
-            <rect x={x} y={pT + iH - bH} width={bW} height={bH} fill={d.hot ? theme.accentHot : theme.accent} opacity={d.hot ? 1 : 0.65} />
-            <text x={x + bW / 2} y={H - 4} textAnchor="middle" fill={theme.muted} fontSize="8" fontFamily="monospace">{d.lbl}</text>
+            <rect
+              x={x} y={iH - bH} width={bW} height={bH}
+              fill={isHot ? theme.accentHot : theme.accent}
+              opacity={isHot ? 1 : 0.55}
+            />
+            {d.lbl && (
+              <text x={x + bW / 2} y={H - 2} textAnchor="middle" fill={theme.muted} fontSize="8" fontFamily="monospace">{d.lbl}</text>
+            )}
           </g>
         );
       })}
@@ -25,139 +42,227 @@ function VBar({ data, theme, h = 100 }) {
   );
 }
 
-function HBar({ data, theme, h = 20 }) {
-  const W = 300, rowH = h + 10;
-  const max = Math.max(...data.map(d => d.v), 1);
-  return (
-    <svg viewBox={`0 0 ${W} ${data.length * rowH}`} style={{ width: "100%", height: data.length * rowH }}>
-      {data.map((d, i) => {
-        const bW = (d.v / max) * 200;
-        const y = i * rowH;
-        return (
-          <g key={i}>
-            <text x={0} y={y + rowH * 0.65} fill={theme.cream} fontSize="10" fontFamily="monospace">{d.lbl}</text>
-            <rect x={90} y={y + 3} width={bW} height={h - 2} fill={theme.accent} opacity={0.7} />
-            {bW > 0 && <rect x={90} y={y + 3} width={2} height={h - 2} fill={theme.accentHot} />}
-            <text x={296} y={y + rowH * 0.65} textAnchor="end" fill={theme.accentDim} fontSize="10" fontFamily="monospace">{d.v}</text>
-          </g>
-        );
-      })}
-    </svg>
-  );
-}
-
-function Stat({ label, value, sub, hot, theme, tweaks }) {
-  return (
-    <div style={{ padding: "12px 16px", background: theme.surface, border: `1px solid ${theme.borderHi}`, display: "flex", flexDirection: "column", gap: 4 }}>
-      <div style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: theme.muted, letterSpacing: "0.14em" }}>{label}</div>
-      <div style={{ fontFamily: "var(--font-mono)", fontSize: 26, color: hot ? theme.accentHot : theme.cream, lineHeight: 1, textShadow: hot ? glowFn(theme, tweaks.glow * 0.7) : "none" }}>{value}</div>
-      {sub && <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: theme.accentDim }}>{sub}</div>}
+function WeightLine({ data, h = 110, theme }) {
+  if (data.length < 2) return (
+    <div style={{ height: h, display: "flex", alignItems: "center", justifyContent: "center", color: theme.muted, fontSize: 11 }}>
+      need 2+ entries
     </div>
   );
+  const W = 760, H = h;
+  const pT = 10, pB = 10, pL = 4, pR = 4;
+  const iW = W - pL - pR, iH = H - pT - pB;
+  const vals = data.map((d) => d.weight);
+  const minV = Math.min(...vals) - 0.5;
+  const maxV = Math.max(...vals) + 0.5;
+  const range = maxV - minV || 1;
+  const pts = data.map((d, i) => [
+    pL + (i / (data.length - 1)) * iW,
+    pT + iH - ((d.weight - minV) / range) * iH,
+  ]);
+  const line = pts.map((p) => p.join(",")).join(" ");
+  const area = [`${pts[0][0]},${pT + iH}`, ...pts.map((p) => p.join(",")), `${pts[pts.length - 1][0]},${pT + iH}`].join(" ");
+  const last = pts[pts.length - 1];
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={h} preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="wt-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={theme.accent} stopOpacity="0.28" />
+          <stop offset="100%" stopColor={theme.accent} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <polygon points={area} fill="url(#wt-grad)" />
+      <polyline points={line} fill="none" stroke={theme.accent} strokeWidth="1.6" />
+      {pts.map((p, i) => (
+        <circle key={i} cx={p[0]} cy={p[1]} r={i === pts.length - 1 ? 4 : 2} fill={i === pts.length - 1 ? theme.accentHot : theme.accent} />
+      ))}
+      <text x={last[0] - 6} y={last[1] - 8} textAnchor="end" fontSize="10" fontFamily="monospace" fill={theme.accentHot}>
+        {data[data.length - 1].weight} lbs
+      </text>
+    </svg>
+  );
 }
-
-const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 export default function FitnessAnalytics() {
   const { theme, tweaks } = useTheme();
-  const { workouts, metrics, runs } = useFitness();
+  const { workouts, history, runs, runHistory } = useFitness();
 
   const now = new Date();
-  const thisMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  const mo = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  const monthName = now.toLocaleString("en", { month: "long" }).toUpperCase();
+  const year = now.getFullYear();
 
-  const workoutsThisMonth = workouts.filter(w => w.date && w.date.startsWith(thisMonthKey)).length;
-  const runsThisMonth = (runs || []).filter(r => r.date && r.date.startsWith(thisMonthKey)).length;
-  const kmThisMonth = (runs || [])
-    .filter(r => r.date && r.date.startsWith(thisMonthKey))
-    .reduce((s, r) => s + (r.distance_m || 0), 0) / 1000;
-  const latestWeight = metrics && metrics.length > 0 ? metrics[0].weight : null;
+  // Hero stats
+  const workoutsThisMo = workouts.filter((w) => w.date?.startsWith(mo)).length;
+  const runsThisMo = (runs || []).filter((r) => (r.start_date || r.date)?.slice(0, 7) === mo);
+  const kmThisMo = runsThisMo.reduce((s, r) => s + (r.distance_m || 0), 0) / 1000;
+  const latestWeight = history && history.length > 0 ? history[history.length - 1]?.weight : null;
+  const firstWeight = history && history.length > 0 ? history[0]?.weight : null;
+  const weightDelta = latestWeight !== null && firstWeight !== null ? (latestWeight - firstWeight).toFixed(1) : null;
 
-  const monthBars = [];
-  for (let i = 5; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-    const count = workouts.filter(w => w.date && w.date.startsWith(key)).length;
-    monthBars.push({ lbl: MONTH_NAMES[d.getMonth()], v: count, hot: i === 0 });
-  }
+  // Streak (consecutive days with workout or run)
+  const activeDays = useMemo(() => {
+    const days = new Set();
+    workouts.forEach((w) => { if (w.date) days.add(w.date.slice(0, 10)); });
+    (runs || []).forEach((r) => { const d = (r.start_date || r.date)?.slice(0, 10); if (d) days.add(d); });
+    return days;
+  }, [workouts, runs]);
 
-  const runBars = [];
-  for (let i = 5; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-    const km = (runs || [])
-      .filter(r => r.date && r.date.startsWith(key))
-      .reduce((s, r) => s + (r.distance_m || 0), 0) / 1000;
-    runBars.push({ lbl: MONTH_NAMES[d.getMonth()], v: parseFloat(km.toFixed(1)), hot: i === 0 });
-  }
+  const streak = useMemo(() => {
+    let s = 0;
+    const d = new Date();
+    while (true) {
+      const key = d.toISOString().slice(0, 10);
+      if (!activeDays.has(key)) break;
+      s++;
+      d.setDate(d.getDate() - 1);
+    }
+    return s;
+  }, [activeDays]);
 
-  const weightPts = metrics ? metrics.slice(0, 12).reverse() : [];
-  const showWeight = weightPts.length >= 2;
-  const W = 320, H = 80, pL = 6, pR = 6, pT = 8, pB = 8;
-  const iW = W - pL - pR, iH = H - pT - pB;
-  let polyline = null;
-  let areaPoly = null;
-  if (showWeight) {
-    const wMin = Math.min(...weightPts.map(p => p.weight));
-    const wMax = Math.max(...weightPts.map(p => p.weight));
-    const wRange = wMax - wMin || 1;
-    const pts = weightPts.map((p, i) => {
-      const x = pL + (i / (weightPts.length - 1)) * iW;
-      const y = pT + iH - ((p.weight - wMin) / wRange) * iH;
-      return [x, y];
-    });
-    polyline = pts.map(p => p.join(",")).join(" ");
-    areaPoly = [
-      `${pts[0][0]},${pT + iH}`,
-      ...pts.map(p => p.join(",")),
-      `${pts[pts.length - 1][0]},${pT + iH}`,
-    ].join(" ");
-  }
+  // Sessions per week — 12 weeks
+  const sessionsPerWk = useMemo(() => {
+    const bars = [];
+    for (let i = 11; i >= 0; i--) {
+      const refDate = new Date(now);
+      refDate.setDate(refDate.getDate() - i * 7);
+      const ws = weekStart(refDate.toISOString().slice(0, 10));
+      const we = new Date(ws + "T00:00:00");
+      we.setDate(we.getDate() + 6);
+      const weStr = we.toISOString().slice(0, 10);
+      const count = workouts.filter((w) => w.date >= ws && w.date <= weStr).length;
+      bars.push({ v: count, hot: i === 0, lbl: i === 11 || i === 0 ? ws.slice(5) : "" });
+    }
+    return bars;
+  }, [workouts]);
+
+  // Run KM per week from runHistory (already weekly from API)
+  const runKmBars = useMemo(() => {
+    if (!runHistory || !runHistory.length) return [];
+    const slice = runHistory.slice(-12);
+    return slice.map((r, i) => ({
+      v: parseFloat((r.total_km || 0).toFixed(1)),
+      hot: i === slice.length - 1,
+      lbl: i === 0 || i === slice.length - 1 ? (r.week || "").slice(5) : "",
+    }));
+  }, [runHistory]);
+
+  // Weight 90d from history (sorted oldest→newest)
+  const weight90d = useMemo(() => {
+    if (!history || history.length < 2) return [];
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 90);
+    const cutStr = cutoff.toISOString().slice(0, 10);
+    return history.filter((h) => (h.date || h.recorded_at || "").slice(0, 10) >= cutStr);
+  }, [history]);
+
+  const totalSets = workouts.reduce((s, w) => s + (w.sets?.length || 0), 0);
+
+  const heroStats = [
+    ["WORKOUTS", String(workoutsThisMo), "this month"],
+    ["RUNS", `${runsThisMo.length}`, `${kmThisMo.toFixed(1)} km`],
+    ["WEIGHT", latestWeight !== null ? String(latestWeight) : "—", latestWeight !== null ? `lbs${weightDelta !== null ? ` · ${parseFloat(weightDelta) > 0 ? "+" : ""}${weightDelta}` : ""}` : "no data"],
+    ["STREAK", streak > 0 ? `${streak}d` : String(totalSets), streak > 0 ? "active days" : "total sets"],
+  ];
 
   return (
-    <div style={{ padding: 18, display: "flex", flexDirection: "column", gap: 14, height: "100%", overflow: "auto", fontFamily: "var(--font-mono)" }}>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
-        <Stat label="WORKOUTS THIS MONTH" value={workoutsThisMonth} theme={theme} tweaks={tweaks} />
-        <Stat label="RUNS THIS MONTH" value={runsThisMonth} theme={theme} tweaks={tweaks} />
-        <Stat label="THIS MONTH KM" value={kmThisMonth.toFixed(1)} sub="km" theme={theme} tweaks={tweaks} />
-        <Stat label="LATEST WEIGHT" value={latestWeight !== null ? latestWeight : "—"} sub={latestWeight !== null ? "lbs" : undefined} theme={theme} tweaks={tweaks} />
+    <div style={{ padding: 18, display: "flex", flexDirection: "column", gap: 14, fontFamily: "var(--font-mono)", overflowY: "auto" }}>
+      {/* Hero */}
+      <Box glowing padding="16px 20px">
+        <div style={{ fontSize: 10, color: theme.muted, letterSpacing: "0.18em", marginBottom: 8 }}>
+          // FITNESS · {monthName} · {year}
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 14 }}>
+          {heroStats.map(([l, v, s]) => (
+            <div key={l}>
+              <div style={{ fontSize: 10, color: theme.muted, letterSpacing: "0.14em" }}>{l}</div>
+              <div style={{ fontSize: 34, color: theme.accentHot, lineHeight: 1, textShadow: glowFn(theme, tweaks.glow * 1.2), marginTop: 2 }}>{v}</div>
+              <div style={{ fontSize: 10, color: theme.accentDim, marginTop: 3 }}>{s}</div>
+            </div>
+          ))}
+        </div>
+      </Box>
+
+      {/* Two-column: charts left | log right */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+        {/* Left column: session bars + run bars */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <Box title="SESSIONS · PER WEEK · 12W" padding="14px 18px">
+            {sessionsPerWk.every((d) => d.v === 0) ? (
+              <div style={{ color: theme.muted, fontSize: 11, padding: "8px 0" }}>no workouts yet</div>
+            ) : (
+              <BarChart data={sessionsPerWk} h={100} theme={theme} />
+            )}
+            <div style={{ fontSize: 10, color: theme.accentDim, display: "flex", justifyContent: "space-between", marginTop: 4 }}>
+              <span>{sessionsPerWk[0]?.lbl}</span>
+              <span style={{ color: theme.accentHot }}>now · {sessionsPerWk[sessionsPerWk.length - 1]?.v} sessions</span>
+              <span>{sessionsPerWk[sessionsPerWk.length - 1]?.lbl}</span>
+            </div>
+          </Box>
+
+          <Box title="RUN KM · PER WEEK" padding="14px 18px">
+            {!runKmBars.length || runKmBars.every((d) => d.v === 0) ? (
+              <div style={{ color: theme.muted, fontSize: 11, padding: "8px 0" }}>no runs logged yet</div>
+            ) : (
+              <BarChart data={runKmBars} h={100} theme={theme} />
+            )}
+            {runKmBars.length > 0 && (
+              <div style={{ fontSize: 10, color: theme.accentDim, display: "flex", justifyContent: "space-between", marginTop: 4 }}>
+                <span>{runKmBars[0]?.lbl}</span>
+                <span style={{ color: theme.accentHot }}>
+                  {runKmBars[runKmBars.length - 1]?.v} km this week
+                </span>
+                <span>{runKmBars[runKmBars.length - 1]?.lbl}</span>
+              </div>
+            )}
+          </Box>
+        </div>
+
+        {/* Right column: weight 90d + latest + recent workouts */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <Box title="WEIGHT · 90D" padding="14px 18px">
+            <WeightLine data={weight90d} h={100} theme={theme} />
+            {weight90d.length >= 2 && (
+              <div style={{ fontSize: 10, color: theme.accentDim, display: "flex", justifyContent: "space-between", marginTop: 4 }}>
+                <span>{weight90d[0]?.weight} lbs</span>
+                <span style={{ color: theme.accentHot }}>
+                  {weightDelta !== null
+                    ? `${parseFloat(weightDelta) > 0 ? "↑" : "↓"} ${Math.abs(parseFloat(weightDelta))} lbs`
+                    : ""}
+                </span>
+                <span>{weight90d[weight90d.length - 1]?.weight} lbs</span>
+              </div>
+            )}
+            {weight90d.length < 2 && (
+              <div style={{ fontSize: 10, color: theme.muted, marginTop: 4 }}>log weight entries to see trend</div>
+            )}
+          </Box>
+
+          <Box title="RECENT.WORKOUTS" padding="14px 18px" style={{ flex: 1 }}>
+            <div style={{
+              fontSize: 10, color: theme.accentDim, letterSpacing: "0.08em",
+              display: "grid", gridTemplateColumns: "56px 1fr 44px",
+              gap: 8, padding: "4px 0", borderBottom: `1px dashed ${theme.border}`, marginBottom: 4
+            }}>
+              <span>date</span><span>workout</span><span style={{ textAlign: "right" }}>min</span>
+            </div>
+            {workouts.length === 0 ? (
+              <div style={{ color: theme.muted, fontSize: 11, padding: "8px 0" }}>no workouts yet</div>
+            ) : (
+              workouts.slice(0, 8).map((w, i) => (
+                <div key={w.id || i} style={{
+                  fontSize: 11, color: theme.cream, padding: "6px 0",
+                  display: "grid", gridTemplateColumns: "56px 1fr 44px",
+                  gap: 8, alignItems: "center", borderBottom: `1px dashed ${theme.border}`
+                }}>
+                  <span style={{ color: theme.muted, fontSize: 10 }}>{w.date?.slice(5) || "—"}</span>
+                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{w.title || w.name || "workout"}</span>
+                  <span style={{ textAlign: "right", color: theme.accent }}>{w.duration || "—"}</span>
+                </div>
+              ))
+            )}
+          </Box>
+        </div>
       </div>
-
-      <Box title="WORKOUTS / MONTH">
-        <VBar data={monthBars} theme={theme} h={110} />
-      </Box>
-
-      <Box title="RUNNING KM / MONTH">
-        <VBar data={runBars} theme={theme} h={110} />
-      </Box>
-
-      {showWeight && (
-        <Box title="BODY WEIGHT TREND">
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: 22, color: theme.accentHot, textShadow: glowFn(theme, tweaks.glow * 0.6) }}>
-              {weightPts[weightPts.length - 1].weight}
-            </span>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: theme.accentDim }}>lbs latest</span>
-          </div>
-          <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%" }}>
-            <defs>
-              <linearGradient id="wgrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={theme.accent} stopOpacity="0.3" />
-                <stop offset="100%" stopColor={theme.accent} stopOpacity="0.02" />
-              </linearGradient>
-            </defs>
-            <polygon points={areaPoly} fill="url(#wgrad)" />
-            <polyline points={polyline} fill="none" stroke={theme.accent} strokeWidth="1.5" />
-            {weightPts.map((p, i) => {
-              const x = pL + (i / (weightPts.length - 1)) * iW;
-              const wMin = Math.min(...weightPts.map(q => q.weight));
-              const wMax = Math.max(...weightPts.map(q => q.weight));
-              const wRange = wMax - wMin || 1;
-              const y = pT + iH - ((p.weight - wMin) / wRange) * iH;
-              return <circle key={i} cx={x} cy={y} r="2" fill={theme.accentHot} />;
-            })}
-          </svg>
-        </Box>
-      )}
     </div>
   );
 }

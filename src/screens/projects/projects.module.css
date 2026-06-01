@@ -52,24 +52,24 @@
   border-radius: 3px;
 }
 .devp-status-badge.s-active {
-  background: rgba(74, 184, 122, 0.18);
-  color: #4ab87a;
-  border: 1px solid rgba(74, 184, 122, 0.3);
+  background: var(--accent-faint);
+  color: var(--accent);
+  border: 1px solid var(--border-hi);
 }
 .devp-status-badge.s-paused {
-  background: rgba(224, 180, 58, 0.18);
-  color: #e0b43a;
-  border: 1px solid rgba(224, 180, 58, 0.3);
+  background: rgba(255, 197, 90, 0.12);
+  color: #ffc55a;
+  border: 1px solid rgba(255, 197, 90, 0.3);
 }
 .devp-status-badge.s-completed {
-  background: rgba(90, 158, 212, 0.18);
-  color: #5a9ed4;
-  border: 1px solid rgba(90, 158, 212, 0.3);
+  background: rgba(122, 181, 255, 0.12);
+  color: #7ab5ff;
+  border: 1px solid rgba(122, 181, 255, 0.3);
 }
 .devp-status-badge.s-idea {
-  background: rgba(184, 122, 212, 0.18);
-  color: #b87ad4;
-  border: 1px solid rgba(184, 122, 212, 0.3);
+  background: var(--accent-faint);
+  color: var(--accent-dim);
+  border: 1px solid var(--border);
 }
 
 .devp-priority-badge {
@@ -79,19 +79,19 @@
   border-radius: 3px;
 }
 .devp-priority-badge.p-high {
-  background: rgba(220, 80, 80, 0.18);
-  color: #dc5050;
-  border: 1px solid rgba(220, 80, 80, 0.3);
+  background: rgba(255, 106, 90, 0.12);
+  color: #ff6a5a;
+  border: 1px solid rgba(255, 106, 90, 0.3);
 }
 .devp-priority-badge.p-medium {
-  background: rgba(150, 150, 150, 0.12);
-  color: #888;
-  border: 1px solid rgba(150, 150, 150, 0.25);
+  background: var(--surface2);
+  color: var(--muted);
+  border: 1px solid var(--border);
 }
 .devp-priority-badge.p-low {
-  background: rgba(80, 180, 80, 0.12);
-  color: #6ab07a;
-  border: 1px solid rgba(80, 180, 80, 0.25);
+  background: var(--accent-faint);
+  color: var(--accent-dim);
+  border: 1px solid var(--border);
 }
 
 .devp-stale-badge {
@@ -100,7 +100,7 @@
   padding: 3px 6px;
   border-radius: 3px;
   background: rgba(220, 150, 50, 0.18);
-  color: #dc9632;
+  color: #ffc55a;
   border: 1px solid rgba(220, 150, 50, 0.3);
 }
 
@@ -189,7 +189,7 @@
   flex-shrink: 0;
 }
 .devp-commit-age.stale {
-  color: #dc9632;
+  color: #ffc55a;
 }
 .devp-commit-loading {
   color: var(--muted);
@@ -288,7 +288,7 @@
 
 .devp-todo-add-btn {
   background: var(--accent);
-  color: #000;
+  color: var(--bg);
   border: none;
   border-radius: 4px;
   padding: 6px 14px;
@@ -320,7 +320,7 @@
   padding: 5px 10px;
   background: rgba(64, 196, 196, 0.12);
   border: 1px solid rgba(64, 196, 196, 0.35);
-  color: #40c4c4;
+  color: var(--accent);
   border-radius: 4px;
   cursor: pointer;
   transition:
@@ -438,7 +438,7 @@
   transition: color 0.1s;
 }
 .kb-delete-btn:hover {
-  color: var(--danger);
+  color: #ff6a5a;
 }
 
 .kb-card-top {
@@ -467,7 +467,7 @@
 .kb-card-project {
   font-family: "Press Start 2P", monospace;
   font-size: 7px;
-  color: #40c4c4;
+  color: var(--accent);
   opacity: 0.85;
 }
 .kb-card-due {
@@ -476,7 +476,7 @@
   font-family: "Share Tech Mono", monospace;
 }
 .kb-card-due.overdue {
-  color: #dc5050;
+  color: #ff6a5a;
 }
 .kb-card-started {
   font-size: 10px;

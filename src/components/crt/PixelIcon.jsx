@@ -276,7 +276,7 @@ const ICONS = {
 
 export default function PixelIcon({ kind, size = 14, color, style = {} }) {
   const ctx = useTheme();
-  const c = color || ctx?.theme?.accent || "#3aff7a";
+  const c = color || ctx?.theme?.accent || "var(--accent)";
   const cells = ICONS[kind] || ICONS.flag;
   return (
     <svg

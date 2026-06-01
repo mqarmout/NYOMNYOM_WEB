@@ -109,7 +109,7 @@
 }
 .amount-hint {
   font-size: 11px;
-  color: var(--dim);
+  color: var(--muted);
   margin-top: 4px;
 }
 

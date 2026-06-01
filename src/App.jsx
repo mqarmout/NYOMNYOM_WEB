@@ -9,7 +9,6 @@ import { ProjectsProvider, useDevProjects } from "./context/ProjectsContext";
 import { HydroProvider, useHydro } from "./context/HydroContext";
 
 import Dashboard from "./screens/spending/Dashboard";
-import Graphs from "./screens/spending/Graphs";
 import Categories from "./screens/spending/Categories";
 import Applications from "./screens/jobs/Applications";
 import Contacts from "./screens/jobs/Contacts";
@@ -32,17 +31,16 @@ import Home from "./screens/Home";
 import PublicPortfolio from "./screens/PublicPortfolio";
 import JobsAnalytics from "./screens/jobs/Analytics";
 import FitnessAnalytics from "./screens/fitness/Analytics";
-import PortfolioAnalytics from "./screens/portfolio/Analytics";
 import ClimbingAnalytics from "./screens/climbing/Analytics";
 import ProjectsAnalytics from "./screens/projects/Analytics";
 import Shell from "./components/crt/Shell";
 import { apiFetch } from "./utils";
 
 const SECTION_DEFAULT = {
-  spending: "graphs",
+  spending: "dashboard",
   jobs: "jobs-analytics",
   fitness: "fitness-analytics",
-  portfolio: "portfolio-analytics",
+  portfolio: "portfolio-projects",
   climbing: "climbing-analytics",
   projects: "projects-analytics",
   hydro: "hydro-dashboard",
@@ -52,7 +50,6 @@ const SECTION_ORDER = ["spending", "jobs", "fitness", "portfolio", "climbing", "
 
 const SCREEN_TO_SECTION = {
   dashboard: "spending",
-  graphs: "spending",
   categories: "spending",
   "jobs-analytics": "jobs",
   "jobs-applications": "jobs",
@@ -61,7 +58,6 @@ const SCREEN_TO_SECTION = {
   "fitness-workouts": "fitness",
   "fitness-runs": "fitness",
   "fitness-metrics": "fitness",
-  "portfolio-analytics": "portfolio",
   "portfolio-projects": "portfolio",
   "portfolio-skills": "portfolio",
   "portfolio-experience": "portfolio",
@@ -87,7 +83,6 @@ const COMMANDS = [
     event: "shortcut:new-income",
     label: "Spending → Add Income",
   },
-  { cmd: "spending/graphs", screen: "graphs", fire: false, label: "Spending → Graphs" },
   { cmd: "spending/categories", screen: "categories", fire: false, label: "Spending → Categories" },
   {
     cmd: "spending/categories/new",
@@ -113,8 +108,7 @@ const COMMANDS = [
     fire: false,
     label: "Fitness → Body Metrics",
   },
-  { cmd: "portfolio", screen: "portfolio-analytics", fire: false, label: "Portfolio → Analytics" },
-  { cmd: "portfolio/analytics", screen: "portfolio-analytics", fire: false, label: "Portfolio → Analytics" },
+  { cmd: "portfolio", screen: "portfolio-projects", fire: false, label: "Portfolio → Projects" },
   {
     cmd: "portfolio/projects",
     screen: "portfolio-projects",
@@ -240,34 +234,32 @@ const FKEY_MAP = {
 // Section sub-tabs
 const SECTION_TABS = {
   spending: [
-    ["graphs", "GRAPHS"],
     ["dashboard", "DASHBOARD"],
     ["categories", "CATEGORIES"],
   ],
   jobs: [
-    ["jobs-analytics", "ANALYTICS"],
+    ["jobs-analytics", "DASHBOARD"],
     ["jobs-applications", "APPLICATIONS"],
     ["jobs-contacts", "CONTACTS"],
   ],
   fitness: [
-    ["fitness-analytics", "ANALYTICS"],
+    ["fitness-analytics", "DASHBOARD"],
     ["fitness-workouts", "WORKOUTS"],
     ["fitness-runs", "RUNNING"],
     ["fitness-metrics", "BODY"],
   ],
   portfolio: [
-    ["portfolio-analytics", "ANALYTICS"],
     ["portfolio-projects", "PROJECTS"],
     ["portfolio-skills", "SKILLS"],
     ["portfolio-experience", "EXPERIENCE"],
     ["portfolio-about", "ABOUT"],
   ],
   climbing: [
-    ["climbing-analytics", "ANALYTICS"],
+    ["climbing-analytics", "DASHBOARD"],
     ["climbing-routes", "ROUTES"],
   ],
   projects: [
-    ["projects-analytics", "ANALYTICS"],
+    ["projects-analytics", "DASHBOARD"],
     ["projects-tracker", "PROJECTS"],
     ["projects-board", "BOARD"],
   ],
@@ -507,8 +499,6 @@ function renderScreen(screen) {
   switch (screen) {
     case "dashboard":
       return <Dashboard />;
-    case "graphs":
-      return <Graphs />;
     case "categories":
       return <Categories />;
     case "jobs-applications":
@@ -533,8 +523,6 @@ function renderScreen(screen) {
       return <JobsAnalytics />;
     case "fitness-analytics":
       return <FitnessAnalytics />;
-    case "portfolio-analytics":
-      return <PortfolioAnalytics />;
     case "climbing-analytics":
       return <ClimbingAnalytics />;
     case "projects-analytics":
