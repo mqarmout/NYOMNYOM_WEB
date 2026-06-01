@@ -45,7 +45,9 @@ function TaskModal({ initial, projects, defaultProjectIds, onSave, onClose }) {
   };
 
   const saveRef = useRef(null);
-  saveRef.current = handleSave;
+  useEffect(() => {
+    saveRef.current = handleSave;
+  });
 
   useEffect(() => {
     const handler = (e) => {
@@ -237,7 +239,8 @@ function KanbanColumn({
     >
       <div className={styles.kbColHeader}>
         <span className={styles.kbColTitle} style={{ color: col.color }}>
-          <span style={{ marginRight: 4, fontSize: 7 }}>●</span>{col.label}
+          <span style={{ marginRight: 4, fontSize: 7 }}>●</span>
+          {col.label}
         </span>
         <span className={styles.kbColCount}>{tasks.length}</span>
       </div>
@@ -280,7 +283,7 @@ export function KanbanBoard({
 
   const [showAdd, setShowAdd] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
-  const [draggingId, setDraggingId] = useState(null);
+  const [_draggingId, setDraggingId] = useState(null);
 
   useEffect(() => {
     const handler = () => setShowAdd(true);

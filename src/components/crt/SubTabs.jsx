@@ -3,7 +3,16 @@ import { useTheme, glow as glowFn } from "../../context/ThemeContext";
 export default function SubTabs({ tabs, active, onChange }) {
   const { theme, tweaks } = useTheme();
   return (
-    <div style={{ display: "flex", gap: 0, borderBottom: `1px solid ${theme.border}`, overflowX: "auto", WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}>
+    <div
+      style={{
+        display: "flex",
+        gap: 0,
+        borderBottom: `1px solid ${theme.border}`,
+        overflowX: "auto",
+        WebkitOverflowScrolling: "touch",
+        scrollbarWidth: "none",
+      }}
+    >
       {tabs.map(([id, label]) => {
         const isActive = active === id;
         return (

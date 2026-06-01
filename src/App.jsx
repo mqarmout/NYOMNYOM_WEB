@@ -95,12 +95,22 @@ const COMMANDS = [
   },
   { cmd: "jobs", screen: "jobs-analytics", fire: false, label: "Jobs → Analytics" },
   { cmd: "jobs/analytics", screen: "jobs-analytics", fire: false, label: "Jobs → Analytics" },
-  { cmd: "jobs/applications", screen: "jobs-applications", fire: false, label: "Jobs → Applications" },
+  {
+    cmd: "jobs/applications",
+    screen: "jobs-applications",
+    fire: false,
+    label: "Jobs → Applications",
+  },
   { cmd: "jobs/new", screen: "jobs-applications", fire: true, label: "Jobs → Add Application" },
   { cmd: "jobs/contacts", screen: "jobs-contacts", fire: false, label: "Jobs → Contacts" },
   { cmd: "jobs/contacts/new", screen: "jobs-contacts", fire: true, label: "Jobs → Add Contact" },
   { cmd: "fitness", screen: "fitness-analytics", fire: false, label: "Fitness → Analytics" },
-  { cmd: "fitness/analytics", screen: "fitness-analytics", fire: false, label: "Fitness → Analytics" },
+  {
+    cmd: "fitness/analytics",
+    screen: "fitness-analytics",
+    fire: false,
+    label: "Fitness → Analytics",
+  },
   { cmd: "fitness/new", screen: "fitness-workouts", fire: true, label: "Fitness → Log Workout" },
   { cmd: "fitness/workouts", screen: "fitness-workouts", fire: false, label: "Fitness → Workouts" },
   { cmd: "fitness/runs", screen: "fitness-runs", fire: false, label: "Fitness → Running" },
@@ -127,11 +137,21 @@ const COMMANDS = [
   },
   { cmd: "portfolio/about", screen: "portfolio-about", fire: false, label: "Portfolio → About" },
   { cmd: "climbing", screen: "climbing-analytics", fire: false, label: "Climbing → Analytics" },
-  { cmd: "climbing/analytics", screen: "climbing-analytics", fire: false, label: "Climbing → Analytics" },
+  {
+    cmd: "climbing/analytics",
+    screen: "climbing-analytics",
+    fire: false,
+    label: "Climbing → Analytics",
+  },
   { cmd: "climbing/routes", screen: "climbing-routes", fire: false, label: "Climbing → Routes" },
   { cmd: "climbing/new", screen: "climbing-routes", fire: true, label: "Climbing → Log Climb" },
   { cmd: "projects", screen: "projects-analytics", fire: false, label: "Projects → Analytics" },
-  { cmd: "projects/analytics", screen: "projects-analytics", fire: false, label: "Projects → Analytics" },
+  {
+    cmd: "projects/analytics",
+    screen: "projects-analytics",
+    fire: false,
+    label: "Projects → Analytics",
+  },
   { cmd: "projects/tracker", screen: "projects-tracker", fire: false, label: "Projects → Tracker" },
   { cmd: "projects/new", screen: "projects-tracker", fire: true, label: "Projects → New Project" },
   { cmd: "projects/board", screen: "projects-board", fire: false, label: "Projects → Board" },
@@ -470,7 +490,16 @@ function SectionTabs({ section, screen, onNav }) {
   const tabs = SECTION_TABS[section];
   if (!tabs || tabs.length <= 1) return null;
   return (
-    <div style={{ display: "flex", borderBottom: `1px solid ${theme.border}`, flexShrink: 0, overflowX: "auto", WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}>
+    <div
+      style={{
+        display: "flex",
+        borderBottom: `1px solid ${theme.border}`,
+        flexShrink: 0,
+        overflowX: "auto",
+        WebkitOverflowScrolling: "touch",
+        scrollbarWidth: "none",
+      }}
+    >
       {tabs.map(([id, label]) => {
         const active = screen === id;
         return (
@@ -570,7 +599,9 @@ function AppInner({ authUser, onLogout }) {
   const { loadAll: loadHydro } = useHydro();
 
   useEffect(() => {
-    const handler = (e) => { if (e.detail?.screen) setScreen(e.detail.screen); };
+    const handler = (e) => {
+      if (e.detail?.screen) setScreen(e.detail.screen);
+    };
     window.addEventListener("shortcut:go", handler);
     return () => window.removeEventListener("shortcut:go", handler);
   }, []);

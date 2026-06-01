@@ -45,8 +45,16 @@ export default function History() {
         <>
           <MetricChart title="pH" data={make("ph")} unit="target range 5.5–6.5" />
           <MetricChart title="EC (ppm)" data={make("ec_ppm")} unit="nutrient concentration" />
-          <MetricChart title="Water Temperature (°C)" data={make("water_temp")} unit="target range 18–24°C" />
-          <MetricChart title="Water Level (%)" data={make("water_level")} unit="reservoir fill level" />
+          <MetricChart
+            title="Water Temperature (°C)"
+            data={make("water_temp")}
+            unit="target range 18–24°C"
+          />
+          <MetricChart
+            title="Water Level (%)"
+            data={make("water_level")}
+            unit="reservoir fill level"
+          />
           <MetricChart title="Air Temperature (°C)" data={make("air_temp")} unit="ambient" />
           <MetricChart title="Humidity (%)" data={make("humidity")} unit="relative humidity" />
 

@@ -54,7 +54,9 @@ export default function AddExpense({ onClose, initial }) {
   };
 
   const saveRef = useRef(null);
-  saveRef.current = handleSave;
+  useEffect(() => {
+    saveRef.current = handleSave;
+  });
 
   useEffect(() => {
     const handler = (e) => {

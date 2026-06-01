@@ -54,7 +54,9 @@ input[type="checkbox"] {
   position: relative;
   flex-shrink: 0;
   vertical-align: middle;
-  transition: border-color 0.1s, background 0.1s;
+  transition:
+    border-color 0.1s,
+    background 0.1s;
 }
 input[type="checkbox"]:checked {
   background: var(--accent);

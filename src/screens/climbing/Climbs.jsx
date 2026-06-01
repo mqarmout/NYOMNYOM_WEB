@@ -46,7 +46,9 @@ export function ClimbModal({ initial, onSave, onClose }) {
   };
 
   const saveRef = useRef(null);
-  saveRef.current = handleSubmit;
+  useEffect(() => {
+    saveRef.current = handleSubmit;
+  });
 
   const TYPES = ["boulder", "sport"];
   useEffect(() => {
@@ -195,7 +197,7 @@ export function ClimbModal({ initial, onSave, onClose }) {
                 set("sent", e.target.checked);
                 if (!e.target.checked) set("flash", false);
               }}
-              style={{ accentColor: "var(--accent)", width: 15, height: 15 }}
+              style={{ width: 15, height: 15 }}
             />
             Sent <ICheck size={11} />
           </label>
@@ -215,7 +217,7 @@ export function ClimbModal({ initial, onSave, onClose }) {
                 checked={form.flash}
                 disabled={!form.sent}
                 onChange={(e) => set("flash", e.target.checked)}
-                style={{ accentColor: "var(--accent)", width: 15, height: 15 }}
+                style={{ width: 15, height: 15 }}
               />
               Flash <IZap size={11} />
             </label>

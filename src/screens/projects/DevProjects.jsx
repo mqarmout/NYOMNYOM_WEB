@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { useDevProjects } from "../../context/ProjectsContext";
 import { KanbanModal } from "./KanbanBoard";
 import {
-  Px,
   IClose,
   IEdit,
   IChevDown,
@@ -65,7 +64,9 @@ function ProjectModal({ initial, onSave, onClose }) {
   };
 
   const saveRef = useRef(null);
-  saveRef.current = handleSave;
+  useEffect(() => {
+    saveRef.current = handleSave;
+  });
 
   useEffect(() => {
     const handler = (e) => {

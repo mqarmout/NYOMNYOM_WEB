@@ -29,7 +29,7 @@ export function ClimbingProvider({ children }) {
       showToast("Climb logged");
       return res.id;
     },
-    [loadAll]
+    [loadAll, showToast]
   );
 
   const updateClimb = useCallback(
@@ -50,7 +50,7 @@ export function ClimbingProvider({ children }) {
       await loadAll();
       showToast("Climb updated");
     },
-    [loadAll]
+    [loadAll, showToast]
   );
 
   const deleteClimb = useCallback(
@@ -59,7 +59,7 @@ export function ClimbingProvider({ children }) {
       await loadAll();
       showToast("Climb deleted");
     },
-    [loadAll]
+    [loadAll, showToast]
   );
 
   return (
