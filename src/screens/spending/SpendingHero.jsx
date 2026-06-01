@@ -10,8 +10,8 @@ export default function SpendingHero({ data, expenses, categories, profile }) {
   const mono = { fontFamily: "var(--font-mono)" };
 
   const currency = profile?.currency || "$";
-  const mo = new Date().toISOString().slice(0, 7);
   const now = new Date();
+  const mo = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   const monthName = now.toLocaleString("default", { month: "long" }).toUpperCase();
   const year = now.getFullYear();
   const daysInMonth = new Date(year, now.getMonth() + 1, 0).getDate();
@@ -28,8 +28,9 @@ export default function SpendingHero({ data, expenses, categories, profile }) {
   // vs last month
   const prevMo = (() => {
     const d = new Date();
+    d.setDate(1);
     d.setMonth(d.getMonth() - 1);
-    return d.toISOString().slice(0, 7);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
   })();
   const prevTotal = expenses?.filter(e => e.date?.startsWith(prevMo)).reduce((s, e) => s + e.amount, 0) || 0;
   const vsPrev = prevTotal > 0 ? ((total - prevTotal) / prevTotal * 100) : null;

@@ -19,9 +19,10 @@ export default function Dashboard() {
   const mono = { fontFamily: "var(--font-mono)" };
 
   useEffect(() => {
-    const month = new Date().toISOString().slice(0, 7);
-    apiFetch("/api/analytics?month=" + month).then(d => {
-      if (!d.error) setAnalytics(d);
+    const d = new Date();
+    const month = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    apiFetch("/api/analytics?month=" + month).then(res => {
+      if (!res.error) setAnalytics(res);
     });
   }, [expenses]);
 
@@ -43,7 +44,8 @@ export default function Dashboard() {
   }, []);
 
   const currency = profile.currency || "$";
-  const mo = new Date().toISOString().slice(0, 7);
+  const now = new Date();
+  const mo = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
   // Transaction log
   const allTx = useMemo(() => [
@@ -60,30 +62,42 @@ export default function Dashboard() {
     );
   }, [allTx, filter]);
 
-  // Top categories
+  // Top categories — use analytics.by_category (server-aggregated) when available
   const topCats = useMemo(() => {
+    if (analytics?.by_category) {
+      return analytics.by_category
+        .filter(c => (c.spent || 0) > 0 || (c.budget || 0) > 0)
+        .sort((a, b) => (b.spent || 0) - (a.spent || 0))
+        .slice(0, 5);
+    }
     return categories
       .map(c => {
         const spent = expenses.filter(e => e.category_id === c.id && e.date?.startsWith(mo)).reduce((s, e) => s + e.amount, 0);
         return { ...c, spent };
       })
-      .filter(c => c.spent > 0 || c.budget > 0)
+      .filter(c => c.spent > 0 || (c.budget || 0) > 0)
       .sort((a, b) => b.spent - a.spent)
       .slice(0, 5);
-  }, [categories, expenses, mo]);
+  }, [categories, expenses, mo, analytics]);
 
-  // Daily 30D histogram
+  // Daily 30D histogram — use analytics.daily (server-aggregated) when available
   const dailyBars = useMemo(() => {
+    const lookup = {};
+    if (analytics?.daily) {
+      for (const { date, total } of analytics.daily) lookup[date] = total;
+    }
     const days = [];
     for (let i = 29; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
-      const ds = d.toISOString().slice(0, 10);
-      const v = expenses.filter(e => e.date === ds).reduce((s, e) => s + e.amount, 0);
+      const ds = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      const v = analytics
+        ? (lookup[ds] || 0)
+        : expenses.filter(e => e.date === ds).reduce((s, e) => s + e.amount, 0);
       days.push({ ds, v, lbl: ds.slice(5) });
     }
     return days;
-  }, [expenses]);
+  }, [expenses, analytics]);
 
   const maxDay = Math.max(...dailyBars.map(d => d.v), 1);
   const svgW = 760, svgH = 120;
