@@ -188,6 +188,17 @@ export default function PublicPortfolio({ onLogin }) {
     });
   }, []);
 
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key === "F1") {
+        e.preventDefault();
+        setShowSignIn(true);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
   if (!data) {
     return (
       <div
