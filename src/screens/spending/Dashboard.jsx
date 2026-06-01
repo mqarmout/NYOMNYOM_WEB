@@ -31,6 +31,7 @@ export default function Dashboard() {
     const onIncome = () => setModal({ type: "income", item: null });
     const onKey = e => {
       if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+      if (e.key === "e") { e.preventDefault(); setModal({ type: "expense", item: null }); }
       if (e.key === "i") { e.preventDefault(); setModal({ type: "income", item: null }); }
     };
     window.addEventListener("shortcut:new", onExpense);
@@ -197,7 +198,7 @@ export default function Dashboard() {
               })}
             </div>
             <button
-              onClick={() => {}}
+              onClick={() => window.dispatchEvent(new CustomEvent("shortcut:go", { detail: { screen: "categories" } }))}
               style={{
                 marginTop: 10, ...mono, fontSize: 10, color: theme.accent,
                 background: "none", border: "none", cursor: "pointer", letterSpacing: "0.1em",
@@ -209,7 +210,7 @@ export default function Dashboard() {
         </div>
 
         {/* RIGHT — TXN.LOG */}
-        <Box title="TXN.LOG" padding="14px 18px" style={{ display: "flex", flexDirection: "column", minHeight: 360, maxHeight: 600 }}>
+        <Box title="TXN.LOG" padding="14px 18px" style={{ display: "flex", flexDirection: "column", maxHeight: "calc(100vh - 220px)", minHeight: 360 }}>
           {/* Search */}
           <div style={{
             display: "flex", alignItems: "center", gap: 10,

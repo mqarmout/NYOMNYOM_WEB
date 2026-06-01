@@ -10,6 +10,7 @@ import { HydroProvider, useHydro } from "./context/HydroContext";
 
 import Dashboard from "./screens/spending/Dashboard";
 import Categories from "./screens/spending/Categories";
+import SpendingHistory from "./screens/spending/History";
 import Applications from "./screens/jobs/Applications";
 import Contacts from "./screens/jobs/Contacts";
 import Workouts from "./screens/fitness/Workouts";
@@ -51,6 +52,7 @@ const SECTION_ORDER = ["spending", "jobs", "fitness", "portfolio", "climbing", "
 const SCREEN_TO_SECTION = {
   dashboard: "spending",
   categories: "spending",
+  "spending-history": "spending",
   "jobs-analytics": "jobs",
   "jobs-applications": "jobs",
   "jobs-contacts": "jobs",
@@ -83,6 +85,7 @@ const COMMANDS = [
     event: "shortcut:new-income",
     label: "Spending → Add Income",
   },
+  { cmd: "spending/history", screen: "spending-history", fire: false, label: "Spending → History" },
   { cmd: "spending/categories", screen: "categories", fire: false, label: "Spending → Categories" },
   {
     cmd: "spending/categories/new",
@@ -236,6 +239,7 @@ const SECTION_TABS = {
   spending: [
     ["dashboard", "DASHBOARD"],
     ["categories", "CATEGORIES"],
+    ["spending-history", "HISTORY"],
   ],
   jobs: [
     ["jobs-analytics", "DASHBOARD"],
@@ -501,6 +505,8 @@ function renderScreen(screen) {
       return <Dashboard />;
     case "categories":
       return <Categories />;
+    case "spending-history":
+      return <SpendingHistory />;
     case "jobs-applications":
       return <Applications />;
     case "jobs-contacts":
@@ -563,6 +569,12 @@ function AppInner({ authUser, onLogout }) {
   const { loadAll: loadProjects } = useDevProjects();
   const { loadAll: loadHydro } = useHydro();
 
+  useEffect(() => {
+    const handler = (e) => { if (e.detail?.screen) setScreen(e.detail.screen); };
+    window.addEventListener("shortcut:go", handler);
+    return () => window.removeEventListener("shortcut:go", handler);
+  }, []);
+
   const perms = authUser.permissions;
   useEffect(() => {
     const ok = (s) => !perms || perms.includes(s);
@@ -594,6 +606,11 @@ function AppInner({ authUser, onLogout }) {
       }
       if (e.key === "n" || e.key === "N") {
         if (screen !== null) window.dispatchEvent(new Event("shortcut:new"));
+        return;
+      }
+      if ((e.key === "e" || e.key === "E") && screen !== null) {
+        const sec = SCREEN_TO_SECTION[screen];
+        if (sec === "spending") window.dispatchEvent(new Event("shortcut:new"));
         return;
       }
       const k = e.key.toLowerCase();
