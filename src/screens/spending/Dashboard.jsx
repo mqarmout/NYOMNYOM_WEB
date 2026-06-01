@@ -10,21 +10,32 @@ import BlockBar from "../../components/crt/BlockBar";
 import { useBreakpoint } from "../../hooks/useBreakpoint";
 
 export default function Dashboard() {
-  const { categories, expenses, income, profile, deleteExpense, deleteIncome } = useApp();
+  const { categories, profile } = useApp();
   const { theme, tweaks } = useTheme();
   const bp = useBreakpoint();
   const [modal, setModal] = useState(null);
   const [filter, setFilter] = useState("");
   const [analytics, setAnalytics] = useState(null);
+  const [txExpenses, setTxExpenses] = useState([]);
+  const [txIncome, setTxIncome] = useState([]);
   const mono = { fontFamily: "var(--font-mono)" };
 
-  useEffect(() => {
-    const d = new Date();
-    const month = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-    apiFetch("/api/analytics?month=" + month).then(res => {
+  const now = new Date();
+  const mo = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+  const loadTxData = () => {
+    apiFetch("/api/analytics?month=" + mo).then(res => {
       if (!res.error) setAnalytics(res);
     });
-  }, [expenses]);
+    apiFetch("/api/expenses?month=" + mo).then(res => {
+      if (!res.error) setTxExpenses(res);
+    });
+    apiFetch("/api/income?month=" + mo).then(res => {
+      if (!res.error) setTxIncome(res);
+    });
+  };
+
+  useEffect(() => { loadTxData(); }, []);
 
   useEffect(() => {
     const onExpense = () => setModal({ type: "expense", item: null });
@@ -45,14 +56,12 @@ export default function Dashboard() {
   }, []);
 
   const currency = profile.currency || "$";
-  const now = new Date();
-  const mo = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
-  // Transaction log
+  // Transaction log — uses locally-fetched data, not AppContext, to guarantee loading
   const allTx = useMemo(() => [
-    ...expenses.map(e => ({ ...e, _type: "expense" })),
-    ...income.map(i => ({ ...i, _type: "income" })),
-  ].sort((a, b) => b.date > a.date ? 1 : b.date < a.date ? -1 : 0), [expenses, income]);
+    ...txExpenses.map(e => ({ ...e, _type: "expense" })),
+    ...txIncome.map(i => ({ ...i, _type: "income" })),
+  ].sort((a, b) => b.date > a.date ? 1 : b.date < a.date ? -1 : 0), [txExpenses, txIncome]);
 
   const filtered = useMemo(() => {
     if (!filter.trim()) return allTx;
@@ -73,13 +82,13 @@ export default function Dashboard() {
     }
     return categories
       .map(c => {
-        const spent = expenses.filter(e => e.category_id === c.id && e.date?.startsWith(mo)).reduce((s, e) => s + e.amount, 0);
+        const spent = txExpenses.filter(e => e.category_id === c.id).reduce((s, e) => s + e.amount, 0);
         return { ...c, spent };
       })
       .filter(c => c.spent > 0 || (c.budget || 0) > 0)
       .sort((a, b) => b.spent - a.spent)
       .slice(0, 5);
-  }, [categories, expenses, mo, analytics]);
+  }, [categories, txExpenses, analytics]);
 
   // Daily 30D histogram — use analytics.daily (server-aggregated) when available
   const dailyBars = useMemo(() => {
@@ -94,11 +103,11 @@ export default function Dashboard() {
       const ds = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
       const v = analytics
         ? (lookup[ds] || 0)
-        : expenses.filter(e => e.date === ds).reduce((s, e) => s + e.amount, 0);
+        : txExpenses.filter(e => e.date === ds).reduce((s, e) => s + e.amount, 0);
       days.push({ ds, v, lbl: ds.slice(5) });
     }
     return days;
-  }, [expenses, analytics]);
+  }, [txExpenses, analytics]);
 
   const maxDay = Math.max(...dailyBars.map(d => d.v), 1);
   const svgW = 760, svgH = 120;
@@ -107,7 +116,7 @@ export default function Dashboard() {
   return (
     <div style={{ padding: 18, display: "flex", flexDirection: "column", gap: 14, ...mono }}>
       <style>{`@keyframes crt-blink { 0%,100%{opacity:1} 50%{opacity:0} }`}</style>
-      <SpendingHero data={analytics} expenses={expenses} categories={categories} profile={profile} />
+      <SpendingHero data={analytics} expenses={txExpenses} categories={categories} profile={profile} />
 
       <div style={{
         display: "grid",
@@ -299,16 +308,16 @@ export default function Dashboard() {
 
       {/* Modals */}
       {modal?.type === "expense" && (
-        <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) setModal(null); }}>
+        <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) { setModal(null); loadTxData(); } }}>
           <div className="modal-box">
-            <AddExpense onClose={() => setModal(null)} initial={modal.item} />
+            <AddExpense onClose={() => { setModal(null); loadTxData(); }} initial={modal.item} />
           </div>
         </div>
       )}
       {modal?.type === "income" && (
-        <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) setModal(null); }}>
+        <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) { setModal(null); loadTxData(); } }}>
           <div className="modal-box">
-            <AddIncome onClose={() => setModal(null)} initial={modal.item} />
+            <AddIncome onClose={() => { setModal(null); loadTxData(); }} initial={modal.item} />
           </div>
         </div>
       )}
