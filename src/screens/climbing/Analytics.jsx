@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useClimbing } from "../../context/ClimbingContext";
 import { useTheme, STATUS, glow as glowFn } from "../../context/ThemeContext";
 import Box from "../../components/crt/Box";
-import { IClose } from "../../icons";
+import { ClimbModal } from "./Climbs";
 
 const VGRADE_ORDER = ["V0","V1","V2","V3","V4","V5","V6","V7","V8","V9","V10"];
 
@@ -23,80 +23,6 @@ function maxGrade(sent) {
     .filter(n => n >= 0);
   if (!nums.length) return "—";
   return `V${Math.max(...nums)}`;
-}
-
-function styleOf(c) {
-  if (!c.sent) return "project";
-  if (c.flash) return "flash";
-  return "redpoint";
-}
-
-function QuickLogModal({ onSave, onClose }) {
-  const { theme } = useTheme();
-  const [name, setName] = useState("");
-  const [location, setLocation] = useState("");
-  const [grade, setGrade] = useState("V3");
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
-  const [sent, setSent] = useState(true);
-  const [flash, setFlash] = useState(false);
-  const [attempts, setAttempts] = useState(1);
-
-  useEffect(() => {
-    const h = (e) => { if (e.key === "Escape") onClose(); };
-    document.addEventListener("keydown", h);
-    return () => document.removeEventListener("keydown", h);
-  }, [onClose]);
-
-  return (
-    <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal-box">
-        <div className="modal-header">
-          <span className="modal-title">LOG CLIMB</span>
-          <button className="close-btn" onClick={onClose}><IClose /></button>
-        </div>
-        <div className="field">
-          <label>Route / Problem</label>
-          <input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder="crimp scrunch..." />
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          <div className="field">
-            <label>Gym / Crag</label>
-            <input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="The Hangar..." />
-          </div>
-          <div className="field">
-            <label>Date</label>
-            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-          </div>
-          <div className="field">
-            <label>Grade (V-scale)</label>
-            <select value={grade} onChange={(e) => setGrade(e.target.value)}>
-              {VGRADE_ORDER.map((g) => <option key={g}>{g}</option>)}
-            </select>
-          </div>
-          <div className="field">
-            <label>Attempts</label>
-            <input type="number" min="1" value={attempts} onChange={(e) => setAttempts(e.target.value)} />
-          </div>
-        </div>
-        <div style={{ display: "flex", gap: 20, marginBottom: 14 }}>
-          <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: 13 }}>
-            <input type="checkbox" checked={sent} onChange={(e) => { setSent(e.target.checked); if (!e.target.checked) setFlash(false); }} style={{ accentColor: "var(--accent)" }} />
-            Sent
-          </label>
-          <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: 13, opacity: sent ? 1 : 0.4 }}>
-            <input type="checkbox" checked={flash} disabled={!sent} onChange={(e) => setFlash(e.target.checked)} style={{ accentColor: "var(--accent)" }} />
-            Flash
-          </label>
-        </div>
-        <button
-          className="modal-save-btn"
-          onClick={() => onSave({ climb_type: "boulder", name, location, my_grade: grade, setter_grade: "", wall_type: "", date, sent: sent ? 1 : 0, flash: flash ? 1 : 0, attempts: parseInt(attempts) || 1, notes: "" })}
-        >
-          LOG CLIMB
-        </button>
-      </div>
-    </div>
-  );
 }
 
 export default function ClimbingAnalytics() {
@@ -163,7 +89,7 @@ export default function ClimbingAnalytics() {
               onClick={() => setShowModal(true)}
               style={{ padding: "9px 16px", background: theme.accent, border: "none", borderRadius: 0, color: theme.bg, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", cursor: "pointer", fontFamily: "var(--font-mono)" }}
             >
-              [+] LOG SEND
+              [+] LOG CLIMB
             </button>
           </div>
         </div>
@@ -273,8 +199,8 @@ export default function ClimbingAnalytics() {
       </div>
 
       {showModal && (
-        <QuickLogModal
-          onSave={async (data) => { await addClimb(data, null); setShowModal(false); }}
+        <ClimbModal
+          onSave={async (data, photo) => { await addClimb(data, photo); setShowModal(false); }}
           onClose={() => setShowModal(false)}
         />
       )}

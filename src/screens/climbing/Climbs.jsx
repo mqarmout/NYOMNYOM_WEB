@@ -20,7 +20,7 @@ const EMPTY = {
   notes: "",
 };
 
-function ClimbModal({ initial, onSave, onClose }) {
+export function ClimbModal({ initial, onSave, onClose }) {
   const [form, setForm] = useState(initial || EMPTY);
   const [photo, setPhoto] = useState(null);
   const [preview, setPreview] = useState(
