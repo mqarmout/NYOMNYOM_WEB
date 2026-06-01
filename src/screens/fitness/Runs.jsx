@@ -66,7 +66,9 @@ function RunModal({ initial, onSave, onClose }) {
   };
 
   const saveRef = useRef(null);
-  saveRef.current = handleSave;
+  useEffect(() => {
+    saveRef.current = handleSave;
+  });
 
   useEffect(() => {
     const handler = (e) => {

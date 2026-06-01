@@ -43,7 +43,7 @@ export function HydroProvider({ children }) {
       }
       return r;
     },
-    [loadAll]
+    [loadAll, _toast]
   );
 
   const updatePump = useCallback(
@@ -55,7 +55,7 @@ export function HydroProvider({ children }) {
       }
       return r;
     },
-    [loadAll]
+    [loadAll, _toast]
   );
 
   const triggerPump = useCallback(async () => {
@@ -65,7 +65,7 @@ export function HydroProvider({ children }) {
       _toast("Pump triggered manually");
     }
     return r;
-  }, [loadAll]);
+  }, [loadAll, _toast]);
 
   const addDosing = useCallback(
     async (data) => {
@@ -76,7 +76,7 @@ export function HydroProvider({ children }) {
       }
       return r;
     },
-    [loadAll]
+    [loadAll, _toast]
   );
 
   const deleteDosing = useCallback(async (id) => {
@@ -93,7 +93,7 @@ export function HydroProvider({ children }) {
       }
       return r;
     },
-    [loadAll]
+    [loadAll, _toast]
   );
 
   const updatePlant = useCallback(
@@ -108,7 +108,7 @@ export function HydroProvider({ children }) {
       }
       return r;
     },
-    [loadAll]
+    [loadAll, _toast]
   );
 
   const deletePlant = useCallback(async (id) => {

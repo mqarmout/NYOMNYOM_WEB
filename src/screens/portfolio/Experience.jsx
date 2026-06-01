@@ -78,7 +78,7 @@ function ExperienceModal({ initial, onSave, onClose }) {
             id="current-role"
             checked={current}
             onChange={(e) => setCurrent(e.target.checked)}
-            style={{ width: 16, height: 16, accentColor: "var(--accent)" }}
+            style={{ width: 16, height: 16 }}
           />
           <label
             htmlFor="current-role"

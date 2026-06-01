@@ -338,7 +338,10 @@ function Sidebar({ active, onNav, username, onLogout }) {
 
 function TabRail({ active, onNav }) {
   const { theme } = useTheme();
-  const items = [{ id: "home", icon: "map" }, ...SECTION_META.map((s) => ({ id: s.id, icon: s.icon }))];
+  const items = [
+    { id: "home", icon: "map" },
+    ...SECTION_META.map((s) => ({ id: s.id, icon: s.icon })),
+  ];
   return (
     <aside
       style={{
@@ -419,7 +422,7 @@ function TabRail({ active, onNav }) {
 
 // ─── phone chrome ───────────────────────────────────────────────────────────
 
-function PhoneContextStrip({ path, cmd, username }) {
+function PhoneContextStrip({ path, _cmd, username }) {
   const { theme, tweaks } = useTheme();
   const [now, setNow] = useState(new Date());
 
@@ -453,7 +456,15 @@ function PhoneContextStrip({ path, cmd, username }) {
         {username || "user"}@nyomnyom
       </span>
       <span style={{ color: theme.muted }}>:</span>
-      <span style={{ color: theme.cream, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+      <span
+        style={{
+          color: theme.cream,
+          flex: 1,
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}
+      >
         ~{path || "/dashboard"}
       </span>
       <span style={{ fontVariantNumeric: "tabular-nums", color: theme.muted, flexShrink: 0 }}>
@@ -579,7 +590,10 @@ function MoreSheet({ onNav, onClose, onLogout }) {
           </button>
         ))}
         <button
-          onClick={() => { onNav("profile"); onClose(); }}
+          onClick={() => {
+            onNav("profile");
+            onClose();
+          }}
           style={{
             display: "flex",
             alignItems: "center",
@@ -598,7 +612,10 @@ function MoreSheet({ onNav, onClose, onLogout }) {
           <span style={{ marginLeft: "auto", color: theme.muted, fontSize: 11 }}>→</span>
         </button>
         <button
-          onClick={() => { onLogout(); onClose(); }}
+          onClick={() => {
+            onLogout();
+            onClose();
+          }}
           style={{
             display: "flex",
             alignItems: "center",
@@ -675,11 +692,7 @@ export default function Shell({
         <main style={{ flex: 1, overflow: "auto", minWidth: 0, position: "relative", zIndex: 2 }}>
           {children}
         </main>
-        <PhoneTabBar
-          phoneActive={phoneActive}
-          onNav={onNav}
-          onMore={() => setShowMore(true)}
-        />
+        <PhoneTabBar phoneActive={phoneActive} onNav={onNav} onMore={() => setShowMore(true)} />
         {showMore && (
           <MoreSheet onNav={onNav} onClose={() => setShowMore(false)} onLogout={onLogout} />
         )}

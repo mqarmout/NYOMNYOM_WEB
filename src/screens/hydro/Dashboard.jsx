@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useHydro } from "../../context/HydroContext";
 import { useTheme, STATUS } from "../../context/ThemeContext";
-import { fmtDate } from "../../utils";
 import { IClose } from "../../icons";
 
 const PH_IDEAL = [5.5, 6.5];
@@ -208,7 +207,9 @@ export default function Dashboard() {
 
   const r = latest;
   const phColor = r ? statusColor(r.ph, PH_IDEAL, PH_OK, theme.accentHot) : theme.muted;
-  const tmpColor = r ? statusColor(r.water_temp, TEMP_IDEAL, TEMP_OK, theme.accentHot) : theme.muted;
+  const tmpColor = r
+    ? statusColor(r.water_temp, TEMP_IDEAL, TEMP_OK, theme.accentHot)
+    : theme.muted;
   const lvlColor = r ? levelColor(r.water_level, theme.accentHot) : theme.muted;
 
   const activePlants = plants.filter((p) => p.active);

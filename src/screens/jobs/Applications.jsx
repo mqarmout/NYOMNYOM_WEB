@@ -335,7 +335,9 @@ function JobModal({ initial, onSave, onClose }) {
   };
 
   const saveRef = useRef(null);
-  saveRef.current = handleSave;
+  useEffect(() => {
+    saveRef.current = handleSave;
+  });
 
   useEffect(() => {
     const handler = (e) => {
@@ -501,7 +503,9 @@ export default function Applications() {
   const JobCard = ({ job }) => (
     <div className={styles.jobCard} onClick={() => setModal({ mode: "edit", job })}>
       <div className={styles.jobCardHeader}>
-        <div className={styles.jobCardCompany} style={{ color: theme.accentHot }}>{job.company}</div>
+        <div className={styles.jobCardCompany} style={{ color: theme.accentHot }}>
+          {job.company}
+        </div>
         <button
           className="tx-delete"
           onClick={(e) => {
@@ -512,7 +516,9 @@ export default function Applications() {
           <IClose />
         </button>
       </div>
-      <div className={styles.jobCardRole} style={{ color: theme.cream }}>{job.role}</div>
+      <div className={styles.jobCardRole} style={{ color: theme.cream }}>
+        {job.role}
+      </div>
       <div className={styles.jobCardMeta}>
         {job.salary && <span style={{ color: theme.accent }}>{job.salary}</span>}
         {job.date_applied && <span>{job.date_applied}</span>}
@@ -539,7 +545,8 @@ export default function Applications() {
       <div className={styles.jobColumn} style={{ borderTop: `2px solid ${color}` }}>
         <div className={styles.jobColumnHeader}>
           <span className={styles.jobColumnLabel} style={{ color }}>
-            <span style={{ marginRight: 5, fontSize: 7 }}>●</span>{label}
+            <span style={{ marginRight: 5, fontSize: 7 }}>●</span>
+            {label}
           </span>
           <span className={styles.jobColumnCount}>{col.length}</span>
         </div>

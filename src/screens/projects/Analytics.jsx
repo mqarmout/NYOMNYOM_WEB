@@ -22,9 +22,12 @@ const STATUS_COLOR = (theme) => ({
 function taskCountsFor(projectId, kanbanTasks) {
   const linked = (kanbanTasks || []).filter((t) => {
     try {
-      const ids = typeof t.project_ids === "string" ? JSON.parse(t.project_ids || "[]") : (t.project_ids || []);
+      const ids =
+        typeof t.project_ids === "string" ? JSON.parse(t.project_ids || "[]") : t.project_ids || [];
       return ids.includes(String(projectId)) || ids.includes(projectId);
-    } catch { return false; }
+    } catch {
+      return false;
+    }
   });
   return {
     backlog: linked.filter((t) => t.status === "backlog").length,
@@ -80,19 +83,40 @@ export default function ProjectsAnalytics() {
 
   function linkedProjectNames(task) {
     try {
-      const ids = typeof task.project_ids === "string" ? JSON.parse(task.project_ids || "[]") : (task.project_ids || []);
-      return ids.map((id) => (projects || []).find((p) => String(p.id) === String(id))?.name).filter(Boolean);
-    } catch { return []; }
+      const ids =
+        typeof task.project_ids === "string"
+          ? JSON.parse(task.project_ids || "[]")
+          : task.project_ids || [];
+      return ids
+        .map((id) => (projects || []).find((p) => String(p.id) === String(id))?.name)
+        .filter(Boolean);
+    } catch {
+      return [];
+    }
   }
 
   return (
-    <div style={{ padding: 18, display: "flex", flexDirection: "column", gap: 14, fontFamily: "var(--font-mono)" }}>
+    <div
+      style={{
+        padding: 18,
+        display: "flex",
+        flexDirection: "column",
+        gap: 14,
+        fontFamily: "var(--font-mono)",
+      }}
+    >
       {/* Hero */}
       <Box glowing padding="16px 20px">
         <div style={{ fontSize: 10, color: theme.muted, letterSpacing: "0.18em", marginBottom: 8 }}>
-          // PROJECTS · {monthName} · {year}
+          {`// PROJECTS · ${monthName} · ${year}`}
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 14 }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
+            gap: 14,
+          }}
+        >
           {[
             ["ACTIVE", String(totalActive), "projects"],
             ["IN PROGRESS", String(totalInProgress), "tasks"],
@@ -101,7 +125,17 @@ export default function ProjectsAnalytics() {
           ].map(([l, v, s]) => (
             <div key={l}>
               <div style={{ fontSize: 10, color: theme.muted, letterSpacing: "0.14em" }}>{l}</div>
-              <div style={{ fontSize: 34, color: theme.accentHot, lineHeight: 1, textShadow: glowFn(theme, tweaks.glow * 1.2), marginTop: 2 }}>{v}</div>
+              <div
+                style={{
+                  fontSize: 34,
+                  color: theme.accentHot,
+                  lineHeight: 1,
+                  textShadow: glowFn(theme, tweaks.glow * 1.2),
+                  marginTop: 2,
+                }}
+              >
+                {v}
+              </div>
               <div style={{ fontSize: 10, color: theme.accentDim, marginTop: 3 }}>{s}</div>
             </div>
           ))}
@@ -114,21 +148,40 @@ export default function ProjectsAnalytics() {
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <Box title="ACTIVE.PROJECTS" padding="14px 18px">
             {activeProjects.length === 0 ? (
-              <div style={{ color: theme.muted, fontSize: 11, padding: "8px 0" }}>no active projects</div>
+              <div style={{ color: theme.muted, fontSize: 11, padding: "8px 0" }}>
+                no active projects
+              </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {activeProjects.map((p) => {
                   const counts = taskCountsFor(p.id, kanbanTasks);
                   const commit = commits[p.id];
                   return (
-                    <div key={p.id} style={{
-                      padding: "10px 12px",
-                      background: theme.surface2,
-                      border: `1px solid ${theme.border}`,
-                      borderLeft: `3px solid ${theme.accentHot}`,
-                    }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
-                        <span style={{ fontSize: 12, color: theme.accentHot, fontWeight: 700, letterSpacing: "0.06em" }}>
+                    <div
+                      key={p.id}
+                      style={{
+                        padding: "10px 12px",
+                        background: theme.surface2,
+                        border: `1px solid ${theme.border}`,
+                        borderLeft: `3px solid ${theme.accentHot}`,
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "flex-start",
+                          marginBottom: 6,
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: 12,
+                            color: theme.accentHot,
+                            fontWeight: 700,
+                            letterSpacing: "0.06em",
+                          }}
+                        >
                           {p.name}
                         </span>
                         <span style={{ fontSize: 9, color: theme.muted, letterSpacing: "0.04em" }}>
@@ -136,12 +189,22 @@ export default function ProjectsAnalytics() {
                         </span>
                       </div>
                       <div style={{ display: "flex", gap: 12, fontSize: 10 }}>
-                        <span style={{ color: theme.muted }}>backlog <span style={{ color: theme.cream }}>{counts.backlog}</span></span>
-                        <span style={{ color: theme.accent }}>doing <span style={{ color: theme.cream }}>{counts.in_progress}</span></span>
-                        <span style={{ color: theme.accentDim }}>done <span style={{ color: theme.cream }}>{counts.done}</span></span>
+                        <span style={{ color: theme.muted }}>
+                          backlog <span style={{ color: theme.cream }}>{counts.backlog}</span>
+                        </span>
+                        <span style={{ color: theme.accent }}>
+                          doing <span style={{ color: theme.cream }}>{counts.in_progress}</span>
+                        </span>
+                        <span style={{ color: theme.accentDim }}>
+                          done <span style={{ color: theme.cream }}>{counts.done}</span>
+                        </span>
                         {commit?.date && (
                           <span style={{ color: theme.faint, marginLeft: "auto" }}>
-                            ↑ {new Date(commit.date).toLocaleDateString("en", { month: "short", day: "numeric" })}
+                            ↑{" "}
+                            {new Date(commit.date).toLocaleDateString("en", {
+                              month: "short",
+                              day: "numeric",
+                            })}
                           </span>
                         )}
                       </div>
@@ -158,25 +221,56 @@ export default function ProjectsAnalytics() {
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {statusBars.map(({ status, count, color }) => (
-                  <div key={status} style={{ display: "grid", gridTemplateColumns: "70px 1fr 26px", gap: 10, alignItems: "center" }}>
+                  <div
+                    key={status}
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "70px 1fr 26px",
+                      gap: 10,
+                      alignItems: "center",
+                    }}
+                  >
                     <span style={{ fontSize: 10, color, letterSpacing: "0.06em" }}>
-                      <span style={{ marginRight: 5 }}>●</span>{STATUS_LABELS[status]}
+                      <span style={{ marginRight: 5 }}>●</span>
+                      {STATUS_LABELS[status]}
                     </span>
-                    <div style={{ position: "relative", height: 14, background: theme.surface2, border: `1px solid ${theme.border}` }}>
-                      <div style={{
-                        position: "absolute", top: 0, left: 0, bottom: 0,
-                        width: `${(count / maxStatus) * 100}%`,
-                        background: color,
-                        boxShadow: `0 0 6px ${color}60`,
-                      }} />
+                    <div
+                      style={{
+                        position: "relative",
+                        height: 14,
+                        background: theme.surface2,
+                        border: `1px solid ${theme.border}`,
+                      }}
+                    >
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          bottom: 0,
+                          width: `${(count / maxStatus) * 100}%`,
+                          background: color,
+                          boxShadow: `0 0 6px ${color}60`,
+                        }}
+                      />
                     </div>
-                    <span style={{ fontSize: 11, color: theme.cream, textAlign: "right" }}>{count}</span>
+                    <span style={{ fontSize: 11, color: theme.cream, textAlign: "right" }}>
+                      {count}
+                    </span>
                   </div>
                 ))}
               </div>
             )}
             {(projects || []).length > 0 && (
-              <div style={{ marginTop: 10, fontSize: 10, color: theme.muted, borderTop: `1px dashed ${theme.border}`, paddingTop: 8 }}>
+              <div
+                style={{
+                  marginTop: 10,
+                  fontSize: 10,
+                  color: theme.muted,
+                  borderTop: `1px dashed ${theme.border}`,
+                  paddingTop: 8,
+                }}
+              >
                 {(projects || []).length} total · {totalActive} active
               </div>
             )}
@@ -184,13 +278,27 @@ export default function ProjectsAnalytics() {
         </div>
 
         {/* Right: open tasks */}
-        <Box title="OPEN.TASKS" padding="14px 18px" style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{
-            fontSize: 10, color: theme.muted, letterSpacing: "0.08em",
-            display: "grid", gridTemplateColumns: "60px 1fr 60px",
-            gap: 8, padding: "4px 0", borderBottom: `1px dashed ${theme.border}`, marginBottom: 4
-          }}>
-            <span>priority</span><span>task</span><span style={{ textAlign: "right" }}>status</span>
+        <Box
+          title="OPEN.TASKS"
+          padding="14px 18px"
+          style={{ display: "flex", flexDirection: "column" }}
+        >
+          <div
+            style={{
+              fontSize: 10,
+              color: theme.muted,
+              letterSpacing: "0.08em",
+              display: "grid",
+              gridTemplateColumns: "60px 1fr 60px",
+              gap: 8,
+              padding: "4px 0",
+              borderBottom: `1px dashed ${theme.border}`,
+              marginBottom: 4,
+            }}
+          >
+            <span>priority</span>
+            <span>task</span>
+            <span style={{ textAlign: "right" }}>status</span>
           </div>
           <div style={{ flex: 1, overflowY: "auto" }}>
             {openTasks.length === 0 ? (
@@ -202,24 +310,54 @@ export default function ProjectsAnalytics() {
                 const pColor = priorityColors[t.priority] || theme.muted;
                 const names = linkedProjectNames(t);
                 return (
-                  <div key={t.id} style={{
-                    fontSize: 11, color: theme.cream, padding: "7px 0",
-                    display: "grid", gridTemplateColumns: "60px 1fr 60px",
-                    gap: 8, alignItems: "start", borderBottom: `1px dashed ${theme.border}`
-                  }}>
-                    <span style={{ color: pColor, fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", paddingTop: 1 }}>
+                  <div
+                    key={t.id}
+                    style={{
+                      fontSize: 11,
+                      color: theme.cream,
+                      padding: "7px 0",
+                      display: "grid",
+                      gridTemplateColumns: "60px 1fr 60px",
+                      gap: 8,
+                      alignItems: "start",
+                      borderBottom: `1px dashed ${theme.border}`,
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: pColor,
+                        fontSize: 9,
+                        fontWeight: 700,
+                        letterSpacing: "0.08em",
+                        paddingTop: 1,
+                      }}
+                    >
                       {(t.priority || "medium").toUpperCase()}
                     </span>
                     <div>
-                      <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.title}</div>
+                      <div
+                        style={{
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {t.title}
+                      </div>
                       {names.length > 0 && (
-                        <div style={{ fontSize: 9, color: theme.accentDim, marginTop: 2 }}>{names.join(", ")}</div>
+                        <div style={{ fontSize: 9, color: theme.accentDim, marginTop: 2 }}>
+                          {names.join(", ")}
+                        </div>
                       )}
                     </div>
-                    <span style={{
-                      textAlign: "right", fontSize: 9, fontWeight: 600,
-                      color: t.status === "in_progress" ? theme.accent : theme.muted,
-                    }}>
+                    <span
+                      style={{
+                        textAlign: "right",
+                        fontSize: 9,
+                        fontWeight: 600,
+                        color: t.status === "in_progress" ? theme.accent : theme.muted,
+                      }}
+                    >
                       {t.status === "in_progress" ? "DOING" : "BACKLOG"}
                     </span>
                   </div>
@@ -228,7 +366,15 @@ export default function ProjectsAnalytics() {
             )}
           </div>
           {(kanbanTasks || []).length > 0 && (
-            <div style={{ marginTop: 10, fontSize: 10, color: theme.muted, borderTop: `1px dashed ${theme.border}`, paddingTop: 8 }}>
+            <div
+              style={{
+                marginTop: 10,
+                fontSize: 10,
+                color: theme.muted,
+                borderTop: `1px dashed ${theme.border}`,
+                paddingTop: 8,
+              }}
+            >
               {openTasks.length} open · {totalDone} done · {(kanbanTasks || []).length} total
             </div>
           )}

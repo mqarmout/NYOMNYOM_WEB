@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useApp } from "../context/AppContext";
 import { useTheme, PALETTES } from "../context/ThemeContext";
-import { fmt, fmtDate, getInitials } from "../utils";
+import { fmt, fmtDate } from "../utils";
 import Box from "../components/crt/Box";
 
 const FONT_OPTIONS = [
@@ -88,12 +88,26 @@ export default function Profile() {
           marginBottom: 4,
         }}
       >
-        // PROFILE · {profile.name?.toUpperCase() || "AGENT"}
+        {`// PROFILE · ${profile.name?.toUpperCase() || "AGENT"}`}
       </div>
-      <h1 style={{ fontFamily: "var(--font-mono)", fontSize: 20, color: theme.accentHot, margin: "0 0 4px" }}>
+      <h1
+        style={{
+          fontFamily: "var(--font-mono)",
+          fontSize: 20,
+          color: theme.accentHot,
+          margin: "0 0 4px",
+        }}
+      >
         {profile.name || "Your Profile"}
       </h1>
-      <p style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: theme.muted, marginBottom: 24 }}>
+      <p
+        style={{
+          fontFamily: "var(--font-mono)",
+          fontSize: 11,
+          color: theme.muted,
+          marginBottom: 24,
+        }}
+      >
         {profile.since ? `tracking since ${fmtDate(profile.since)}` : "no expenses logged yet"}
       </p>
 
@@ -106,7 +120,15 @@ export default function Profile() {
           { label: "CATEGORIES", value: String(categories.length) },
         ].map(({ label, value }) => (
           <div key={label} style={statStyle}>
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: theme.muted, letterSpacing: "0.12em", marginBottom: 6 }}>
+            <div
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: 9,
+                color: theme.muted,
+                letterSpacing: "0.12em",
+                marginBottom: 6,
+              }}
+            >
               {label}
             </div>
             <div style={{ fontFamily: "var(--font-mono)", fontSize: 18, color: theme.accentHot }}>
@@ -116,21 +138,45 @@ export default function Profile() {
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, alignItems: "start" }}>
+      <div
+        style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, alignItems: "start" }}
+      >
         {/* Account settings */}
         <Box title="ACCOUNT.SETTINGS">
           <div style={{ paddingTop: 8 }}>
             <div style={rowStyle}>
               <div style={{ flex: 1 }}>
                 <label style={labelStyle}>DISPLAY NAME</label>
-                <div style={{ display: "flex", alignItems: "center", background: theme.surface2, border: `1px solid ${theme.borderHi}` }}>
-                  <span style={{ color: theme.accent, fontFamily: "var(--font-mono)", fontSize: 13, padding: "8px 8px 8px 10px" }}>{">"}</span>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    background: theme.surface2,
+                    border: `1px solid ${theme.borderHi}`,
+                  }}
+                >
+                  <span
+                    style={{
+                      color: theme.accent,
+                      fontFamily: "var(--font-mono)",
+                      fontSize: 13,
+                      padding: "8px 8px 8px 10px",
+                    }}
+                  >
+                    {">"}
+                  </span>
                   <input
                     type="text"
                     placeholder="your name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    style={{ ...inputStyle, background: "transparent", border: "none", paddingLeft: 4, flex: 1 }}
+                    style={{
+                      ...inputStyle,
+                      background: "transparent",
+                      border: "none",
+                      paddingLeft: 4,
+                      flex: 1,
+                    }}
                   />
                 </div>
               </div>
@@ -157,8 +203,24 @@ export default function Profile() {
             <div style={rowStyle}>
               <div style={{ flex: 1 }}>
                 <label style={labelStyle}>MONTHLY BUDGET</label>
-                <div style={{ display: "flex", alignItems: "center", background: theme.surface2, border: `1px solid ${theme.borderHi}` }}>
-                  <span style={{ color: theme.accentDim, fontFamily: "var(--font-mono)", fontSize: 13, padding: "8px 8px 8px 10px" }}>{">"}</span>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    background: theme.surface2,
+                    border: `1px solid ${theme.borderHi}`,
+                  }}
+                >
+                  <span
+                    style={{
+                      color: theme.accentDim,
+                      fontFamily: "var(--font-mono)",
+                      fontSize: 13,
+                      padding: "8px 8px 8px 10px",
+                    }}
+                  >
+                    {">"}
+                  </span>
                   <input
                     type="number"
                     min="0"
@@ -166,14 +228,36 @@ export default function Profile() {
                     placeholder="0 = disabled"
                     value={monthlyBudget}
                     onChange={(e) => setMonthlyBudget(e.target.value)}
-                    style={{ ...inputStyle, background: "transparent", border: "none", paddingLeft: 4, flex: 1 }}
+                    style={{
+                      ...inputStyle,
+                      background: "transparent",
+                      border: "none",
+                      paddingLeft: 4,
+                      flex: 1,
+                    }}
                   />
                 </div>
               </div>
               <div style={{ flex: 1 }}>
                 <label style={labelStyle}>ROLLOVER %</label>
-                <div style={{ display: "flex", alignItems: "center", background: theme.surface2, border: `1px solid ${theme.borderHi}` }}>
-                  <span style={{ color: theme.accentDim, fontFamily: "var(--font-mono)", fontSize: 13, padding: "8px 8px 8px 10px" }}>{">"}</span>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    background: theme.surface2,
+                    border: `1px solid ${theme.borderHi}`,
+                  }}
+                >
+                  <span
+                    style={{
+                      color: theme.accentDim,
+                      fontFamily: "var(--font-mono)",
+                      fontSize: 13,
+                      padding: "8px 8px 8px 10px",
+                    }}
+                  >
+                    {">"}
+                  </span>
                   <input
                     type="number"
                     min="0"
@@ -182,7 +266,13 @@ export default function Profile() {
                     placeholder="% of leftover"
                     value={rolloverPct}
                     onChange={(e) => setRolloverPct(e.target.value)}
-                    style={{ ...inputStyle, background: "transparent", border: "none", paddingLeft: 4, flex: 1 }}
+                    style={{
+                      ...inputStyle,
+                      background: "transparent",
+                      border: "none",
+                      paddingLeft: 4,
+                      flex: 1,
+                    }}
                   />
                 </div>
               </div>
@@ -260,7 +350,8 @@ export default function Profile() {
                       textAlign: "left",
                     }}
                   >
-                    {tweaks.font === f.key ? "● " : "○ "}{f.label}
+                    {tweaks.font === f.key ? "● " : "○ "}
+                    {f.label}
                   </button>
                 ))}
               </div>
@@ -279,7 +370,7 @@ export default function Profile() {
                 step="0.1"
                 value={tweaks.glow}
                 onChange={(e) => setTweak("glow", parseFloat(e.target.value))}
-                style={{ width: "100%", accentColor: theme.accent }}
+                style={{ width: "100%" }}
               />
             </div>
 
@@ -287,7 +378,9 @@ export default function Profile() {
             <div style={{ marginBottom: 14 }}>
               <label style={{ ...labelStyle, display: "flex", justifyContent: "space-between" }}>
                 <span>SCANLINES</span>
-                <span style={{ color: theme.accentHot }}>{Math.round(tweaks.scanlines * 100)}%</span>
+                <span style={{ color: theme.accentHot }}>
+                  {Math.round(tweaks.scanlines * 100)}%
+                </span>
               </label>
               <input
                 type="range"
@@ -296,7 +389,7 @@ export default function Profile() {
                 step="0.01"
                 value={tweaks.scanlines}
                 onChange={(e) => setTweak("scanlines", parseFloat(e.target.value))}
-                style={{ width: "100%", accentColor: theme.accent }}
+                style={{ width: "100%" }}
               />
             </div>
 
@@ -313,7 +406,7 @@ export default function Profile() {
                 step="0.05"
                 value={tweaks.vignette}
                 onChange={(e) => setTweak("vignette", parseFloat(e.target.value))}
-                style={{ width: "100%", accentColor: theme.accent }}
+                style={{ width: "100%" }}
               />
             </div>
           </div>

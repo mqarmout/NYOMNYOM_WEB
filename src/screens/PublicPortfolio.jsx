@@ -360,9 +360,7 @@ export default function PublicPortfolio({ onLogin }) {
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: isPhone
-                    ? "1fr"
-                    : "repeat(auto-fill, minmax(260px, 1fr))",
+                  gridTemplateColumns: isPhone ? "1fr" : "repeat(auto-fill, minmax(260px, 1fr))",
                   gap: 12,
                 }}
               >

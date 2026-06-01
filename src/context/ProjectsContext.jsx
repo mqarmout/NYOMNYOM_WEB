@@ -35,7 +35,7 @@ export function ProjectsProvider({ children }) {
       showToast("Project added");
       return res.id;
     },
-    [loadAll]
+    [loadAll, showToast]
   );
 
   const updateProject = useCallback(
@@ -44,15 +44,18 @@ export function ProjectsProvider({ children }) {
       await loadAll();
       showToast("Project updated");
     },
-    [loadAll]
+    [loadAll, showToast]
   );
 
-  const deleteProject = useCallback(async (id) => {
-    await apiFetch(`/api/dev-projects/${id}`, { method: "DELETE" });
-    setProjects((ps) => ps.filter((p) => p.id !== id));
-    setKanbanTasks((ts) => ts.filter((t) => t.project_id !== id));
-    showToast("Project deleted");
-  }, []);
+  const deleteProject = useCallback(
+    async (id) => {
+      await apiFetch(`/api/dev-projects/${id}`, { method: "DELETE" });
+      setProjects((ps) => ps.filter((p) => p.id !== id));
+      setKanbanTasks((ts) => ts.filter((t) => t.project_id !== id));
+      showToast("Project deleted");
+    },
+    [showToast]
+  );
 
   const fetchCommit = useCallback(async (projectId) => {
     const res = await apiFetch(`/api/dev-projects/${projectId}/commit`);
@@ -62,32 +65,38 @@ export function ProjectsProvider({ children }) {
 
   // ── Kanban ────────────────────────────────────────────────────────────────
 
-  const addKanbanTask = useCallback(async (fields) => {
-    const tempId = -Date.now();
-    const tempTask = { id: tempId, status: "backlog", started_at: null, ...fields };
-    setKanbanTasks((ts) => [...ts, tempTask]);
+  const addKanbanTask = useCallback(
+    async (fields) => {
+      const tempId = -Date.now();
+      const tempTask = { id: tempId, status: "backlog", started_at: null, ...fields };
+      setKanbanTasks((ts) => [...ts, tempTask]);
 
-    const res = await apiFetch("/api/kanban", { method: "POST", body: JSON.stringify(fields) });
-    if (res.error) {
-      setKanbanTasks((ts) => ts.filter((t) => t.id !== tempId));
-      showToast("Error: " + res.error);
-      return null;
-    }
-    setKanbanTasks((ts) => ts.map((t) => (t.id === tempId ? { ...t, id: res.id } : t)));
-    showToast("Task added");
-    return res.id;
-  }, []);
+      const res = await apiFetch("/api/kanban", { method: "POST", body: JSON.stringify(fields) });
+      if (res.error) {
+        setKanbanTasks((ts) => ts.filter((t) => t.id !== tempId));
+        showToast("Error: " + res.error);
+        return null;
+      }
+      setKanbanTasks((ts) => ts.map((t) => (t.id === tempId ? { ...t, id: res.id } : t)));
+      showToast("Task added");
+      return res.id;
+    },
+    [showToast]
+  );
 
   const updateKanbanTask = useCallback(async (taskId, fields) => {
     await apiFetch(`/api/kanban/${taskId}`, { method: "PUT", body: JSON.stringify(fields) });
     setKanbanTasks((ts) => ts.map((t) => (t.id === taskId ? { ...t, ...fields } : t)));
   }, []);
 
-  const deleteKanbanTask = useCallback(async (taskId) => {
-    await apiFetch(`/api/kanban/${taskId}`, { method: "DELETE" });
-    setKanbanTasks((ts) => ts.filter((t) => t.id !== taskId));
-    showToast("Task deleted");
-  }, []);
+  const deleteKanbanTask = useCallback(
+    async (taskId) => {
+      await apiFetch(`/api/kanban/${taskId}`, { method: "DELETE" });
+      setKanbanTasks((ts) => ts.filter((t) => t.id !== taskId));
+      showToast("Task deleted");
+    },
+    [showToast]
+  );
 
   return (
     <ProjectsContext.Provider

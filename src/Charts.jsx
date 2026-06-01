@@ -22,8 +22,14 @@ export function AreaChart({ data }) {
   const gradId = `ag-${uid}`;
   const glowId = `agl-${uid}`;
 
-  const W = 340, H = 110, pL = 10, pR = 10, pT = 10, pB = 24;
-  const iW = W - pL - pR, iH = H - pT - pB;
+  const W = 340,
+    H = 110,
+    pL = 10,
+    pR = 10,
+    pT = 10,
+    pB = 24;
+  const iW = W - pL - pR,
+    iH = H - pT - pB;
 
   if (!data.length)
     return (
@@ -107,21 +113,34 @@ function polar(cx, cy, r, deg) {
 
 function donutArc(cx, cy, R, r, a1, a2) {
   if (a2 - a1 >= 360) a2 = a1 + 359.99;
-  const s1 = polar(cx, cy, R, a1), e1 = polar(cx, cy, R, a2);
-  const s2 = polar(cx, cy, r, a2), e2 = polar(cx, cy, r, a1);
+  const s1 = polar(cx, cy, R, a1),
+    e1 = polar(cx, cy, R, a2);
+  const s2 = polar(cx, cy, r, a2),
+    e2 = polar(cx, cy, r, a1);
   const lg = a2 - a1 > 180 ? 1 : 0;
   return `M${s1.x} ${s1.y} A${R} ${R} 0 ${lg} 1 ${e1.x} ${e1.y} L${s2.x} ${s2.y} A${r} ${r} 0 ${lg} 0 ${e2.x} ${e2.y}Z`;
 }
 
 export function DonutChart({ segments, total, currency = "$" }) {
   const { theme } = useTheme();
-  const size = 160, cx = 80, cy = 80, R = 66, r = 46;
+  const size = 160,
+    cx = 80,
+    cy = 80,
+    R = 66,
+    r = 46;
   const COLORS = crtRamp(theme);
 
   if (!segments.length || total === 0)
     return (
       <svg viewBox={`0 0 ${size} ${size}`}>
-        <circle cx={cx} cy={cy} r={(R + r) / 2} fill="none" stroke={theme.border} strokeWidth={R - r} />
+        <circle
+          cx={cx}
+          cy={cy}
+          r={(R + r) / 2}
+          fill="none"
+          stroke={theme.border}
+          strokeWidth={R - r}
+        />
         <text x={cx} y={cy + 5} textAnchor="middle" fill={theme.muted} fontSize="11">
           No data
         </text>
@@ -142,7 +161,14 @@ export function DonutChart({ segments, total, currency = "$" }) {
       <text x={cx} y={cy - 8} textAnchor="middle" fill={theme.muted} fontSize="10">
         TOTAL
       </text>
-      <text x={cx} y={cy + 10} textAnchor="middle" fill={theme.cream} fontSize="15" fontWeight="800">
+      <text
+        x={cx}
+        y={cy + 10}
+        textAnchor="middle"
+        fill={theme.cream}
+        fontSize="15"
+        fontWeight="800"
+      >
         {totalFmt}
       </text>
     </svg>
@@ -155,8 +181,14 @@ export function HistoryBars({ months }) {
   const uid = useId();
   const glowId = `hbl-${uid}`;
 
-  const W = 340, H = 110, pL = 10, pR = 10, pT = 10, pB = 28;
-  const iW = W - pL - pR, iH = H - pT - pB;
+  const W = 340,
+    H = 110,
+    pL = 10,
+    pR = 10,
+    pT = 10,
+    pB = 28;
+  const iW = W - pL - pR,
+    iH = H - pT - pB;
 
   if (!months.length)
     return (
