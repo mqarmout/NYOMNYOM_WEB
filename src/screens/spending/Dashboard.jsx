@@ -135,6 +135,7 @@ export default function Dashboard() {
         expenses={txExpenses}
         categories={categories}
         profile={profile}
+        onSaved={loadTxData}
       />
 
       <div

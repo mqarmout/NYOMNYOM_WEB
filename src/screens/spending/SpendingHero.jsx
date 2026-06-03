@@ -4,7 +4,7 @@ import { fmt } from "../../utils";
 import Box from "../../components/crt/Box";
 import AddExpense from "./AddExpense";
 
-export default function SpendingHero({ data, expenses, categories, profile }) {
+export default function SpendingHero({ data, expenses, categories, profile, onSaved }) {
   const { theme, tweaks } = useTheme();
   const [showAdd, setShowAdd] = useState(false);
   const mono = { fontFamily: "var(--font-mono)" };
@@ -129,7 +129,7 @@ export default function SpendingHero({ data, expenses, categories, profile }) {
           }}
         >
           <div className="modal-box">
-            <AddExpense onClose={() => setShowAdd(false)} />
+            <AddExpense onClose={() => { setShowAdd(false); onSaved?.(); }} />
           </div>
         </div>
       )}
