@@ -1,6 +1,6 @@
 # NYOMNYOM — Web
 
-React (Vite) frontend for the NYOMNYOM personal dashboard. CRT terminal aesthetic, mountain map navigation, pixel-art icon set.
+React (Vite) frontend for the NYOMNYOM personal dashboard. CRT terminal aesthetic with swappable phosphor palettes, mountain map navigation, pixel-art icon set.
 
 The Flask backend lives in the sibling directory `nyomnyom_server/`.
 
@@ -8,8 +8,9 @@ The Flask backend lives in the sibling directory `nyomnyom_server/`.
 
 - React 18 + Vite
 - `pixelarticons` SVG icon set via `vite-plugin-svgr`
-- `Share Tech Mono` + `Press Start 2P` fonts (Google Fonts)
-- Pure CSS — no component library
+- `JetBrains Mono` / `IBM Plex Mono` / `Fira Code` monospace fonts
+- Pure CSS with CSS custom properties — no component library
+- CRT theme system: scanlines, vignette, phosphor glow, palette switching
 
 ## Running locally
 
@@ -34,32 +35,53 @@ Flask reads `../nyomnyom_web/dist/` and serves it as the SPA catch-all.
 ```
 nyomnyom_web/
 ├── src/
-│   ├── App.jsx         # auth shell, mountain map, terminal launcher, AppInner
-│   ├── icons.jsx       # all pixelarticons — Px component, CATEGORY_ICONS, named shortcuts
-│   ├── index.css       # all styles (CRT theme, component classes)
-│   ├── utils.js        # apiFetch, fmt, fmtDate, getInitials, COLORS
-│   ├── Charts.jsx      # AreaChart SVG component
-│   ├── context/        # one context per tracker section
-│   │   ├── AppContext.jsx        # spending: categories, expenses, profile
-│   │   ├── JobContext.jsx        # jobs, contacts
-│   │   ├── FitnessContext.jsx    # workouts, sets, body metrics, weight history
-│   │   ├── PortfolioContext.jsx  # projects, skills, experience, about
-│   │   ├── ClimbingContext.jsx   # climb log, photo upload
-│   │   ├── ProjectsContext.jsx   # dev projects, kanban tasks, commit cache
-│   │   └── HydroContext.jsx      # readings, pump schedule/log, dosing, plants
+│   ├── App.jsx              # auth shell, SCREEN_TO_SECTION routing, terminal launcher, AppInner
+│   ├── icons.jsx            # all pixelarticons — Px component, CATEGORY_ICONS, named shortcuts
+│   ├── index.css            # global styles (CRT base, component classes, CSS vars)
+│   ├── utils.js             # apiFetch, fmt, fmtDate, getInitials, COLORS
+│   ├── Charts.jsx           # AreaChart + other shared SVG chart components
+│   ├── context/
+│   │   ├── ThemeContext.jsx     # CRT theme: palettes (green/amber/cyan), glow, scanlines, vignette, font
+│   │   ├── AppContext.jsx       # spending: categories, expenses, income, profile
+│   │   ├── JobContext.jsx       # jobs, contacts
+│   │   ├── FitnessContext.jsx   # workouts, sets, body metrics, weight history
+│   │   ├── PortfolioContext.jsx # projects, skills, experience, about
+│   │   ├── ClimbingContext.jsx  # climb log, photo upload
+│   │   ├── ProjectsContext.jsx  # dev projects, kanban tasks, commit cache
+│   │   └── HydroContext.jsx     # readings, pump schedule/log, dosing, plants
+│   ├── components/
+│   │   └── crt/
+│   │       ├── Shell.jsx        # main layout: scanlines, vignette, sidebar nav, phone bottom tabs
+│   │       ├── Box.jsx          # styled CRT panel
+│   │       ├── CRTButton.jsx    # phosphor-glow button
+│   │       ├── BlockBar.jsx     # progress/bar component
+│   │       ├── SubTabs.jsx      # tab row component
+│   │       └── PixelIcon.jsx    # pixelarticon wrapper
+│   ├── hooks/
+│   │   ├── useBreakpoint.js     # responsive breakpoint hook
+│   │   └── useToast.js          # toast notification hook
 │   └── screens/
-│       ├── spending/   Dashboard, Graphs, Categories, AddExpense
-│       ├── jobs/       Applications, Contacts
-│       ├── fitness/    Workouts, BodyMetrics
-│       ├── portfolio/  Projects, Skills, Experience, About
-│       ├── climbing/   Climbs
-│       ├── projects/   DevProjects, KanbanBoard, KanbanScreen
-│       ├── hydro/      Dashboard, History, Plants, Dosing
+│       ├── Home.jsx             # mountain map UI
+│       ├── spending/    Dashboard, SpendingHero, Categories, AddExpense, AddIncome, History
+│       ├── jobs/        Analytics, Applications, Contacts
+│       ├── fitness/     Analytics, Workouts, BodyMetrics, Runs
+│       ├── portfolio/   Projects, Skills, Experience, About
+│       ├── climbing/    Analytics, Climbs
+│       ├── projects/    Analytics, DevProjects, KanbanBoard, KanbanScreen
+│       ├── hydro/       Dashboard, History, Plants, Dosing
 │       ├── PublicPortfolio.jsx
 │       ├── SignIn.jsx
 │       └── Profile.jsx
 └── vite.config.js
 ```
+
+## CRT theme system
+
+`ThemeContext` drives all visual styling. Three palettes: `green` (P1), `cyan` (P2), `amber` (P3). Each palette sets CSS custom properties (`--accent`, `--bg`, `--surface`, `--border`, etc.) on `:root`. Additional tweaks: glow intensity, scanline strength, vignette strength, monospace font choice. Settings persist to `localStorage`.
+
+Rules:
+- Never hardcode colors — use CSS vars or `theme.*` from `useTheme()`
+- Use `glow(theme, intensity)` for the standard phosphor box-shadow
 
 ## Icons
 
@@ -79,7 +101,6 @@ All icons use [pixelarticons](https://pixelarticons.com/), imported as React SVG
 | `N` | New item in current section |
 | `← →` | Cycle tabs within a section |
 | `Esc` | Close modal → return to map |
-| `?` | Show shortcut reference |
 
 ### Terminal commands (`/`)
 
@@ -105,9 +126,9 @@ Station positions: fitness `(120,340)`, jobs `(260,255)`, portfolio `(200,180)`,
 
 ## Tracker features
 
-- **Spending** — expenses with categories and budgets, monthly analytics, multi-month history graphs
+- **Spending** — expenses and income with recurring support (daily/weekly/monthly/yearly templates), categories with budgets, monthly analytics, multi-month history graphs
 - **Jobs** — kanban pipeline (applied → screening → interviewing → offer → rejected/withdrawn), contacts per job, URL extraction
-- **Fitness** — workout sessions with completion time; exercises as sets/reps/weight or time-based (seconds); edit sessions and individual sets inline; body weight log with history graph; Strava-connected running log with one-click incremental import
+- **Fitness** — workout sessions with completion time; exercises as sets/reps/weight or time-based (seconds); edit sessions and individual sets inline; body weight log with history graph; running log with manual entry and Strava incremental import
 - **Portfolio** — projects, skills, experience, about; public read-only view at `/` when unauthenticated
 - **Climbing** — boulder and sport climb log with grades, wall type, attempts, sent/flash flags, optional photo upload
 - **Dev Projects** — status/priority tracker, per-project todos, kanban board, GitHub last-commit fetch
