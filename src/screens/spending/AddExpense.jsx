@@ -6,7 +6,7 @@ import AutocompleteInput from "./AutocompleteInput";
 import styles from "./spending.module.css";
 
 export default function AddExpense({ onClose, initial }) {
-  const { categories, addExpense, updateExpense, showToast, profile } = useApp();
+  const { categories, addExpense, updateExpense, deleteExpense, showToast, profile } = useApp();
   const today = new Date().toISOString().split("T")[0];
   const [amount, setAmount] = useState(initial ? String(initial.amount) : "");
   const [desc, setDesc] = useState(initial?.description ?? "");
@@ -77,9 +77,20 @@ export default function AddExpense({ onClose, initial }) {
     <>
       <div className="modal-header">
         <div className="modal-title">{isEdit ? "Edit Expense" : "Add Expense"}</div>
-        <button className="close-btn" onClick={onClose}>
-          <IClose />
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {isEdit && (
+            <button
+              style={{ padding: "4px 10px", background: "transparent", border: "1px solid #ff6a5a", color: "#ff6a5a", fontSize: 11, cursor: "pointer", fontFamily: "var(--font-mono)" }}
+              onClick={async () => { await deleteExpense(initial.id); onClose(); }}
+              disabled={saving}
+            >
+              Delete
+            </button>
+          )}
+          <button className="close-btn" onClick={onClose}>
+            <IClose />
+          </button>
+        </div>
       </div>
 
       <div className={styles.amountWrap}>
