@@ -4,7 +4,7 @@ import { fmt } from "../../utils";
 import Box from "../../components/crt/Box";
 import AddExpense from "./AddExpense";
 
-export default function SpendingHero({ data, expenses, categories, profile, onSaved }) {
+export default function SpendingHero({ data, expenses, categories, profile, onSaved, onAddIncome }) {
   const { theme, tweaks } = useTheme();
   const [showAdd, setShowAdd] = useState(false);
   const mono = { fontFamily: "var(--font-mono)" };
@@ -95,8 +95,8 @@ export default function SpendingHero({ data, expenses, categories, profile, onSa
           <div
             style={{
               display: "flex",
-              flexDirection: "column",
-              gap: 6,
+              flexDirection: "row",
+              gap: 8,
               alignSelf: "flex-start",
               marginTop: 8,
             }}
@@ -117,6 +117,24 @@ export default function SpendingHero({ data, expenses, categories, profile, onSa
             >
               [+] EXPENSE
             </button>
+            {onAddIncome && (
+              <button
+                onClick={onAddIncome}
+                style={{
+                  ...mono,
+                  fontSize: 11,
+                  padding: "8px 16px",
+                  background: "transparent",
+                  color: theme.accent,
+                  border: `1px solid ${theme.accent}`,
+                  fontWeight: 700,
+                  letterSpacing: "0.1em",
+                  cursor: "pointer",
+                }}
+              >
+                [+] INCOME
+              </button>
+            )}
           </div>
         </div>
       </Box>

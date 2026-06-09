@@ -6,6 +6,7 @@ import AddExpense from "./AddExpense";
 import AddIncome from "./AddIncome";
 import SpendingHero from "./SpendingHero";
 import Box from "../../components/crt/Box";
+import { CategoryBarChart } from "../../Charts";
 import { useBreakpoint } from "../../hooks/useBreakpoint";
 
 export default function Dashboard() {
@@ -136,6 +137,7 @@ export default function Dashboard() {
         categories={categories}
         profile={profile}
         onSaved={loadTxData}
+        onAddIncome={() => setModal({ type: "income", item: null })}
       />
 
       <div
@@ -209,85 +211,53 @@ export default function Dashboard() {
             </div>
           </Box>
 
-          {/* Top categories */}
-          <Box title="TOP.CATEGORIES" padding="16px 20px" style={{ flex: 1 }}>
-            <div
-              style={{
-                ...mono,
-                fontSize: 10,
-                color: theme.muted,
-                letterSpacing: "0.08em",
-                display: "grid",
-                gridTemplateColumns: "1fr auto auto auto",
-                gap: 10,
-                paddingBottom: 6,
-                borderBottom: `1px dashed ${theme.border}`,
-                marginBottom: 8,
-              }}
-            >
-              <span>category</span>
-              <span>utilization</span>
-              <span>spent / budget</span>
-              <span style={{ textAlign: "right" }}>%</span>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              {topCats.length === 0 ? (
-                <div style={{ ...mono, fontSize: 12, color: theme.muted }}>
-                  no spending this month
-                </div>
-              ) : (
-                topCats.map((c) => {
-                  const over = c.budget > 0 && c.spent > c.budget;
-                  const pct = c.budget > 0 ? Math.round((c.spent / c.budget) * 100) : 0;
-                  const blocks =
-                    c.budget > 0 ? Math.min(20, Math.round((c.spent / c.budget) * 20)) : 0;
-                  return (
-                    <div
-                      key={c.id}
-                      style={{
-                        ...mono,
-                        fontSize: 11,
-                        color: theme.cream,
-                        display: "grid",
-                        gridTemplateColumns: "1fr auto auto auto",
-                        gap: 10,
-                        alignItems: "center",
-                      }}
-                    >
-                      <span
+          {/* Spending by category */}
+          <Box title="SPEND.BY.CATEGORY" padding="16px 20px" style={{ flex: 1 }}>
+            {topCats.length === 0 ? (
+              <div style={{ ...mono, fontSize: 12, color: theme.muted }}>no spending this month</div>
+            ) : (
+              <>
+                <CategoryBarChart
+                  data={topCats.map((c) => ({ name: c.name, spent: c.spent || 0, budget: c.budget }))}
+                />
+                <div style={{ display: "flex", flexDirection: "column", gap: 3, marginTop: 10 }}>
+                  {topCats.map((c) => {
+                    const over = c.budget > 0 && c.spent > c.budget;
+                    const pct = c.budget > 0 ? Math.round((c.spent / c.budget) * 100) : null;
+                    return (
+                      <div
+                        key={c.id}
                         style={{
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
+                          ...mono,
+                          fontSize: 10,
+                          color: theme.cream,
+                          display: "grid",
+                          gridTemplateColumns: "1fr auto auto",
+                          gap: 8,
+                          padding: "3px 0",
+                          borderBottom: `1px solid ${theme.border}`,
+                          alignItems: "center",
                         }}
                       >
-                        {c.name}
-                      </span>
-                      <span
-                        style={{ color: over ? STATUS.red : theme.accent, whiteSpace: "nowrap" }}
-                      >
-                        {"█".repeat(blocks)}
-                        <span style={{ color: theme.faint }}>
-                          {"░".repeat(Math.max(0, 20 - blocks))}
+                        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {c.name}
                         </span>
-                      </span>
-                      <span style={{ color: theme.muted, whiteSpace: "nowrap" }}>
-                        {fmt(c.spent, currency)}{" "}
-                        {c.budget > 0 ? `/ ${fmt(c.budget, currency)}` : ""}
-                      </span>
-                      <span style={{ color: over ? STATUS.red : theme.cream, textAlign: "right" }}>
-                        {c.budget > 0 ? `${pct}%` : "—"}
-                      </span>
-                    </div>
-                  );
-                })
-              )}
-            </div>
+                        <span style={{ color: theme.muted, whiteSpace: "nowrap" }}>
+                          {fmt(c.spent, currency)}
+                          {c.budget > 0 ? ` / ${fmt(c.budget, currency)}` : ""}
+                        </span>
+                        <span style={{ color: over ? STATUS.red : theme.cream, textAlign: "right", minWidth: 32 }}>
+                          {pct !== null ? `${pct}%` : "—"}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
             <button
               onClick={() =>
-                window.dispatchEvent(
-                  new CustomEvent("shortcut:go", { detail: { screen: "categories" } })
-                )
+                window.dispatchEvent(new CustomEvent("shortcut:go", { detail: { screen: "categories" } }))
               }
               style={{
                 marginTop: 10,

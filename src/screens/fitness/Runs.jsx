@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useFitness } from "../../context/FitnessContext";
-import { AreaChart } from "../../Charts";
+import { RunBarChart } from "../../Charts";
 import { fmtDate, apiFetch } from "../../utils";
 import { IClose, IEdit } from "../../icons";
 import { STATUS } from "../../context/ThemeContext";
@@ -386,10 +386,10 @@ export default function Runs() {
         </div>
       </div>
 
-      {chartData.length > 1 && (
+      {chartData.length > 0 && (
         <div className="graph-card" style={{ marginBottom: 24 }}>
           <div className="graph-card-title">Weekly Distance (km)</div>
-          <AreaChart data={chartData} color="var(--accent)" />
+          <RunBarChart data={chartData} />
         </div>
       )}
 

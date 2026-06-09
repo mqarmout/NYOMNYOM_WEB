@@ -355,9 +355,13 @@ function ClimbCard({ climb, onEdit, onDelete }) {
 }
 
 export default function Climbs() {
-  const { climbs, addClimb, updateClimb, deleteClimb } = useClimbing();
+  const { climbs, addClimb, updateClimb, deleteClimb, loadAll } = useClimbing();
   const [filter, setFilter] = useState("all");
   const [modal, setModal] = useState(null); // null | 'new' | climbObj
+
+  useEffect(() => {
+    loadAll();
+  }, [loadAll]);
 
   useEffect(() => {
     const handler = () => setModal("new");

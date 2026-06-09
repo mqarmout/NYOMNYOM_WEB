@@ -9,7 +9,7 @@ import { useHydro } from "../context/HydroContext";
 import { usePortfolio } from "../context/PortfolioContext";
 import Box from "../components/crt/Box";
 import { useBreakpoint } from "../hooks/useBreakpoint";
-import { AreaChart } from "../Charts";
+import { AreaChart, CategoryBarChart } from "../Charts";
 
 function StatTile({ label, value, sub, hot = false, warn = false }) {
   const { theme, tweaks } = useTheme();
@@ -468,8 +468,7 @@ function AlertsPanel({ expenses, categories, hydroLatest, jobs, theme, _tweaks }
         msg: "pending decision",
       });
     }
-    // OK status
-    list.push({ c: theme.accent, sym: "✓", label: "sync", msg: "2m ago" });
+    list.push({ c: theme.accent, sym: "✓", label: "system", msg: "all ok" });
     return list.slice(0, 6);
   }, [expenses, categories, hydroLatest, jobs, mo, theme]);
 
@@ -616,6 +615,19 @@ export default function Home({ username, onNav }) {
     }
     return days;
   }, [expenses]);
+
+  // Spending by category for bar chart
+  const categoryChartData = useMemo(() => {
+    return categories
+      .map((c) => ({
+        name: c.name,
+        spent: thisMonthExp.filter((e) => e.category_id === c.id).reduce((s, e) => s + e.amount, 0),
+        budget: c.budget || 0,
+      }))
+      .filter((c) => c.spent > 0)
+      .sort((a, b) => b.spent - a.spent)
+      .slice(0, 8);
+  }, [categories, thisMonthExp]);
 
   // Prev month comparison
   const prevMo = (() => {
@@ -806,7 +818,7 @@ export default function Home({ username, onNav }) {
             }}
           >
             <StatTile
-              label="NET·MAY"
+              label={`NET·${new Date().toLocaleString("default", { month: "short" }).toUpperCase()}`}
               value={`${totalSpent > 0 ? "-" : "+"}${currency}${Math.abs(totalSpent - (totalBudget || totalSpent)).toFixed(0)}`}
               sub={
                 vsPrev !== null
@@ -837,7 +849,7 @@ export default function Home({ username, onNav }) {
             />
           </div>
 
-          {/* Spending chart */}
+          {/* Spending charts */}
           <Box title="SPENDING · 30D" padding="18px 20px">
             <div
               style={{
@@ -888,6 +900,13 @@ export default function Home({ username, onNav }) {
             </div>
             <AreaChart data={spendingChartData} />
           </Box>
+
+          {/* Spending by category bar chart */}
+          {categoryChartData.length > 0 && (
+            <Box title="SPENDING · BY.CATEGORY" padding="18px 20px">
+              <CategoryBarChart data={categoryChartData} />
+            </Box>
+          )}
 
           {/* Mini-graph row */}
           <div
