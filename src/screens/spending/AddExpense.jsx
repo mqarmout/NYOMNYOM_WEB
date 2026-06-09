@@ -122,7 +122,7 @@ export default function AddExpense({ onClose, initial }) {
 
       <div className="field">
         <label>
-          Target{" "}
+          Merchant{" "}
           <span style={{ opacity: 0.5, fontWeight: 400, fontSize: "0.85em" }}>(optional)</span>
         </label>
         <AutocompleteInput

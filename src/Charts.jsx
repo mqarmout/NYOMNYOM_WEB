@@ -1,6 +1,182 @@
 import { useId } from "react";
 import { useTheme, STATUS } from "./context/ThemeContext";
 
+// ── Category bar chart (angled x-axis labels) ──────────────────────────────
+export function CategoryBarChart({ data }) {
+  // data: [{ name: string, spent: number, budget?: number }]
+  const { theme, tweaks } = useTheme();
+  const uid = useId();
+  const glowId = `cbg-${uid}`;
+
+  const W = 400, H = 200, pL = 36, pR = 10, pT = 10, pB = 80;
+  const iW = W - pL - pR, iH = H - pT - pB;
+
+  if (!data.length)
+    return (
+      <svg viewBox={`0 0 ${W} ${H}`} className="svg-chart">
+        <text x={W / 2} y={H / 2} textAnchor="middle" fill={theme.muted} fontSize="12">
+          No data yet
+        </text>
+      </svg>
+    );
+
+  const maxVal = Math.max(...data.map((d) => Math.max(d.spent, d.budget || 0)), 1);
+  const slot = iW / data.length;
+  const bW = Math.max(slot * 0.6, 6);
+
+  // y-axis ticks
+  const yTicks = [0, 0.25, 0.5, 0.75, 1].map((f) => ({
+    y: pT + iH - f * iH,
+    v: Math.round(maxVal * f),
+  }));
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="svg-chart" overflow="visible">
+      <defs>
+        {tweaks.glow > 0 && (
+          <filter id={glowId}>
+            <feGaussianBlur stdDeviation={0.8 * tweaks.glow} result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        )}
+      </defs>
+
+      {/* y-axis ticks */}
+      {yTicks.map(({ y, v }) => (
+        <g key={v}>
+          <line x1={pL} y1={y} x2={pL + iW} y2={y} stroke={theme.border} strokeWidth="0.5" strokeDasharray="3 3" />
+          <text x={pL - 4} y={y + 3} textAnchor="end" fill={theme.muted} fontSize="8">
+            {v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v}
+          </text>
+        </g>
+      ))}
+
+      {/* bars */}
+      {data.map((d, i) => {
+        const cx = pL + i * slot + slot / 2;
+        const barH = Math.max((d.spent / maxVal) * iH, d.spent > 0 ? 2 : 0);
+        const isOver = d.budget > 0 && d.spent > d.budget;
+        const color = isOver ? STATUS.red : theme.accent;
+
+        return (
+          <g key={i}>
+            {/* budget marker line */}
+            {d.budget > 0 && (
+              <line
+                x1={cx - bW / 2 - 2}
+                y1={pT + iH - (d.budget / maxVal) * iH}
+                x2={cx + bW / 2 + 2}
+                y2={pT + iH - (d.budget / maxVal) * iH}
+                stroke={theme.accentDim}
+                strokeWidth="1"
+                strokeDasharray="2 2"
+              />
+            )}
+            {/* spent bar */}
+            <rect
+              x={cx - bW / 2}
+              y={pT + iH - barH}
+              width={bW}
+              height={barH}
+              fill={color}
+              opacity={0.85}
+              filter={tweaks.glow > 0 ? `url(#${glowId})` : undefined}
+            />
+            {/* angled label */}
+            <text
+              x={cx}
+              y={pT + iH + 6}
+              textAnchor="end"
+              fill={theme.muted}
+              fontSize="9"
+              transform={`rotate(-40, ${cx}, ${pT + iH + 6})`}
+            >
+              {d.name.length > 14 ? d.name.slice(0, 13) + "…" : d.name}
+            </text>
+          </g>
+        );
+      })}
+
+      {/* baseline */}
+      <line x1={pL} y1={pT + iH} x2={pL + iW} y2={pT + iH} stroke={theme.borderHi} strokeWidth="0.6" />
+    </svg>
+  );
+}
+
+// ── Run bar chart (weekly distance bars with date labels) ──────────────────
+export function RunBarChart({ data }) {
+  // data: [{ v: number (km), lbl: string (date) }]
+  const { theme, tweaks } = useTheme();
+  const uid = useId();
+  const glowId = `rbg-${uid}`;
+
+  const W = 340, H = 140, pL = 10, pR = 10, pT = 10, pB = 22;
+  const iW = W - pL - pR, iH = H - pT - pB;
+
+  if (!data.length)
+    return (
+      <svg viewBox={`0 0 ${W} ${H}`} className="svg-chart">
+        <text x={W / 2} y={H / 2} textAnchor="middle" fill={theme.muted} fontSize="12">
+          No data yet
+        </text>
+      </svg>
+    );
+
+  const maxVal = Math.max(...data.map((d) => d.v), 1);
+  const slot = iW / data.length;
+  const bW = Math.max(slot * 0.6, 4);
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="svg-chart">
+      <defs>
+        {tweaks.glow > 0 && (
+          <filter id={glowId}>
+            <feGaussianBlur stdDeviation={0.8 * tweaks.glow} result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        )}
+      </defs>
+      {data.map((d, i) => {
+        const isLast = i === data.length - 1;
+        const h = Math.max((d.v / maxVal) * iH, d.v > 0 ? 2 : 0);
+        const x = pL + i * slot + (slot - bW) / 2;
+        const showLbl = data.length <= 12 || i % Math.ceil(data.length / 8) === 0 || isLast;
+        return (
+          <g key={i}>
+            <rect
+              x={x}
+              y={pT + iH - h}
+              width={bW}
+              height={h}
+              fill={isLast ? theme.accentHot : theme.accent}
+              opacity={isLast ? 1 : 0.6}
+              filter={isLast && tweaks.glow > 0 ? `url(#${glowId})` : undefined}
+            />
+            {showLbl && (
+              <text
+                x={x + bW / 2}
+                y={H - 4}
+                textAnchor="middle"
+                fill={isLast ? theme.accentHot : theme.muted}
+                fontSize="8"
+              >
+                {d.lbl}
+              </text>
+            )}
+          </g>
+        );
+      })}
+      <line x1={pL} y1={pT + iH} x2={pL + iW} y2={pT + iH} stroke={theme.borderHi} strokeWidth="0.6" />
+    </svg>
+  );
+}
+
 // CRT-friendly donut color ramp: derived from active theme + STATUS colors
 function crtRamp(theme) {
   return [

@@ -7,6 +7,7 @@ import { PortfolioProvider, usePortfolio } from "./context/PortfolioContext";
 import { ClimbingProvider, useClimbing } from "./context/ClimbingContext";
 import { ProjectsProvider, useDevProjects } from "./context/ProjectsContext";
 import { HydroProvider, useHydro } from "./context/HydroContext";
+import { PrintsProvider, usePrints } from "./context/PrintsContext";
 
 import Dashboard from "./screens/spending/Dashboard";
 import Categories from "./screens/spending/Categories";
@@ -27,6 +28,8 @@ import HydroDashboard from "./screens/hydro/Dashboard";
 import HydroHistory from "./screens/hydro/History";
 import HydroPlants from "./screens/hydro/Plants";
 import HydroDosing from "./screens/hydro/Dosing";
+import PrintsDashboard from "./screens/prints/Dashboard";
+import PrintLog from "./screens/prints/PrintLog";
 import Profile from "./screens/Profile";
 import Home from "./screens/Home";
 import PublicPortfolio from "./screens/PublicPortfolio";
@@ -45,9 +48,10 @@ const SECTION_DEFAULT = {
   climbing: "climbing-analytics",
   projects: "projects-analytics",
   hydro: "hydro-dashboard",
+  prints: "prints-dashboard",
 };
 
-const SECTION_ORDER = ["spending", "jobs", "fitness", "portfolio", "climbing", "projects", "hydro"];
+const SECTION_ORDER = ["spending", "jobs", "fitness", "portfolio", "climbing", "projects", "hydro", "prints"];
 
 const SCREEN_TO_SECTION = {
   dashboard: "spending",
@@ -73,6 +77,8 @@ const SCREEN_TO_SECTION = {
   "hydro-history": "hydro",
   "hydro-plants": "hydro",
   "hydro-dosing": "hydro",
+  "prints-dashboard": "prints",
+  "prints-log": "prints",
 };
 
 const COMMANDS = [
@@ -163,6 +169,9 @@ const COMMANDS = [
   { cmd: "hydro/plants/new", screen: "hydro-plants", fire: true, label: "Hydro → Add Plant" },
   { cmd: "hydro/dosing", screen: "hydro-dosing", fire: false, label: "Hydro → Dosing Log" },
   { cmd: "hydro/dosing/new", screen: "hydro-dosing", fire: true, label: "Hydro → Log Dosing" },
+  { cmd: "prints", screen: "prints-dashboard", fire: false, label: "Prints → Dashboard" },
+  { cmd: "prints/new", screen: "prints-dashboard", fire: true, label: "Prints → Log Print" },
+  { cmd: "prints/log", screen: "prints-log", fire: false, label: "Prints → History" },
   { cmd: "profile", screen: "profile", fire: false, label: "Profile" },
   { cmd: "logout", screen: "__logout__", fire: false, label: "Logout" },
 ];
@@ -176,6 +185,7 @@ const PATH_MAP = {
   portfolio: "/portfolio",
   projects: "/projects",
   hydro: "/hydro",
+  prints: "/prints",
   profile: "/profile",
 };
 
@@ -188,6 +198,7 @@ const CMD_MAP = {
   portfolio: "./public --serve",
   projects: "./kanban --board",
   hydro: "./sensors --live",
+  prints: "./prints --history",
   profile: "./profile --edit",
 };
 
@@ -292,6 +303,10 @@ const SECTION_TABS = {
     ["hydro-history", "HISTORY"],
     ["hydro-plants", "PLANTS"],
     ["hydro-dosing", "DOSING"],
+  ],
+  prints: [
+    ["prints-dashboard", "DASHBOARD"],
+    ["prints-log", "HISTORY"],
   ],
 };
 
@@ -576,6 +591,10 @@ function renderScreen(screen) {
       return <HydroPlants />;
     case "hydro-dosing":
       return <HydroDosing />;
+    case "prints-dashboard":
+      return <PrintsDashboard />;
+    case "prints-log":
+      return <PrintLog />;
     case "profile":
       return <Profile />;
     default:
@@ -597,6 +616,7 @@ function AppInner({ authUser, onLogout }) {
   const { loadAll: loadClimbing } = useClimbing();
   const { loadAll: loadProjects } = useDevProjects();
   const { loadAll: loadHydro } = useHydro();
+  const { loadAll: loadPrints } = usePrints();
 
   useEffect(() => {
     const handler = (e) => {
@@ -616,7 +636,8 @@ function AppInner({ authUser, onLogout }) {
     if (ok("climbing")) loadClimbing();
     if (ok("projects")) loadProjects();
     if (ok("hydro")) loadHydro();
-  }, [perms, loadApp, loadJob, loadFitness, loadPortfolio, loadClimbing, loadProjects, loadHydro]);
+    if (ok("prints")) loadPrints();
+  }, [perms, loadApp, loadJob, loadFitness, loadPortfolio, loadClimbing, loadProjects, loadHydro, loadPrints]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -759,7 +780,9 @@ function AuthedApp({ authUser, onLogout }) {
             <ClimbingProvider>
               <ProjectsProvider>
                 <HydroProvider>
-                  <AppInner authUser={authUser} onLogout={onLogout} />
+                  <PrintsProvider>
+                    <AppInner authUser={authUser} onLogout={onLogout} />
+                  </PrintsProvider>
                 </HydroProvider>
               </ProjectsProvider>
             </ClimbingProvider>

@@ -11,6 +11,7 @@ const SECTION_META = [
   { id: "climbing", label: "climbing", icon: "climb", key: "5" },
   { id: "projects", label: "projects", icon: "code", key: "6" },
   { id: "hydro", label: "hydro", icon: "drop", key: "7" },
+  { id: "prints", label: "prints", icon: "printer", key: "8" },
 ];
 
 // phone bottom tabs — only 4 main + more

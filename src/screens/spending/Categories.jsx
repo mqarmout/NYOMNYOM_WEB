@@ -3,7 +3,7 @@ import Fuse from "fuse.js";
 import { useApp } from "../../context/AppContext";
 import { useTheme, STATUS } from "../../context/ThemeContext";
 import { fmt } from "../../utils";
-import { Px, IClose, CATEGORY_ICONS } from "../../icons";
+import { Px, IClose, IEdit, CATEGORY_ICONS } from "../../icons";
 import Box from "../../components/crt/Box";
 import SpendingHero from "./SpendingHero";
 import styles from "./spending.module.css";
@@ -252,16 +252,21 @@ export default function Categories() {
                   <div style={{ display: "flex", gap: 4, justifyContent: "flex-end" }}>
                     <button
                       onClick={() => setModal({ mode: "edit", cat: c })}
+                      title="Edit category"
                       style={{
                         ...mono,
                         fontSize: 10,
                         color: theme.accent,
                         background: "none",
-                        border: "none",
+                        border: `1px solid ${theme.border}`,
                         cursor: "pointer",
+                        padding: "3px 7px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 4,
                       }}
                     >
-                      set →
+                      <IEdit size={11} /> edit
                     </button>
                   </div>
                 </div>
